@@ -1,0 +1,10 @@
+NodeSystemGraphView {
+    flex-grow: 1;
+}
+#Grid
+{
+    --thick-line: 0;
+    --spacing: 15;
+    --grid-background-color: rgb(35,35,35);
+    --line-color: rgb(32,32,32);
+}

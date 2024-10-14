@@ -1,0 +1,16 @@
+{
+    "name": "GameAbilitySystem.Logic",
+    "rootNamespace": "",
+    "references": [
+        "GUID:298dff7fd453955449dc9e26ac2623e6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

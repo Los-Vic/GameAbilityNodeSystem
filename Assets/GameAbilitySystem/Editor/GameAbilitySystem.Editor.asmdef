@@ -1,0 +1,20 @@
+{
+    "name": "GameAbilitySystem.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9aa2ff1c84ac5f84aa311e5ef490c810",
+        "GUID:9211b54bab341cb47ae2fb64d0129850",
+        "GUID:3ecc63be1598eaf458594bc4d90dd1bc"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
