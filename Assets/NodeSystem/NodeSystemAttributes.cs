@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace NodeSystem
 {
@@ -23,5 +24,4 @@ namespace NodeSystem
     public class ExposedPropAttribute:Attribute
     {
     }
-    
 }

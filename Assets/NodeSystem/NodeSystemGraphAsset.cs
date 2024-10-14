@@ -3,11 +3,13 @@ using UnityEngine;
 
 namespace NodeSystem
 {
-    [CreateAssetMenu(menuName = "NodeSystem", fileName = "NodeSystem/NewGraph")]
+    [CreateAssetMenu(menuName = "NodeSystem/GraphAsset", fileName = "NewGraph")]
     public class NodeSystemGraphAsset:ScriptableObject
     {
         [SerializeReference]
+        [HideInInspector]
         public List<NodeSystemNode> nodes = new();
+        [HideInInspector]
         public List<NodeSystemConnection> connections = new();
         
 #if UNITY_EDITOR        
