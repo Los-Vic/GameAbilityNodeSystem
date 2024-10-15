@@ -31,29 +31,43 @@ namespace NodeSystem.Editor.Elements
             }
             
             this.name = type.Name;
-            if (att.InPortNums > 0)
-            {
-                CreateInputPorts(att.InPortNums);
-            }
-
-            if (att.OutPortNums > 0)
-            {
-                CreateOutPorts(att.OutPortNums);
-            }
-
             foreach (var fieldInfo in type.GetFields())
             {
-                var attr = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
-                if (attr == null)
-                    continue;
-
-                var propertyField = DrawField(fieldInfo.Name);
-                propertyField?.RegisterValueChangeCallback(OnFieldChangeCallback);
+                var portAttribute = fieldInfo.GetCustomAttribute<PortAttribute>();
+                if (portAttribute != null)
+                {
+                    CreatePort(fieldInfo, portAttribute);
+                }
+                
+                var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
+                if (exposedPropAttribute != null)
+                {
+                    var propertyField = DrawField(fieldInfo.Name);
+                    propertyField?.RegisterValueChangeCallback(OnFieldChangeCallback);
+                }
             }
             
             RefreshExpandedState();
         }
 
+        private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)
+        {
+            var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection, portAttribute.PortCapacity,
+                fieldInfo.FieldType);
+
+            port.portName = fieldInfo.Name;
+            Ports.Add(port);
+
+            if (portAttribute.PortDirection == Direction.Input)
+            {
+                inputContainer.Add(port);
+            }
+            else
+            {
+                outputContainer.Add(port);
+            }
+        }
+        
         private void OnFieldChangeCallback(SerializedPropertyChangeEvent evt)
         {
             
@@ -62,32 +76,6 @@ namespace NodeSystem.Editor.Elements
         public void SavePosition()
         {
             Node.Position = GetPosition();
-        }
-
-        private void CreateInputPorts(uint portNums)
-        {
-            for (var i = 0; i < portNums; ++i)
-            {
-                var port = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                    typeof(bool));
-
-                port.portName = i == 0 ? "In" : $"In{i}";
-                Ports.Add(port);
-                inputContainer.Add(port);
-            }
-        }
-
-        private void CreateOutPorts(uint portNums)
-        {
-            for (var i = 0; i < portNums; ++i)
-            {
-                var port = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                    typeof(bool));
-
-                port.portName = i == 0 ? "Out" : $"Out{i}";
-                Ports.Add(port);
-                outputContainer.Add(port);
-            }
         }
 
         private void FetchSerializedProperty()

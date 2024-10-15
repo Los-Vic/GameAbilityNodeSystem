@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9a031e6822c43f8bb22b01c64b7d36a, type: 3}
+  m_Name: NewGraph
+  m_EditorClassIdentifier: 
+  nodes:
+  - rid: 2940347327794905088
+  connections: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 2940347327794905088
+      type: {class: DebugPrintNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: d82a1114-9ba8-40d4-8597-e108267cc3cc
+        position:
+          serializedVersion: 2
+          x: 311.2
+          y: 282.4
+          width: 146.4
+          height: 119.19998
+        typeName: NodeSystem.Nodes.DebugPrintNode, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        Log: 
+        InPort:
+          guid: d9817b01-8e8c-4479-8d59-605a54717674
+          position:
+            serializedVersion: 2
+            x: 0
+            y: 0
+            width: 0
+            height: 0
+          typeName: 
+        OutPort:
+          guid: fade6d6f-12a0-4192-ad91-8729de9ba961
+          position:
+            serializedVersion: 2
+            x: 0
+            y: 0
+            width: 0
+            height: 0
+          typeName: 

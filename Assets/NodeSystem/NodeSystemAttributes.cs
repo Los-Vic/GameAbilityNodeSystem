@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NodeSystem
@@ -8,20 +9,32 @@ namespace NodeSystem
     {
         public string Title { get; private set; }
         public string MenuItem { get; private set; }
-        public uint InPortNums { get; private set; }
-        public uint OutPortNums { get; private set; }
 
-        public NodeAttribute(string title, string menuItem = "", uint inPortNums = 1, uint outPortNums = 1)
+        public NodeAttribute(string title, string menuItem = "")
         {
             Title = title;
             MenuItem = menuItem;
-            InPortNums = inPortNums;
-            OutPortNums = outPortNums;
         }
     }
     
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ExposedPropAttribute:Attribute
     {
+    }
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class PortAttribute : Attribute
+    {
+        public Direction PortDirection;
+        public Orientation Orientation;
+        public Port.Capacity PortCapacity;
+
+        public PortAttribute(Direction portDirection, Orientation orientation = Orientation.Horizontal, 
+            Port.Capacity portCapacity = Port.Capacity.Single)
+        {
+            Orientation = orientation;
+            PortDirection = portDirection;
+            PortCapacity = portCapacity;
+        }
     }
 }
