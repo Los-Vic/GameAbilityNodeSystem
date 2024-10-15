@@ -23,6 +23,35 @@ namespace GameAbilitySystem.Logic.Ability
             
         }
 
+        //获得和移除Ability
+        internal void OnAddAbility()
+        {
+            
+        }
+
+        internal void OnRemoveAbility()
+        {
+            
+        }
+        
+        //如何触发Ability
+        
+        
+        
+        //执行Ability
+        public virtual bool CheckAbility()
+        {
+            return true;
+        }
+
+        internal void ActivateAbility()
+        {
+            if (!CheckAbility())
+                return;
+            
+            
+        }
+
         #region Object Pool
 
         public ObjectPoolParam GetPoolParam()
