@@ -17,7 +17,9 @@ namespace NodeSystem.Editor.Windows
 
         private readonly List<NodeSystemEditorNode> _graphEditorNodes = new();
         private readonly Dictionary<string, NodeSystemEditorNode> _editorNodesMap = new();
-        private readonly Dictionary<Edge, NodeSystemConnection> _edgeConnectionMap = new();
+        private readonly Dictionary<Edge, (NodeSystemPort, NodeSystemPort)> _edgeConnectionMap = new();
+
+        private readonly List<NodeSystemEditorNode> _copyEditorNodes = new();
 
         private NodeSystemSearchProvider _searchProvider;
         public NodeSystemGraphView(SerializedObject serializedObject, NodeSystemEditorWindow window)
@@ -27,7 +29,7 @@ namespace NodeSystem.Editor.Windows
             Window = window;
             _searchProvider = ScriptableObject.CreateInstance<NodeSystemSearchProvider>();
             _searchProvider.GraphView = this;
-
+            
             //Add Style Sheet
             var styleSheet =
                 AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/NodeSystem/Editor/GraphViewSs.uss");
@@ -48,6 +50,7 @@ namespace NodeSystem.Editor.Windows
             this.AddManipulator(new ClickSelector());
             this.AddManipulator(new ContentZoomer());
             
+            
             //Add Node To Graph View
             ReDrawGraph();
             
@@ -55,6 +58,32 @@ namespace NodeSystem.Editor.Windows
             nodeCreationRequest = ShowSearchWindow;
             graphViewChanged += OnGraphViewChanged;
             Undo.undoRedoEvent += OnUndoRedo;
+
+            //Support Copy/Paste
+            serializeGraphElements += OnSerializeGraphElements;
+            canPasteSerializedData += data => true;
+            unserializeAndPaste += OnUnserializeAndPaste;
+        }
+        
+        private void OnUnserializeAndPaste(string operationname, string data)
+        {
+            Debug.Log(operationname + "  " + data);
+        }
+
+        //Only Support Copy Nodes And ExposedProp Fields
+        private string OnSerializeGraphElements(IEnumerable<GraphElement> elements)
+        {
+            foreach (var elem in elements)
+            {
+                if (elem is NodeSystemEditorNode node)
+                {
+                    var js = JsonUtility.ToJson(node.Node);
+                    Debug.Log(js);
+                }
+               
+            }
+            
+            return "Copy";
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -64,7 +93,7 @@ namespace NodeSystem.Editor.Windows
 
             foreach (var node in _graphEditorNodes)
             {
-                allPort.AddRange(node.Ports);
+                allPort.AddRange(node.ViewPortToNodePort.Keys);
             }
 
             foreach (var port in allPort)
@@ -196,14 +225,17 @@ namespace NodeSystem.Editor.Windows
         private void AddConnectionToGraphAsset(Edge edge)
         {
             var inNode = (NodeSystemEditorNode)edge.input.node;
-            var inPortIndex = inNode.Ports.IndexOf(edge.input);
+            var inPortId = inNode.ViewPortToNodePort[edge.input];
             
             var outNode = (NodeSystemEditorNode)edge.output.node;
-            var outPortIndex = outNode.Ports.IndexOf(edge.output);
+            var outPortId = outNode.ViewPortToNodePort[edge.output];
 
-            var connection = new NodeSystemConnection(inNode.Node.Id, inPortIndex, outNode.Node.Id, outPortIndex);
-            _edgeConnectionMap.Add(edge, connection);
-            _graphAsset.AddConnection(connection);
+            var inPort = _graphAsset.GetPort(inPortId);
+            var outPort = _graphAsset.GetPort(outPortId);
+            inPort.ConnectTo(outPortId);
+            outPort.ConnectTo(inPortId);
+            
+            _edgeConnectionMap.Add(edge, (inPort, outPort));
         }
 
         /// <summary>
@@ -214,44 +246,46 @@ namespace NodeSystem.Editor.Windows
         {
             if (_edgeConnectionMap.Remove(edge, out var connection))
             {
-                _graphAsset.RemoveConnection(connection);
+                connection.Item1.Disconnect();
+                connection.Item2.Disconnect();
             }
         }
-
-        /// <summary>
-        /// Add Edge
-        /// </summary>
-        /// <param name="connection"></param>
-        private void AddConnectionToGraphView(NodeSystemConnection connection)
-        {
-            if (!_editorNodesMap.TryGetValue(connection.inPort.nodeId, out var inNode))
-                return;
-            if(!_editorNodesMap.TryGetValue(connection.outPort.nodeId, out var outNode))
-                return;
-
-            var inPort = inNode.Ports[connection.inPort.portIndex];
-            var outPort = outNode.Ports[connection.outPort.portIndex];
-            var edge = inPort.ConnectTo(outPort);
-            AddElement(edge);
-            _edgeConnectionMap.Add(edge, connection);
-        }
-
+        
         private void ReDrawGraph()
         {
+            _graphAsset.LoadMap();
+            
             foreach (var element in graphElements)
             {
                 RemoveElement(element);
             }
             _graphEditorNodes.Clear();
             _editorNodesMap.Clear();
-            foreach (var node in _graphAsset.Nodes)
+            foreach (var node in _graphAsset.nodes)
             {
                 AddNodeToGraphView(node);
             }
 
-            foreach (var connection in _graphAsset.Connections)
+            //Create Edge By Input Port
+            foreach (var editorNode in _editorNodesMap.Values)
             {
-                AddConnectionToGraphView(connection);
+                foreach (var (nodePortId, viewPort) in editorNode.NodePortToViewPort)
+                {
+                    var nodePort = _graphAsset.GetPort(nodePortId);
+                    if(nodePort.direction == Direction.Output)
+                        continue;
+                    
+                    if(string.IsNullOrEmpty(nodePort.connectPortId))
+                        continue;
+
+                    var outNodePort = _graphAsset.GetPort(nodePort.connectPortId);
+                    var outEditorNode = _editorNodesMap[outNodePort.belongNodeId];
+                    var outViewPort = outEditorNode.NodePortToViewPort[outNodePort.Id];
+                    
+                    var edge = viewPort.ConnectTo(outViewPort);
+                    AddElement(edge);
+                    _edgeConnectionMap.Add(edge, (nodePort, outNodePort));
+                }
             }
         }
 

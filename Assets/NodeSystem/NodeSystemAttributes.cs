@@ -10,10 +10,13 @@ namespace NodeSystem
         public string Title { get; private set; }
         public string MenuItem { get; private set; }
 
-        public NodeAttribute(string title, string menuItem = "")
+        public ENodeCategory NodeCategory { get; private set; }
+
+        public NodeAttribute(string title, string menuItem = "", ENodeCategory nodeCategory = ENodeCategory.Flow)
         {
             Title = title;
             MenuItem = menuItem;
+            NodeCategory = nodeCategory;
         }
     }
     
@@ -26,15 +29,23 @@ namespace NodeSystem
     public class PortAttribute : Attribute
     {
         public Direction PortDirection;
+        public Type PortType;
+        public string PortName;
         public Orientation Orientation;
         public Port.Capacity PortCapacity;
 
-        public PortAttribute(Direction portDirection, Orientation orientation = Orientation.Horizontal, 
+        public PortAttribute(Direction portDirection, Type portType, string portName = "", Orientation orientation = Orientation.Horizontal, 
             Port.Capacity portCapacity = Port.Capacity.Single)
         {
+            PortName = portName;
+            PortType = portType;
             Orientation = orientation;
             PortDirection = portDirection;
-            PortCapacity = portCapacity;
+            
+            //暂不支持多端口
+            PortCapacity = Port.Capacity.Single;
         }
     }
+    
+    
 }

@@ -13,39 +13,93 @@ MonoBehaviour:
   m_Name: NewGraph
   m_EditorClassIdentifier: 
   nodes:
-  - rid: 2940347327794905088
-  connections: []
+  - rid: 2940347397808586753
+  - rid: 2940347397808586757
+  - rid: 2940347397808586759
+  ports:
+  - rid: 2940347397808586754
+  - rid: 2940347397808586755
+  - rid: 2940347397808586756
+  - rid: 2940347397808586758
+  - rid: 2940347397808586760
   references:
     version: 2
     RefIds:
-    - rid: 2940347327794905088
+    - rid: 2940347397808586753
       type: {class: DebugPrintNode, ns: NodeSystem.Nodes, asm: NodeSystem}
       data:
-        guid: d82a1114-9ba8-40d4-8597-e108267cc3cc
+        guid: c3ad9329-8694-471e-be2c-da2c472f6d7e
         position:
           serializedVersion: 2
-          x: 311.2
-          y: 282.4
-          width: 146.4
+          x: 564
+          y: 304
+          width: 146.40002
           height: 119.19998
         typeName: NodeSystem.Nodes.DebugPrintNode, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         Log: 
-        InPort:
-          guid: d9817b01-8e8c-4479-8d59-605a54717674
-          position:
-            serializedVersion: 2
-            x: 0
-            y: 0
-            width: 0
-            height: 0
-          typeName: 
-        OutPort:
-          guid: fade6d6f-12a0-4192-ad91-8729de9ba961
-          position:
-            serializedVersion: 2
-            x: 0
-            y: 0
-            width: 0
-            height: 0
-          typeName: 
+        InPort: 62c830b5-91e7-43cf-b90f-8682649f845b
+        InInt: 6d58c0b7-d18c-40c3-9238-771bd47eed77
+        OutPort: f5b0ff80-8003-4736-9559-b96623b547d9
+    - rid: 2940347397808586754
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 62c830b5-91e7-43cf-b90f-8682649f845b
+        belongNodeId: c3ad9329-8694-471e-be2c-da2c472f6d7e
+        connectPortId: 8aea91fd-68be-4753-a039-f211f537347f
+        direction: 0
+    - rid: 2940347397808586755
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 6d58c0b7-d18c-40c3-9238-771bd47eed77
+        belongNodeId: c3ad9329-8694-471e-be2c-da2c472f6d7e
+        connectPortId: 4e07fcd6-a941-4708-83e1-540377465e1b
+        direction: 0
+    - rid: 2940347397808586756
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: f5b0ff80-8003-4736-9559-b96623b547d9
+        belongNodeId: c3ad9329-8694-471e-be2c-da2c472f6d7e
+        connectPortId: 
+        direction: 1
+    - rid: 2940347397808586757
+      type: {class: IntNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: fbdb04d4-c693-4a3b-a136-a9197914e818
+        position:
+          serializedVersion: 2
+          x: 235.2
+          y: 452.8
+          width: 152.8
+          height: 95.20001
+        typeName: NodeSystem.Nodes.IntNode, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        Val: 100
+        OutVal: 4e07fcd6-a941-4708-83e1-540377465e1b
+    - rid: 2940347397808586758
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 4e07fcd6-a941-4708-83e1-540377465e1b
+        belongNodeId: fbdb04d4-c693-4a3b-a136-a9197914e818
+        connectPortId: 6d58c0b7-d18c-40c3-9238-771bd47eed77
+        direction: 1
+    - rid: 2940347397808586759
+      type: {class: StartNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: c1513b23-8964-4718-abd9-6b33c6cf33c1
+        position:
+          serializedVersion: 2
+          x: 261.6
+          y: 304
+          width: 75.19998
+          height: 76.79999
+        typeName: NodeSystem.Nodes.StartNode, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        OutPort: 8aea91fd-68be-4753-a039-f211f537347f
+    - rid: 2940347397808586760
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 8aea91fd-68be-4753-a039-f211f537347f
+        belongNodeId: c1513b23-8964-4718-abd9-6b33c6cf33c1
+        connectPortId: 62c830b5-91e7-43cf-b90f-8682649f845b
+        direction: 1

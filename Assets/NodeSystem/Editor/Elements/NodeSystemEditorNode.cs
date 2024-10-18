@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace NodeSystem.Editor.Elements
 {
     public class NodeSystemEditorNode:Node
     {
         public NodeSystemNode Node { get; private set; }
-        public readonly List<Port> Ports = new();
+        public readonly Dictionary<Port, string> ViewPortToNodePort = new();
+        public readonly Dictionary<string, Port> NodePortToViewPort = new();
 
         private SerializedObject _graphAssetObject;
         private SerializedProperty _serializedNode;
@@ -22,23 +25,28 @@ namespace NodeSystem.Editor.Elements
 
             var type = node.GetType();
             var att = type.GetCustomAttribute<NodeAttribute>();
-            this.title = att.Title;
+            ConstructTitle(type, att);
+            
 
+            //Add Class To Uss
             var depths = att.MenuItem.Split('/');
             foreach (var depth in depths)
             {
                 AddToClassList(depth.ToLower().Replace(' ', '-'));
             }
-            
             this.name = type.Name;
+            
+            
             foreach (var fieldInfo in type.GetFields())
             {
+                //Create Ports
                 var portAttribute = fieldInfo.GetCustomAttribute<PortAttribute>();
                 if (portAttribute != null)
                 {
                     CreatePort(fieldInfo, portAttribute);
                 }
                 
+                //Create Extensions
                 var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
                 if (exposedPropAttribute != null)
                 {
@@ -50,13 +58,31 @@ namespace NodeSystem.Editor.Elements
             RefreshExpandedState();
         }
 
+        private void ConstructTitle(Type type, NodeAttribute attribute)
+        {
+            title = attribute.Title;
+            var box = new Box
+            {
+                style =
+                {
+                    backgroundColor = ElementColor.GetNodeColor(attribute.NodeCategory)
+                }
+            };
+            titleContainer.Add(box);
+            box.SendToBack();
+            box.StretchToParentSize();
+        }
+        
         private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)
         {
             var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection, portAttribute.PortCapacity,
                 fieldInfo.FieldType);
 
-            port.portName = fieldInfo.Name;
-            Ports.Add(port);
+            port.portName = portAttribute.PortName;
+            port.portColor = ElementColor.GetPortColor(portAttribute.PortType);
+            var nodePort = (string)fieldInfo.GetValue(Node);
+            ViewPortToNodePort.Add(port, nodePort);
+            NodePortToViewPort.Add(nodePort, port);
 
             if (portAttribute.PortDirection == Direction.Input)
             {

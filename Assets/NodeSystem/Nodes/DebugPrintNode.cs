@@ -1,5 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+﻿using NodeSystem.Ports;
+using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes
 {
@@ -9,10 +9,12 @@ namespace NodeSystem.Nodes
         [ExposedProp]
         public string Log;
 
-        [Port(Direction.Input), SerializeReference]
-        public NodeSystemNode InPort;
-        [Port(Direction.Output), SerializeReference]
-        public NodeSystemNode OutPort;
+        [Port(Direction.Input, typeof(FlowPort))]
+        public string InPort;
+        [Port(Direction.Input, typeof(IntPort),"IntValue")]
+        public string InInt;
+        [Port(Direction.Output, typeof(FlowPort))]
+        public string OutPort;
         
     }
 }

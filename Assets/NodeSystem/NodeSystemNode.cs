@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace NodeSystem
 {
+    public enum ENodeCategory
+    {
+        Start,
+        Flow,
+        Value
+    }
+    
     [Serializable]
     public class NodeSystemNode
     {
