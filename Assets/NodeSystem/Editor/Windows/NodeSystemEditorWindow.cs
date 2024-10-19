@@ -10,13 +10,13 @@ namespace NodeSystem.Editor.Windows
             var windows = Resources.FindObjectsOfTypeAll<NodeSystemEditorWindow>();
             foreach (var w in windows)
             {
-                if (w._currentGraphAsset == null)
+                if (w.currentGraphAsset == null)
                 {
                     w.Close();
                     continue;
                 }
                 
-                if (w._currentGraphAsset == target)
+                if (w.currentGraphAsset == target)
                 {
                     w.Focus();
                     return;
@@ -29,25 +29,26 @@ namespace NodeSystem.Editor.Windows
             window.Load(target);
         }
 
-        private NodeSystemGraphAsset _currentGraphAsset;
+        [SerializeField]
+        private NodeSystemGraphAsset currentGraphAsset;
         private NodeSystemGraphView _currentView;
         private SerializedObject _serializedObject;
 
         private void OnEnable()
         {
-            if (_currentGraphAsset != null)
+            if (currentGraphAsset != null)
                 DrawGraph();
         }
 
         private void Load(NodeSystemGraphAsset target)
         {
-            _currentGraphAsset = target;
+            currentGraphAsset = target;
             DrawGraph();
         }
 
         private void DrawGraph()
         {
-            _serializedObject = new SerializedObject(_currentGraphAsset);
+            _serializedObject = new SerializedObject(currentGraphAsset);
             _currentView = new NodeSystemGraphView(_serializedObject, this);
             rootVisualElement.Add(_currentView);
         }

@@ -17,8 +17,8 @@ namespace NodeSystem
         [SerializeField] private Rect position;
 
         public string typeName;
-        public string Id => guid;
 
+        public string Id => guid;
         public Rect Position
         {
             get => position;

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NodeSystem.Editor.Elements;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -64,26 +66,94 @@ namespace NodeSystem.Editor.Windows
             canPasteSerializedData += data => true;
             unserializeAndPaste += OnUnserializeAndPaste;
         }
+
+        [Serializable]
+        private class CopyContent
+        {
+            [SerializeReference]
+            public List<NodeSystemNode> Nodes = new();
+            [SerializeReference]
+            public List<NodeSystemPort> Ports = new();
+        }
         
         private void OnUnserializeAndPaste(string operationname, string data)
         {
-            Debug.Log(operationname + "  " + data);
+            Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Paste Nodes");
+            var content = JsonUtility.FromJson<CopyContent>(data);
+            foreach (var node in content.Nodes)
+            {
+                _graphAsset.AddNode(node, false);
+            }
+
+            foreach (var port in content.Ports)
+            {
+                _graphAsset.AddPort(port);
+            }
+            ReDrawGraph();
         }
 
         //Only Support Copy Nodes And ExposedProp Fields
         private string OnSerializeGraphElements(IEnumerable<GraphElement> elements)
         {
+            var content = new CopyContent();
+            var nodeIdMap = new Dictionary<string, string>();
+            var portIdMap = new Dictionary<string, string>();
+            
+            //Create new nodes & ports
             foreach (var elem in elements)
             {
-                if (elem is NodeSystemEditorNode node)
+                if (elem is not NodeSystemEditorNode editorNode) 
+                    continue;
+                var node = editorNode.Node;
+                var type = node.GetType();
+
+                var newNode = (NodeSystemNode)Activator.CreateInstance(type);
+                newNode.Position = new Rect(node.Position.x + 50, node.Position.y + 50, node.Position.width,
+                    node.Position.height);
+                nodeIdMap.Add(node.Id, newNode.Id);
+                content.Nodes.Add(newNode);
+                
+                foreach (var fieldInfo in type.GetFields())
                 {
-                    var js = JsonUtility.ToJson(node.Node);
-                    Debug.Log(js);
+                    //copy field value
+                    fieldInfo.SetValue(newNode, fieldInfo.GetValue(node));
+                    
+                    var attribute = fieldInfo.GetCustomAttribute<PortAttribute>();
+                    if(attribute == null)
+                        continue;
+                    var portId = (string)fieldInfo.GetValue(node);
+                    var port = _graphAsset.GetPort(portId);
+
+                    var newPort = new NodeSystemPort(newNode.Id, port.direction, port.connectPortId);
+                    portIdMap.Add(port.Id, newPort.Id);
+                    content.Ports.Add(newPort);
                 }
-               
+            }
+
+            //Assign new portId
+            foreach (var node in content.Nodes)
+            {
+                var type = node.GetType();
+                foreach (var fieldInfo in type.GetFields())
+                {
+                    var attribute = fieldInfo.GetCustomAttribute<PortAttribute>();
+                    if(attribute == null)
+                        continue;
+                    var portId = (string)fieldInfo.GetValue(node);
+                    var newPortId = portIdMap[portId];
+                    fieldInfo.SetValue(node, newPortId);
+                }
             }
             
-            return "Copy";
+            foreach (var port in content.Ports)
+            {
+                if(port.connectPortId == null)
+                    continue;
+                port.connectPortId = portIdMap.GetValueOrDefault(port.connectPortId);
+            }
+
+            var js = JsonUtility.ToJson(content);
+            return js;
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)

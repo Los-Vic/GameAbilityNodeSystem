@@ -36,12 +36,15 @@ namespace NodeSystem
             }
         }
 
-        public void AddNode(NodeSystemNode node)
+        public void AddNode(NodeSystemNode node, bool needCreatePorts = true)
         {
             nodes.Add(node);
             _nodeMap.Add(node.Id, node);
             
             //Create Ports
+            if(!needCreatePorts)
+                return;
+            
             var type = node.GetType();
             foreach (var fieldInfo in type.GetFields())
             {
@@ -50,8 +53,7 @@ namespace NodeSystem
                     continue;
                 var port = new NodeSystemPort(node.Id, attribute.PortDirection);
                 fieldInfo.SetValue(node, port.Id);
-                ports.Add(port);
-                _portMap.Add(port.Id, port);
+                AddPort(port);
             }
         }
 
@@ -70,11 +72,22 @@ namespace NodeSystem
                 var portId = (string)fieldInfo.GetValue(node);
                 foreach (var p in ports.Where(p => portId == p.Id))
                 {
-                    ports.Remove(p);
-                    _portMap.Remove(p.Id);
+                    RemovePort(p);
                     break;
                 }
             }
+        }
+
+        public void AddPort(NodeSystemPort port)
+        {
+            ports.Add(port);
+            _portMap.Add(port.Id, port);
+        }
+
+        public void RemovePort(NodeSystemPort port)
+        {
+            ports.Remove(port);
+            _portMap.Remove(port.Id);
         }
 #endif
     }

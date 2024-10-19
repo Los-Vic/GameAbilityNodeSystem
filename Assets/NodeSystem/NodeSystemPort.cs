@@ -12,15 +12,15 @@ namespace NodeSystem
     {
         [SerializeField] private string guid = Guid.NewGuid().ToString();
         public string Id => guid;
-        
         public string belongNodeId;
         public string connectPortId;
         public Direction direction;
 
-        public NodeSystemPort(string belongNodeId, Direction direction)
+        public NodeSystemPort(string belongNodeId, Direction direction, string connectPortId = null)
         {
             this.belongNodeId = belongNodeId;
             this.direction = direction;
+            this.connectPortId = connectPortId;
         }
 
         public void ConnectTo(string portId) => connectPortId = portId;
