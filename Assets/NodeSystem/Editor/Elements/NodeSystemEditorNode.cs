@@ -4,6 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace NodeSystem.Editor.Elements
@@ -71,6 +72,10 @@ namespace NodeSystem.Editor.Elements
             titleContainer.Add(box);
             box.SendToBack();
             box.StretchToParentSize();
+            
+            var txtElement = titleContainer.Q<Label>();
+            txtElement.style.fontSize = 16;
+            txtElement.style.unityFontStyleAndWeight = new StyleEnum<FontStyle>() { value = FontStyle.Bold };
         }
         
         private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)

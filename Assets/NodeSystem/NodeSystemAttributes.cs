@@ -11,12 +11,14 @@ namespace NodeSystem
         public string MenuItem { get; private set; }
 
         public ENodeCategory NodeCategory { get; private set; }
+        public ENodeNumsLimit NodeNumsLimit { get; private set; }
 
-        public NodeAttribute(string title, string menuItem = "", ENodeCategory nodeCategory = ENodeCategory.Flow)
+        public NodeAttribute(string title, string menuItem = "", ENodeCategory nodeCategory = ENodeCategory.Flow, ENodeNumsLimit nodeNumsLimit = ENodeNumsLimit.None)
         {
             Title = title;
             MenuItem = menuItem;
             NodeCategory = nodeCategory;
+            NodeNumsLimit = nodeNumsLimit;
         }
     }
     

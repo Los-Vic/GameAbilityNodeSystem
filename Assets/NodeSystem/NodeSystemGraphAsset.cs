@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -88,6 +89,18 @@ namespace NodeSystem
         {
             ports.Remove(port);
             _portMap.Remove(port.Id);
+        }
+
+        public bool HasNodeName(string nodeName)
+        {
+            foreach (var n in nodes)
+            {
+                if (n.nodeName != nodeName) 
+                    continue;
+                return true;
+            }
+
+            return false;
         }
 #endif
     }

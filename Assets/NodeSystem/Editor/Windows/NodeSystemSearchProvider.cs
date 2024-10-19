@@ -108,11 +108,25 @@ namespace NodeSystem.Editor.Windows
             var graphMousePosition = GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             var element = (SearchContextElement)searchTreeEntry.userData;
-            if(!element.TargetType.IsSubclassOf(typeof(NodeSystemNode)))
+            if (!element.TargetType.IsSubclassOf(typeof(NodeSystemNode)))
+            {
+                Debug.LogError($"Can't add node of invalid type [{element.TargetType}]");
                 return false;
-                
+            }
+            
             var node = (NodeSystemNode)Activator.CreateInstance(element.TargetType);
-            node.Position = new Rect(graphMousePosition, Vector2.one); 
+            node.Position = new Rect(graphMousePosition, Vector2.one);
+            var nodeAttribute = node.GetType().GetCustomAttribute<NodeAttribute>();
+            if (nodeAttribute != null)
+            {
+                if (nodeAttribute.NodeNumsLimit == ENodeNumsLimit.Singleton &&
+                    GraphView.GraphAsset.HasNodeName(node.nodeName))
+                {
+                    Debug.LogWarning($"Can't add SingletonNode [{node.nodeName}]");
+                    return true;
+                }
+            }
+            
             GraphView.AddNodeToGraphAsset(node);
             
             return true;

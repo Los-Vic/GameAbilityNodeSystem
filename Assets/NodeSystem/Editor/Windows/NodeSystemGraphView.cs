@@ -14,7 +14,7 @@ namespace NodeSystem.Editor.Windows
     public class NodeSystemGraphView:GraphView
     {
         private readonly SerializedObject _serializedObject;
-        private readonly NodeSystemGraphAsset _graphAsset;
+        public readonly NodeSystemGraphAsset GraphAsset;
         public NodeSystemEditorWindow Window { get; private set; }
 
         private readonly List<NodeSystemEditorNode> _graphEditorNodes = new();
@@ -27,7 +27,7 @@ namespace NodeSystem.Editor.Windows
         public NodeSystemGraphView(SerializedObject serializedObject, NodeSystemEditorWindow window)
         {
             _serializedObject = serializedObject;
-            _graphAsset = (NodeSystemGraphAsset)serializedObject.targetObject;
+            GraphAsset = (NodeSystemGraphAsset)serializedObject.targetObject;
             Window = window;
             _searchProvider = ScriptableObject.CreateInstance<NodeSystemSearchProvider>();
             _searchProvider.GraphView = this;
@@ -82,12 +82,12 @@ namespace NodeSystem.Editor.Windows
             var content = JsonUtility.FromJson<CopyContent>(data);
             foreach (var node in content.Nodes)
             {
-                _graphAsset.AddNode(node, false);
+                GraphAsset.AddNode(node, false);
             }
 
             foreach (var port in content.Ports)
             {
-                _graphAsset.AddPort(port);
+                GraphAsset.AddPort(port);
             }
             ReDrawGraph();
         }
@@ -107,6 +107,13 @@ namespace NodeSystem.Editor.Windows
                 var node = editorNode.Node;
                 var type = node.GetType();
 
+                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
+                if (nodeAttribute is { NodeNumsLimit: ENodeNumsLimit.Singleton })
+                {
+                    Debug.LogWarning($"Can't copy SingletonNode [{node.nodeName}]");
+                    continue;
+                }
+
                 var newNode = (NodeSystemNode)Activator.CreateInstance(type);
                 newNode.Position = new Rect(node.Position.x + 50, node.Position.y + 50, node.Position.width,
                     node.Position.height);
@@ -122,7 +129,7 @@ namespace NodeSystem.Editor.Windows
                     if(attribute == null)
                         continue;
                     var portId = (string)fieldInfo.GetValue(node);
-                    var port = _graphAsset.GetPort(portId);
+                    var port = GraphAsset.GetPort(portId);
 
                     var newPort = new NodeSystemPort(newNode.Id, port.direction, port.connectPortId);
                     portIdMap.Add(port.Id, newPort.Id);
@@ -254,7 +261,7 @@ namespace NodeSystem.Editor.Windows
         public void AddNodeToGraphAsset(NodeSystemNode node)
         {
             Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Add Node");
-            _graphAsset.AddNode(node);
+            GraphAsset.AddNode(node);
             _serializedObject.Update();
             AddNodeToGraphView(node);
 
@@ -267,7 +274,6 @@ namespace NodeSystem.Editor.Windows
         /// <param name="node"></param>
         private void AddNodeToGraphView(NodeSystemNode node)
         {
-            node.typeName = node.GetType().AssemblyQualifiedName;
             var editorNode = new NodeSystemEditorNode(node, _serializedObject);
             editorNode.SetPosition(node.Position);
             _graphEditorNodes.Add(editorNode);
@@ -282,7 +288,7 @@ namespace NodeSystem.Editor.Windows
         /// </summary>
         private void RemoveNodeFromGraphAsset(NodeSystemEditorNode editorNode)
         {
-            _graphAsset.RemoveNode(editorNode.Node);
+            GraphAsset.RemoveNode(editorNode.Node);
             _editorNodesMap.Remove(editorNode.Node.Id);
             _graphEditorNodes.Remove(editorNode);
             _serializedObject.Update();
@@ -300,8 +306,8 @@ namespace NodeSystem.Editor.Windows
             var outNode = (NodeSystemEditorNode)edge.output.node;
             var outPortId = outNode.ViewPortToNodePort[edge.output];
 
-            var inPort = _graphAsset.GetPort(inPortId);
-            var outPort = _graphAsset.GetPort(outPortId);
+            var inPort = GraphAsset.GetPort(inPortId);
+            var outPort = GraphAsset.GetPort(outPortId);
             inPort.ConnectTo(outPortId);
             outPort.ConnectTo(inPortId);
             
@@ -323,7 +329,7 @@ namespace NodeSystem.Editor.Windows
         
         private void ReDrawGraph()
         {
-            _graphAsset.LoadMap();
+            GraphAsset.LoadMap();
             
             foreach (var element in graphElements)
             {
@@ -331,7 +337,7 @@ namespace NodeSystem.Editor.Windows
             }
             _graphEditorNodes.Clear();
             _editorNodesMap.Clear();
-            foreach (var node in _graphAsset.nodes)
+            foreach (var node in GraphAsset.nodes)
             {
                 AddNodeToGraphView(node);
             }
@@ -341,14 +347,14 @@ namespace NodeSystem.Editor.Windows
             {
                 foreach (var (nodePortId, viewPort) in editorNode.NodePortToViewPort)
                 {
-                    var nodePort = _graphAsset.GetPort(nodePortId);
+                    var nodePort = GraphAsset.GetPort(nodePortId);
                     if(nodePort.direction == Direction.Output)
                         continue;
                     
                     if(string.IsNullOrEmpty(nodePort.connectPortId))
                         continue;
 
-                    var outNodePort = _graphAsset.GetPort(nodePort.connectPortId);
+                    var outNodePort = GraphAsset.GetPort(nodePort.connectPortId);
                     var outEditorNode = _editorNodesMap[outNodePort.belongNodeId];
                     var outViewPort = outEditorNode.NodePortToViewPort[outNodePort.Id];
                     
@@ -361,8 +367,8 @@ namespace NodeSystem.Editor.Windows
 
         private void SaveAsset()
         {
-            EditorUtility.SetDirty(_graphAsset);
-            AssetDatabase.SaveAssetIfDirty(_graphAsset);
+            EditorUtility.SetDirty(GraphAsset);
+            AssetDatabase.SaveAssetIfDirty(GraphAsset);
         }
 
         private void BindObject()
