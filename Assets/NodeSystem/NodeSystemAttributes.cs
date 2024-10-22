@@ -12,13 +12,16 @@ namespace NodeSystem
 
         public ENodeCategory NodeCategory { get; private set; }
         public ENodeNumsLimit NodeNumsLimit { get; private set; }
+        
+        public Type NodeRunnerType { get; private set; }
 
-        public NodeAttribute(string title, string menuItem = "", ENodeCategory nodeCategory = ENodeCategory.Flow, ENodeNumsLimit nodeNumsLimit = ENodeNumsLimit.None)
+        public NodeAttribute(string title, string menuItem, ENodeCategory nodeCategory, ENodeNumsLimit nodeNumsLimit, Type runnerType)
         {
             Title = title;
             MenuItem = menuItem;
             NodeCategory = nodeCategory;
             NodeNumsLimit = nodeNumsLimit;
+            NodeRunnerType = runnerType;
         }
     }
     

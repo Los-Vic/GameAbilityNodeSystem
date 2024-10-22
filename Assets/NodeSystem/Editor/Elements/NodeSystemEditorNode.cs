@@ -62,6 +62,26 @@ namespace NodeSystem.Editor.Elements
         private void ConstructTitle(Type type, NodeAttribute attribute)
         {
             title = attribute.Title;
+
+            if (attribute.NodeCategory == ENodeCategory.FlowNonInstant)
+            {
+                var img = new Image
+                {
+                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/clock.png"),
+                    style = { width = 28 , paddingRight = 6 }
+                };
+                titleButtonContainer.Add(img);
+            }
+            else if(attribute.NodeCategory == ENodeCategory.DebugFlowInstant)
+            {
+                var img = new Image
+                {
+                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/debug.png"),
+                    style = { width = 32 , paddingRight = 4 }
+                };
+                titleButtonContainer.Add(img);
+            }
+            
             var box = new Box
             {
                 style =

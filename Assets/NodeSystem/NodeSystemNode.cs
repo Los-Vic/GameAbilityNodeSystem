@@ -7,9 +7,11 @@ namespace NodeSystem
     public enum ENodeCategory
     {
         Start,
-        Flow,
+        FlowInstant,
+        DebugFlowInstant,
         Value,
-        Event
+        Event,
+        FlowNonInstant
     }
 
     public enum ENodeNumsLimit

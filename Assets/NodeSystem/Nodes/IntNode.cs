@@ -1,10 +1,10 @@
 ﻿using NodeSystem.Ports;
+using NodeSystem.Runners;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
 namespace NodeSystem.Nodes
 {
-    [Node("Int", "Literal/Int", ENodeCategory.Value)]
+    [Node("Int", "Literal/Int", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntNodeRunner))]
     public class IntNode:NodeSystemNode
     {
         [ExposedProp]

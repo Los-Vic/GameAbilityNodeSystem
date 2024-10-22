@@ -23,7 +23,9 @@ namespace NodeSystem.Editor.Elements
         {
             switch (nodeCategory)
             {
-                case ENodeCategory.Flow:
+                case ENodeCategory.FlowInstant:
+                case ENodeCategory.FlowNonInstant:
+                case ENodeCategory.DebugFlowInstant:
                     return new Color(0.5f, 0, 0, 1);
                 case ENodeCategory.Value:
                     return new Color(0, 0.5f, 0, 1);

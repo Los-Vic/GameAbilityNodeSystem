@@ -4,16 +4,15 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes
 {
-    [Node("Print","Debug/Print", ENodeCategory.DebugFlowInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
-    public class DebugPrintNode:NodeSystemNode
+    [Node("Delay", "Flow/Delay", ENodeCategory.FlowNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
+    public class DelayNode:NodeSystemNode
     {
-        [ExposedProp]
-        public string Log;
-
         [Port(Direction.Input, typeof(FlowPort))]
         public string InPort;
         [Port(Direction.Output, typeof(FlowPort))]
         public string OutPort;
-        
+
+        [Port(Direction.Input, typeof(IntPort), "delay")]
+        public string InIntPort;
     }
 }
