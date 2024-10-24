@@ -15,12 +15,14 @@ namespace NodeSystem
         public string belongNodeId;
         public string connectPortId;
         public Direction direction;
-
-        public NodeSystemPort(string belongNodeId, Direction direction, string connectPortId = null)
+        public string portType;
+        
+        public NodeSystemPort(string belongNodeId, Direction direction, Type portType, string connectPortId = null)
         {
             this.belongNodeId = belongNodeId;
             this.direction = direction;
             this.connectPortId = connectPortId;
+            this.portType = portType.AssemblyQualifiedName;
         }
 
         public void ConnectTo(string portId) => connectPortId = portId;

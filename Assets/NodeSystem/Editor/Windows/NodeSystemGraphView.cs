@@ -131,7 +131,7 @@ namespace NodeSystem.Editor.Windows
                     var portId = (string)fieldInfo.GetValue(node);
                     var port = GraphAsset.GetPort(portId);
 
-                    var newPort = new NodeSystemPort(newNode.Id, port.direction, port.connectPortId);
+                    var newPort = new NodeSystemPort(newNode.Id, port.direction, attribute.PortType, port.connectPortId);
                     portIdMap.Add(port.Id, newPort.Id);
                     content.Ports.Add(newPort);
                 }
@@ -166,7 +166,7 @@ namespace NodeSystem.Editor.Windows
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
         {
             var allPort = new List<Port>();
-            var ports = new List<Port>();
+            var portList = new List<Port>();
 
             foreach (var node in _graphEditorNodes)
             {
@@ -180,10 +180,10 @@ namespace NodeSystem.Editor.Windows
                 if(port.direction == startPort.direction) continue;
                 if (port.portType == startPort.portType)
                 {
-                    ports.Add(port);
+                    portList.Add(port);
                 }
             }
-            return ports;
+            return portList;
         }
 
         #region Callbacks

@@ -4,14 +4,25 @@
     {
         public static readonly NodeSystemNodeRunner DefaultRunner = new();
 
-        public virtual void InitNode(NodeSystemNode nodeAsset)
+        public bool IsNodeRunnerCompleted { get; protected set; }
+        public virtual void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        {
+            Reset();
+        }
+
+        public virtual void Reset()
+        {
+            IsNodeRunnerCompleted = false;
+        }
+        
+        public virtual void Execute(float dt = 0)
         {
             
         }
 
-        public virtual void ExecuteNode(float dt = 0)
+        public virtual string GetNextNode()
         {
-            
+            return default;
         }
     }
 }

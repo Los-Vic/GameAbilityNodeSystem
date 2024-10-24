@@ -6,12 +6,15 @@ namespace NodeSystem
 {
     public enum ENodeCategory
     {
-        Start,
-        FlowInstant,
-        DebugFlowInstant,
-        Value,
-        Event,
-        FlowNonInstant
+        //Flow Start
+        Start = 0,
+        Event = 1,
+        //Flow 
+        FlowInstant = 100,
+        DebugFlowInstant = 101,
+        FlowNonInstant = 102,
+        //Value
+        Value = 200,
     }
 
     public enum ENodeNumsLimit
@@ -37,11 +40,36 @@ namespace NodeSystem
 
         public NodeSystemNode()
         {
+#if UNITY_EDITOR
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute != null)
             {
                 nodeName = nodeAttribute.Title;
             }
+#endif
+        }
+
+        public bool IsFlowNode()
+        {
+            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
+            if (nodeAttribute == null)
+            {
+                return false;
+            }
+
+            return nodeAttribute.NodeCategory is ENodeCategory.FlowInstant or ENodeCategory.DebugFlowInstant
+                or ENodeCategory.FlowNonInstant;
+        }
+
+        public bool IsValueNode()
+        {
+            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
+            if (nodeAttribute == null)
+            {
+                return false;
+            }
+
+            return nodeAttribute.NodeCategory is ENodeCategory.Value;
         }
     }
 }

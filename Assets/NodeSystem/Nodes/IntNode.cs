@@ -1,5 +1,4 @@
-﻿using NodeSystem.Ports;
-using NodeSystem.Runners;
+﻿using NodeSystem.Runners;
 using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes
@@ -10,7 +9,7 @@ namespace NodeSystem.Nodes
         [ExposedProp]
         public int Val;
 
-        [Port(Direction.Output, typeof(IntPort))]
+        [Port(Direction.Output, typeof(int))]
         public string OutVal;
     }
 }

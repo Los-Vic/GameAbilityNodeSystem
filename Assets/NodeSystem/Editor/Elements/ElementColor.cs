@@ -7,16 +7,18 @@ namespace NodeSystem.Editor.Elements
 {
     public static class ElementColor
     {
+        private static readonly Color DefaultPortColor = new Color(0, 0.8f, 0.8f, 1);
+        
         private static readonly Dictionary<Type, Color> PortColorMap = new()
         {
-            { typeof(IntPort), new Color(0, 0.8f, 0, 1) },
+            { typeof(int), new Color(0, 0.8f, 0, 1) },
             { typeof(FlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
         };
         
         
         public static Color GetPortColor(Type nodeType)
         {
-            return PortColorMap.TryGetValue(nodeType, out var color) ? color : Color.white;
+            return PortColorMap.GetValueOrDefault(nodeType, DefaultPortColor);
         }
 
         public static Color GetNodeColor(ENodeCategory nodeCategory)

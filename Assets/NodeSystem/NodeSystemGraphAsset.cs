@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -9,7 +8,6 @@ namespace NodeSystem
     [CreateAssetMenu(menuName = "NodeSystem/GraphAsset", fileName = "NewGraph")]
     public class NodeSystemGraphAsset:ScriptableObject
     {
-        [Header("!!! Not Edit !!!")]
         [SerializeReference]
         //[HideInInspector]
         public List<NodeSystemNode> nodes = new();
@@ -52,7 +50,7 @@ namespace NodeSystem
                 var attribute = fieldInfo.GetCustomAttribute<PortAttribute>();
                 if(attribute == null)
                     continue;
-                var port = new NodeSystemPort(node.Id, attribute.PortDirection);
+                var port = new NodeSystemPort(node.Id, attribute.PortDirection, attribute.PortType);
                 fieldInfo.SetValue(node, port.Id);
                 AddPort(port);
             }

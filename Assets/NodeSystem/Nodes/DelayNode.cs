@@ -12,7 +12,7 @@ namespace NodeSystem.Nodes
         [Port(Direction.Output, typeof(FlowPort))]
         public string OutPort;
 
-        [Port(Direction.Input, typeof(IntPort), "delay")]
+        [Port(Direction.Input, typeof(int), "delay")]
         public string InIntPort;
     }
 }
