@@ -2,12 +2,11 @@
 {
     public class NodeSystem
     {
-        private NodeSystemNodeRunnerFactory _nodeRunnerFactory;
+        public NodeSystemNodeRunnerFactory NodeRunnerFactory;
         
         public virtual void InitSystem()
         {
-            _nodeRunnerFactory = new NodeSystemNodeRunnerFactory();
-            
+            NodeRunnerFactory = new NodeSystemNodeRunnerFactory();
         }
         
     }

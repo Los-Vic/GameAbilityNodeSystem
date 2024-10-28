@@ -12,8 +12,133 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a031e6822c43f8bb22b01c64b7d36a, type: 3}
   m_Name: NewGraph
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 7815091796812497082
+  - rid: 7815091796812497084
+  - rid: 7815091796812497088
+  - rid: 7815091796812497090
+  ports:
+  - rid: 7815091796812497083
+  - rid: 7815091796812497085
+  - rid: 7815091796812497086
+  - rid: 7815091796812497087
+  - rid: 7815091796812497089
+  - rid: 7815091796812497091
+  - rid: 7815091796812497092
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 7815091796812497082
+      type: {class: StartNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: 9d0d7568-3c6e-4c0f-a57d-b11445b092b8
+        position:
+          serializedVersion: 2
+          x: 288.8
+          y: 331.2
+          width: 86.400024
+          height: 76.79999
+        nodeName: Start
+        OutPort: 0b5fc1df-9b0a-4bbe-9e4c-17c5a9c1d0e7
+    - rid: 7815091796812497083
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 0b5fc1df-9b0a-4bbe-9e4c-17c5a9c1d0e7
+        belongNodeId: 9d0d7568-3c6e-4c0f-a57d-b11445b092b8
+        connectPortId: 954f7431-c39d-49b1-9f63-d05a8c62ba4e
+        direction: 1
+        portType: NodeSystem.Ports.FlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - rid: 7815091796812497084
+      type: {class: DelayNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: 081a2b8e-dd50-403b-80ac-3ca62fa65570
+        position:
+          serializedVersion: 2
+          x: 512
+          y: 331.2
+          width: 119.20001
+          height: 100.79999
+        nodeName: Delay
+        InPort: 954f7431-c39d-49b1-9f63-d05a8c62ba4e
+        OutPort: 238b07ed-68ae-4ee3-a65f-6324d267d273
+        InIntPort: e427fb0e-0298-4fcd-a9bf-838e9e663f54
+    - rid: 7815091796812497085
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 954f7431-c39d-49b1-9f63-d05a8c62ba4e
+        belongNodeId: 081a2b8e-dd50-403b-80ac-3ca62fa65570
+        connectPortId: 0b5fc1df-9b0a-4bbe-9e4c-17c5a9c1d0e7
+        direction: 0
+        portType: NodeSystem.Ports.FlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - rid: 7815091796812497086
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 238b07ed-68ae-4ee3-a65f-6324d267d273
+        belongNodeId: 081a2b8e-dd50-403b-80ac-3ca62fa65570
+        connectPortId: 562c8fd1-5a71-4eae-8c47-d45a680efb3b
+        direction: 1
+        portType: NodeSystem.Ports.FlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - rid: 7815091796812497087
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: e427fb0e-0298-4fcd-a9bf-838e9e663f54
+        belongNodeId: 081a2b8e-dd50-403b-80ac-3ca62fa65570
+        connectPortId: f52f4e1d-2d09-4d89-9f4f-851f5b34ac88
+        direction: 0
+        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+    - rid: 7815091796812497088
+      type: {class: IntNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: 9f3970e9-2f07-4656-a406-f83004204930
+        position:
+          serializedVersion: 2
+          x: 297.6
+          y: 520.8
+          width: 155.19998
+          height: 95.20001
+        nodeName: Int
+        Val: 3
+        OutVal: f52f4e1d-2d09-4d89-9f4f-851f5b34ac88
+    - rid: 7815091796812497089
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: f52f4e1d-2d09-4d89-9f4f-851f5b34ac88
+        belongNodeId: 9f3970e9-2f07-4656-a406-f83004204930
+        connectPortId: e427fb0e-0298-4fcd-a9bf-838e9e663f54
+        direction: 1
+        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+    - rid: 7815091796812497090
+      type: {class: DebugPrintNode, ns: NodeSystem.Nodes, asm: NodeSystem}
+      data:
+        guid: d07e95dc-9918-4f96-b992-0af00d93eadf
+        position:
+          serializedVersion: 2
+          x: 745.6
+          y: 331.2
+          width: 148
+          height: 95.19998
+        nodeName: Print
+        Log: hello world
+        InPort: 562c8fd1-5a71-4eae-8c47-d45a680efb3b
+        OutPort: d3568e01-18eb-4e98-8335-88af67139307
+    - rid: 7815091796812497091
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: 562c8fd1-5a71-4eae-8c47-d45a680efb3b
+        belongNodeId: d07e95dc-9918-4f96-b992-0af00d93eadf
+        connectPortId: 238b07ed-68ae-4ee3-a65f-6324d267d273
+        direction: 0
+        portType: NodeSystem.Ports.FlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - rid: 7815091796812497092
+      type: {class: NodeSystemPort, ns: NodeSystem, asm: NodeSystem}
+      data:
+        guid: d3568e01-18eb-4e98-8335-88af67139307
+        belongNodeId: d07e95dc-9918-4f96-b992-0af00d93eadf
+        connectPortId: 
+        direction: 1
+        portType: NodeSystem.Ports.FlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null

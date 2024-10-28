@@ -7,7 +7,7 @@
         public bool IsNodeRunnerCompleted { get; protected set; }
         public virtual void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
-            Reset();
+            
         }
 
         public virtual void Reset()
@@ -17,7 +17,7 @@
         
         public virtual void Execute(float dt = 0)
         {
-            
+            IsNodeRunnerCompleted = true;
         }
 
         public virtual string GetNextNode()
