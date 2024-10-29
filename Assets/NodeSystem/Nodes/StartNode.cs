@@ -1,4 +1,5 @@
-﻿using NodeSystem.Ports;
+﻿using NodeSystem.Core;
+using NodeSystem.Ports;
 using NodeSystem.Runners;
 using UnityEditor.Experimental.GraphView;
 

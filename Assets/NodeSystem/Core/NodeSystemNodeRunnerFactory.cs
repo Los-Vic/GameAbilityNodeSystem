@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using NodeSystem.ObjectPool;
 
-namespace NodeSystem
+namespace NodeSystem.Core
 {
     public class NodeSystemNodeRunnerFactory
     {

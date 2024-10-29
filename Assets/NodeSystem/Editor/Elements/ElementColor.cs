@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NodeSystem.Core;
 using NodeSystem.Ports;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace NodeSystem.Editor.Elements
         private static readonly Dictionary<Type, Color> PortColorMap = new()
         {
             { typeof(int), new Color(0, 0.8f, 0, 1) },
+            { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
             { typeof(FlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
         };
         

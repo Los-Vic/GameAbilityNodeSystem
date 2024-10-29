@@ -1,4 +1,5 @@
-﻿using NodeSystem.Ports;
+﻿using NodeSystem.Core;
+using NodeSystem.Ports;
 using NodeSystem.Runners;
 using UnityEditor.Experimental.GraphView;
 
@@ -12,7 +13,7 @@ namespace NodeSystem.Nodes
         [Port(Direction.Output, typeof(FlowPort))]
         public string OutPort;
 
-        [Port(Direction.Input, typeof(int), "delay")]
-        public string InIntPort;
+        [Port(Direction.Input, typeof(float), "delay")]
+        public string InFloatPort;
     }
 }

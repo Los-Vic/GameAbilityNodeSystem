@@ -1,3 +1,4 @@
+using NodeSystem.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ namespace NodeSystem.Editor.Windows
                 if (w.currentGraphAsset == target)
                 {
                     w.Focus();
+                    w.Reload();
                     return;
                 }
             }
@@ -46,6 +48,11 @@ namespace NodeSystem.Editor.Windows
             DrawGraph();
         }
 
+        private void Reload()
+        {
+            _currentView?.ReDrawGraph();
+        }
+        
         private void DrawGraph()
         {
             _serializedObject = new SerializedObject(currentGraphAsset);

@@ -1,4 +1,5 @@
 ﻿using NodeSystem;
+using NodeSystem.Core;
 using UnityEngine;
 
 namespace GameAbilitySystem.Logic.Ability

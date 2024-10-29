@@ -1,4 +1,4 @@
-﻿namespace NodeSystem
+﻿namespace NodeSystem.Core
 {
     public class NodeSystem
     {

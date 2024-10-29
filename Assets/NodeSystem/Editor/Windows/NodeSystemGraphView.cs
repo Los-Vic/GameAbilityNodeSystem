@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NodeSystem.Core;
 using NodeSystem.Editor.Elements;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -327,7 +328,7 @@ namespace NodeSystem.Editor.Windows
             }
         }
         
-        private void ReDrawGraph()
+        public void ReDrawGraph()
         {
             GraphAsset.LoadMap();
             

@@ -1,9 +1,10 @@
-﻿using NodeSystem.Nodes;
+﻿using NodeSystem.Core;
+using NodeSystem.Nodes;
 using UnityEngine;
 
 namespace NodeSystem.Runners
 {
-    public class DelayNodeRunner:NodeSystemNodeRunner
+    public class DelayNodeRunner:NodeSystemFlowNodeRunner
     {
         private DelayNode _node;
         private NodeSystemGraphRunner _graphRunner;
@@ -33,8 +34,8 @@ namespace NodeSystem.Runners
                     runner.Execute();
                 }
 
-                var inPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.InIntPort];
-                _delay = (int)_graphRunner.OutPortResultCached[inPort.connectPortId];
+                var inPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.InFloatPort];
+                _delay = (float)_graphRunner.OutPortResultCached[inPort.connectPortId];
                 Debug.Log($"Input Delay [{_delay}]");
             }
 

@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace NodeSystem
+namespace NodeSystem.Core
 {
     public class GraphAssetRuntimeData
     {
@@ -88,9 +88,9 @@ namespace NodeSystem
         public readonly Dictionary<string, object> OutPortResultCached = new();
         
         public GraphAssetRuntimeData GraphAssetRuntimeData;
-        private NodeSystem _nodeSystem;
+        private Core.NodeSystem _nodeSystem;
 
-        private NodeSystemNodeRunner _curRunner;
+        private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;
         
         private void Awake()
@@ -141,7 +141,12 @@ namespace NodeSystem
                     break;
                 }
                 
-                _curRunner = NodeRunners[nextNode];
+                _curRunner = NodeRunners[nextNode] as NodeSystemFlowNodeRunner;
+                if (_curRunner == null)
+                {
+                    EndGraphRunner();
+                    break;
+                }
                 _curRunner.Execute();
             }
         }
@@ -150,7 +155,7 @@ namespace NodeSystem
         {
             Debug.Log("Start GraphRunner");
             _isRunning = true;
-            _curRunner = NodeRunners[GraphAssetRuntimeData.StartNodeId];
+            _curRunner = NodeRunners[GraphAssetRuntimeData.StartNodeId] as NodeSystemFlowNodeRunner;
 
             UpdateCurNodeRunner();
         }

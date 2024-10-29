@@ -1,9 +1,10 @@
-﻿using NodeSystem.Nodes;
+﻿using NodeSystem.Core;
+using NodeSystem.Nodes;
 using UnityEngine;
 
 namespace NodeSystem.Runners
 {
-    public class StartNodeRunner:NodeSystemNodeRunner
+    public class StartNodeRunner:NodeSystemFlowNodeRunner
     {
         private string _nextNode;
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)

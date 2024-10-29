@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace NodeSystem
+namespace NodeSystem.Core
 {
     public enum ENodeCategory
     {

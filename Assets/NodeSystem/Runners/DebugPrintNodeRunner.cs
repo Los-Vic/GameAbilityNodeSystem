@@ -1,9 +1,10 @@
-﻿using NodeSystem.Nodes;
+﻿using NodeSystem.Core;
+using NodeSystem.Nodes;
 using UnityEngine;
 
 namespace NodeSystem.Runners
 {
-    public class DebugPrintNodeRunner:NodeSystemNodeRunner
+    public class DebugPrintNodeRunner:NodeSystemFlowNodeRunner
     {
         private DebugPrintNode _node;
         private NodeSystemGraphRunner _graphRunner;

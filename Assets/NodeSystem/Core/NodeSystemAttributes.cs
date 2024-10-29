@@ -1,8 +1,7 @@
 ﻿using System;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
-namespace NodeSystem
+namespace NodeSystem.Core
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class NodeAttribute : Attribute

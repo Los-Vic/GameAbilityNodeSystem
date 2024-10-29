@@ -1,4 +1,5 @@
-﻿using NodeSystem.Runners;
+﻿using NodeSystem.Core;
+using NodeSystem.Runners;
 using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes

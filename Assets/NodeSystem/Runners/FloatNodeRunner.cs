@@ -4,20 +4,20 @@ using UnityEngine;
 
 namespace NodeSystem.Runners
 {
-    public class IntNodeRunner:NodeSystemNodeRunner
+    public class FloatNodeRunner:NodeSystemNodeRunner
     {
-        private IntNode _node;
+        private FloatNode _node;
         private NodeSystemGraphRunner _graphRunner;
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = ((IntNode)nodeAsset);
+            _node = ((FloatNode)nodeAsset);
             _graphRunner = graphRunner;
         }
 
         public override void Execute(float dt = 0)
         {
-            Debug.Log($"Execute Int Node, Int Val[{_node.Val}]");
+            Debug.Log($"Execute Float Node, Float Val[{_node.Val}]");
             _graphRunner.OutPortResultCached.Add(_node.OutVal, _node.Val);
         }
     }
