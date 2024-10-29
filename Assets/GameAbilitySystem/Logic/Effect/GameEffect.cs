@@ -1,5 +1,5 @@
 ﻿using System;
-using GameAbilitySystem.Logic.ObjectPool;
+using NodeSystem.ObjectPool;
 
 namespace GameAbilitySystem.Logic.Effect
 {

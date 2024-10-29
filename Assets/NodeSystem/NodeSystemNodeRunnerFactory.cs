@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using NodeSystem.ObjectPool;
 
 namespace NodeSystem
 {
     public class NodeSystemNodeRunnerFactory
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
+        private readonly ObjectPoolMgr _objectPoolMgr = new();
         
         public virtual NodeSystemNodeRunner CreateNodeRunner(Type type)
         {
@@ -22,11 +24,8 @@ namespace NodeSystem
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 
-            var runner = Activator.CreateInstance(runnerType) as NodeSystemNodeRunner;
-            if(runner == null)
-                return NodeSystemNodeRunner.DefaultRunner;
-
-            return runner;
+            var runner = _objectPoolMgr.CreateObject(runnerType) as NodeSystemNodeRunner;
+            return runner ?? NodeSystemNodeRunner.DefaultRunner;
         }
     }
 }

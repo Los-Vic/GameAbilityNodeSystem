@@ -6,13 +6,14 @@ namespace NodeSystem
 {
     public enum ENodeCategory
     {
-        //Flow Start
+        //Flow
         Start = 0,
         Event = 1,
-        //Flow 
-        FlowInstant = 100,
-        DebugFlowInstant = 101,
-        FlowNonInstant = 102,
+        Flow = 2,
+        //Executable
+        ExecInstant = 100,
+        ExecDebugInstant = 101,
+        ExecNonInstant = 102,
         //Value
         Value = 200,
     }
@@ -57,8 +58,8 @@ namespace NodeSystem
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is ENodeCategory.FlowInstant or ENodeCategory.DebugFlowInstant
-                or ENodeCategory.FlowNonInstant;
+            return nodeAttribute.NodeCategory is ENodeCategory.ExecInstant or ENodeCategory.ExecDebugInstant
+                or ENodeCategory.ExecNonInstant;
         }
 
         public bool IsValueNode()

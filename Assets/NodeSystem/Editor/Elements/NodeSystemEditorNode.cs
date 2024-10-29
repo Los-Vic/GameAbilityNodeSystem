@@ -63,7 +63,7 @@ namespace NodeSystem.Editor.Elements
         {
             title = attribute.Title;
 
-            if (attribute.NodeCategory == ENodeCategory.FlowNonInstant)
+            if (attribute.NodeCategory == ENodeCategory.ExecNonInstant)
             {
                 var img = new Image
                 {
@@ -72,7 +72,7 @@ namespace NodeSystem.Editor.Elements
                 };
                 titleButtonContainer.Add(img);
             }
-            else if(attribute.NodeCategory == ENodeCategory.DebugFlowInstant)
+            else if(attribute.NodeCategory == ENodeCategory.ExecDebugInstant)
             {
                 var img = new Image
                 {

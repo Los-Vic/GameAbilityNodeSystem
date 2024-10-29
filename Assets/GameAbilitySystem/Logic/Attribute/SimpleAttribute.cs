@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameAbilitySystem.Logic.Effect;
-using GameAbilitySystem.Logic.ObjectPool;
 using GameAbilitySystem.Logic.Observe;
 using GameAbilitySystem.Logic.ValueDecorator;
+using NodeSystem.ObjectPool;
 
 namespace GameAbilitySystem.Logic.Attribute
 {

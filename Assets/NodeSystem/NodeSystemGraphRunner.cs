@@ -125,41 +125,19 @@ namespace NodeSystem
             if(!_isRunning)
                 return;
             
-            if (_curRunner == null)
-            {
-                EndGraphRunner();
-                return;
-            }
-            
-            _curRunner.Execute(Time.deltaTime);
-
-            while (_curRunner.IsNodeRunnerCompleted)
-            {
-                var nextNode = _curRunner.GetNextNode();
-                if (string.IsNullOrEmpty(nextNode))
-                {
-                    _curRunner = null;
-                    break;
-                }
-                
-                _curRunner = NodeRunners[nextNode];
-                _curRunner.Execute();
-            }
+            UpdateCurNodeRunner(Time.deltaTime);
         }
 
-        private void StartGraphRunner()
+        private void UpdateCurNodeRunner(float deltaTime = 0)
         {
-            Debug.Log("Start GraphRunner");
-            _isRunning = true;
-            _curRunner = NodeRunners[GraphAssetRuntimeData.StartNodeId];
-            _curRunner.Execute();
+            _curRunner.Execute(deltaTime);
 
             while (_curRunner.IsNodeRunnerCompleted)
             {
                 var nextNode = _curRunner.GetNextNode();
                 if (string.IsNullOrEmpty(nextNode))
                 {
-                    _curRunner = null;
+                    EndGraphRunner();
                     break;
                 }
                 
@@ -168,10 +146,20 @@ namespace NodeSystem
             }
         }
         
+        private void StartGraphRunner()
+        {
+            Debug.Log("Start GraphRunner");
+            _isRunning = true;
+            _curRunner = NodeRunners[GraphAssetRuntimeData.StartNodeId];
+
+            UpdateCurNodeRunner();
+        }
+        
         private void EndGraphRunner()
         {
             Debug.Log("End GraphRunner");
             _isRunning = false;
+            _curRunner = null;
         }
     }
 }

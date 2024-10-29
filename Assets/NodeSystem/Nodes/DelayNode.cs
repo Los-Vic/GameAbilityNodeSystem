@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes
 {
-    [Node("Delay", "Flow/Delay", ENodeCategory.FlowNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
+    [Node("Delay", "Executable/Delay", ENodeCategory.ExecNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
     public class DelayNode:NodeSystemNode
     {
         [Port(Direction.Input, typeof(FlowPort))]

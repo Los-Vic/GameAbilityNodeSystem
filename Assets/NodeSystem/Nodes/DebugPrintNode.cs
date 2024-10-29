@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NodeSystem.Nodes
 {
-    [Node("Print","Debug/Print", ENodeCategory.DebugFlowInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
+    [Node("Print","Debug/Print", ENodeCategory.ExecDebugInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
     public class DebugPrintNode:NodeSystemNode
     {
         [ExposedProp]
