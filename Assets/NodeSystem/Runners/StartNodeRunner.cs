@@ -1,8 +1,6 @@
-﻿using NodeSystem.Core;
-using NodeSystem.Nodes;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace NodeSystem.Runners
+namespace NS
 {
     public class StartNodeRunner:NodeSystemFlowNodeRunner
     {

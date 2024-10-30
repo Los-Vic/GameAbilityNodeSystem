@@ -1,7 +1,7 @@
 ﻿using System;
 using GameAbilitySystem.Logic.Ability;
 using GameAbilitySystem.Logic.Attribute;
-using NodeSystem.ObjectPool;
+using NS;
 
 namespace GameAbilitySystem.Logic
 {

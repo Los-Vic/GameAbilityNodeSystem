@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GameAbilitySystem.Logic.Effect;
 using GameAbilitySystem.Logic.Observe;
 using GameAbilitySystem.Logic.ValueDecorator;
-using NodeSystem.ObjectPool;
+using NS;
 
 namespace GameAbilitySystem.Logic.Attribute
 {

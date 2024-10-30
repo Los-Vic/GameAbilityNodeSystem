@@ -1,5 +1,5 @@
 ﻿using GameAbilitySystem.Logic.Ability;
-using NodeSystem.Editor.Windows;
+using NSEditor;
 using UnityEditor;
 
 namespace GameAbilitySystem.Editor

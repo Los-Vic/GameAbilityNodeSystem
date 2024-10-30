@@ -1,9 +1,6 @@
-﻿using NodeSystem.Core;
-using NodeSystem.Ports;
-using NodeSystem.Runners;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
-namespace NodeSystem.Nodes
+namespace NS
 {
     [Node("Delay", "Executable/Delay", ENodeCategory.ExecNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
     public class DelayNode:NodeSystemNode

@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace NodeSystem.Core
+namespace NS
 {
     public class GraphAssetRuntimeData
     {
@@ -88,7 +88,7 @@ namespace NodeSystem.Core
         public readonly Dictionary<string, object> OutPortResultCached = new();
         
         public GraphAssetRuntimeData GraphAssetRuntimeData;
-        private Core.NodeSystem _nodeSystem;
+        private NodeSystem _nodeSystem;
 
         private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;

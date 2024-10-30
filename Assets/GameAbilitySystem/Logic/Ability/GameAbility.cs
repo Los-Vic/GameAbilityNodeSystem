@@ -1,5 +1,5 @@
 ﻿using System;
-using NodeSystem.ObjectPool;
+using NS;
 
 namespace GameAbilitySystem.Logic.Ability
 {

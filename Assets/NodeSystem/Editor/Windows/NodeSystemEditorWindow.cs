@@ -1,8 +1,8 @@
-using NodeSystem.Core;
+using NS;
 using UnityEditor;
 using UnityEngine;
 
-namespace NodeSystem.Editor.Windows
+namespace NSEditor
 {
     public class NodeSystemEditorWindow : EditorWindow
     {

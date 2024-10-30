@@ -12,8 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a031e6822c43f8bb22b01c64b7d36a, type: 3}
   m_Name: NewGraph
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 7815091838924095560
+  ports:
+  - rid: 7815091838924095561
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 7815091838924095560
+      type: {class: FloatNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: e30c970c-b761-4c1c-be98-c989683e9f9f
+        position:
+          serializedVersion: 2
+          x: 277.6
+          y: 540.8
+          width: 155.19998
+          height: 95.20001
+        nodeName: Float
+        Val: 0
+        OutVal: 847323c8-6012-4953-a604-fb6a2265607f
+    - rid: 7815091838924095561
+      type: {class: NodeSystemPort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 847323c8-6012-4953-a604-fb6a2265607f
+        belongNodeId: e30c970c-b761-4c1c-be98-c989683e9f9f
+        connectPortId: 
+        direction: 1
+        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089

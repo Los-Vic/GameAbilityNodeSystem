@@ -1,9 +1,8 @@
 ﻿using System;
-using NodeSystem.Ports;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace NodeSystem.Core
+namespace NS
 {
     /// <summary>
     /// 暂不支持多线端口

@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NodeSystem.Core;
-using NodeSystem.Editor.Elements;
+using NS;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace NodeSystem.Editor.Windows
+namespace NSEditor
 {
     public class NodeSystemGraphView:GraphView
     {

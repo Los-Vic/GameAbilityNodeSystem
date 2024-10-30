@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NodeSystem.Core;
+using NS;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace NodeSystem.Editor.Elements
+namespace NSEditor
 {
     public class NodeSystemEditorNode:Node
     {
@@ -102,7 +102,7 @@ namespace NodeSystem.Editor.Elements
         private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)
         {
             var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection, portAttribute.PortCapacity,
-                fieldInfo.FieldType);
+                portAttribute.PortType);
 
             port.portName = portAttribute.PortName;
             port.portColor = ElementColor.GetPortColor(portAttribute.PortType);

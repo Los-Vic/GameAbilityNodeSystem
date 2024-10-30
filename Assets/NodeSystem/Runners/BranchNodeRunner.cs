@@ -1,4 +1,4 @@
-﻿namespace NodeSystem.Runners
+﻿namespace NS
 {
     public class BranchNodeRunner
     {

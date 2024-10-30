@@ -1,6 +1,4 @@
-﻿using NodeSystem.ObjectPool;
-
-namespace NodeSystem.Core
+﻿namespace NS
 {
     public class NodeSystemNodeRunner:IPoolObject
     {

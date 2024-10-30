@@ -1,6 +1,4 @@
-﻿using NodeSystem.Core;
-
-namespace NodeSystem.Nodes
+﻿namespace NS
 {
     public class BranchNode:NodeSystemNode
     {

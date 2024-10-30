@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NodeSystem.ObjectPool;
 
-namespace NodeSystem.Core
+namespace NS
 {
     public class NodeSystemNodeRunnerFactory
     {

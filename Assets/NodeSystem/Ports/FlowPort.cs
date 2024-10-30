@@ -1,4 +1,4 @@
-﻿namespace NodeSystem.Ports
+﻿namespace NS
 {
     public class FlowPort
     {

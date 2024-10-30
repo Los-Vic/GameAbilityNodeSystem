@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace NodeSystem.ObjectPool
+namespace NS
 {
     public struct ObjectPoolParam
     {

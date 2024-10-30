@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace NodeSystem.Core
+namespace NS
 {
     [CreateAssetMenu(menuName = "NodeSystem/GraphAsset", fileName = "NewGraph")]
     public class NodeSystemGraphAsset:ScriptableObject

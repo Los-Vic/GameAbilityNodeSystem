@@ -1,8 +1,6 @@
-﻿using NodeSystem.Core;
-using NodeSystem.Runners;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
-namespace NodeSystem.Nodes
+namespace NS
 {
     [Node("Int", "Literal/Int", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntNodeRunner))]
     public class IntNode:NodeSystemNode

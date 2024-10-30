@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NodeSystem.Core;
+using NS;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace NodeSystem.Editor.Windows
+namespace NSEditor
 {
     public struct SearchContextElement
     {

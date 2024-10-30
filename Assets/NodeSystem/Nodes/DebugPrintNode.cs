@@ -1,9 +1,6 @@
-﻿using NodeSystem.Core;
-using NodeSystem.Ports;
-using NodeSystem.Runners;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
-namespace NodeSystem.Nodes
+namespace NS
 {
     [Node("Print","Debug/Print", ENodeCategory.ExecDebugInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
     public class DebugPrintNode:NodeSystemNode

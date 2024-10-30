@@ -1,4 +1,4 @@
-﻿namespace NodeSystem.Core
+﻿namespace NS
 {
     public class NodeSystemFlowNodeRunner:NodeSystemNodeRunner
     {

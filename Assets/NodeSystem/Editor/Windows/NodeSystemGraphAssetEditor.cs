@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NodeSystem.Core;
+using NS;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace NodeSystem.Editor.Windows
+namespace NSEditor
 {
     [CustomEditor(typeof(NodeSystemGraphAsset))]
     public class NodeSystemGraphAssetEditor:UnityEditor.Editor
@@ -46,7 +47,8 @@ namespace NodeSystem.Editor.Windows
         {
             var graphAsset = serializedObject.targetObject as NodeSystemGraphAsset;
             var nodeMap = new Dictionary<string, NodeSystemNode>();
-            var portMap = new Dictionary<string, List<NodeSystemPort>>();
+            var portMap = new Dictionary<string, NodeSystemPort>();
+            var portListMap = new Dictionary<string, List<NodeSystemPort>>();
             var badPorts = new HashSet<NodeSystemPort>();
             var badPortIds = new HashSet<string>();
             var badNodes = new HashSet<NodeSystemNode>();
@@ -58,6 +60,8 @@ namespace NodeSystem.Editor.Windows
             //Construct Port Map
             foreach (var port in graphAsset.ports)
             {
+                portMap.Add(port.Id, port);
+                
                 if (string.IsNullOrEmpty(port.belongNodeId))
                 {
                     badPorts.Add(port);
@@ -72,10 +76,10 @@ namespace NodeSystem.Editor.Windows
                     continue;
                 }
                 
-                if (!portMap.TryGetValue(port.belongNodeId, out var portList))
+                if (!portListMap.TryGetValue(port.belongNodeId, out var portList))
                 {
                     portList = new List<NodeSystemPort>();
-                    portMap.Add(port.belongNodeId, portList);
+                    portListMap.Add(port.belongNodeId, portList);
                 }
                 
                 portList.Add(port);
@@ -83,7 +87,7 @@ namespace NodeSystem.Editor.Windows
             //Find Bad Nodes & Bad Ports
             foreach (var node in graphAsset.nodes)
             {
-                if (!portMap.TryGetValue(node.Id, out var portList))
+                if (!portListMap.TryGetValue(node.Id, out var portList))
                 {
                     badNodes.Add(node);
                     continue;
@@ -98,23 +102,21 @@ namespace NodeSystem.Editor.Windows
                     var portAttribute = fieldInfo.GetCustomAttribute<PortAttribute>();
                     if (portAttribute == null) 
                         continue;
-                    
-                    var valid = false;
-                    foreach (var port in portList)
+
+                    portAttributeCounter++;
+                    var portId = (string)fieldInfo.GetValue(node);
+                    if (portMap.TryGetValue(portId, out var port))
                     {
                         if (port.portType != portAttribute.PortType.AssemblyQualifiedName ||
-                            port.direction != portAttribute.PortDirection) 
-                            continue;
-                        
-                        valid = true;
-                        portAttributeCounter++;
-                        break;
+                            port.direction != portAttribute.PortDirection)
+                        {
+                           isBadNode = true;
+                        }
                     }
-
-                    if (valid)
-                        continue;
-                    
-                    break;
+                    else
+                    {
+                        isBadNode = true;
+                    }
                 }
 
                 if (portAttributeCounter != portList.Count)
@@ -137,7 +139,7 @@ namespace NodeSystem.Editor.Windows
             {
                 if(badPorts.Contains(port))
                     continue;
-                if (badPortIds.Contains(port.connectPortId) || !portMap.ContainsKey(port.Id))
+                if (badPortIds.Contains(port.connectPortId) || !portListMap.ContainsKey(port.Id))
                 {
                     //Break Connection
                     port.Disconnect();

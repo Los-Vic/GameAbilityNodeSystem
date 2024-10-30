@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using NodeSystem.Core;
-using NodeSystem.Ports;
+using NS;
 using UnityEngine;
 
-namespace NodeSystem.Editor.Elements
+namespace NSEditor
 {
     public static class ElementColor
     {
