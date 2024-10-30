@@ -23,15 +23,6 @@ namespace GameAbilitySystem.Logic.Ability
         
         #region Pool
 
-        public ObjectPoolParam GetPoolParam()
-        {
-            return new ObjectPoolParam()
-            {
-                Capacity = GameAbilitySystemCfg.PoolSizeDefine.DefaultCapacity,
-                MaxSize = GameAbilitySystemCfg.PoolSizeDefine.DefaultMaxSize
-            };
-        }
-
         public void OnCreateFromPool()
         {
         }

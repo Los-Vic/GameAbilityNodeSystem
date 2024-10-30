@@ -85,13 +85,49 @@ namespace NS
         public NodeSystemGraphAsset asset;
         public readonly Dictionary<string, NodeSystemNodeRunner> NodeRunners = new();
         //Cache value of node output 
-        public readonly Dictionary<string, object> OutPortResultCached = new();
+        private readonly Dictionary<string, object> _outPortResultCached = new();
         
         public GraphAssetRuntimeData GraphAssetRuntimeData;
         private NodeSystem _nodeSystem;
 
         private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;
+
+        #region Port Val
+
+        public object GetInPortVal(string inPortId)
+        {
+            var port = GraphAssetRuntimeData.PortIdMap[inPortId];
+            if (port.direction != Direction.Input)
+            {
+                Debug.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
+                return null;
+            }
+            
+            if (string.IsNullOrEmpty(port.connectPortId))
+                return null;
+                
+            inPortId = port.connectPortId;
+            return _outPortResultCached.GetValueOrDefault(inPortId);
+        }
+
+        public void SetOutPortVal(string outPortId, object val)
+        {
+            var port = GraphAssetRuntimeData.PortIdMap[outPortId];
+            if (port.direction != Direction.Output)
+            {
+                Debug.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
+                return;
+            }
+            
+            if (!_outPortResultCached.TryAdd(outPortId, val))
+            {
+                _outPortResultCached[outPortId] = val;
+            }
+        }
+
+        #endregion
+       
         
         private void Awake()
         {

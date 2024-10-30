@@ -28,6 +28,6 @@ namespace NS
         public void ConnectTo(string portId) => connectPortId = portId;
         public void Disconnect() => connectPortId = null;
 
-        public bool IsFlowPort() => portType == typeof(FlowPort).AssemblyQualifiedName;
+        public bool IsFlowPort() => portType == typeof(ExecutePort).AssemblyQualifiedName;
     }
 }

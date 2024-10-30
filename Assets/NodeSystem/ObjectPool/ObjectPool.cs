@@ -4,15 +4,8 @@ using UnityEngine;
 
 namespace NS
 {
-    public struct ObjectPoolParam
-    {
-        public int Capacity;
-        public int MaxSize;
-    }
-    
     public interface IPoolObject
     {
-        ObjectPoolParam GetPoolParam();
         void OnCreateFromPool();
         void OnTakeFromPool();
         void OnReturnToPool();
@@ -27,7 +20,7 @@ namespace NS
         private readonly Type _poolObjectType;
         
         //Constructor
-        public ObjectPool(ObjectPoolParam param, Type type)
+        public ObjectPool(Type type, int capacity, int maxSize)
         {
             var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
@@ -39,7 +32,7 @@ namespace NS
             Debug.Log($"[ObjectPool]Create object pool success: type [{type}]");
             _poolObjectType = type;
             _pool = new UnityEngine.Pool.ObjectPool<IPoolObject>(CreateItem, OnTakeFromPool, OnReturnToPool, OnDestroyItem,
-                true, param.Capacity, param.MaxSize);
+                true, capacity, maxSize);
         }
         
         public IPoolObject CreateObject()
@@ -104,13 +97,15 @@ namespace NS
     public class ObjectPoolMgr
     {
         private readonly Dictionary<Type, ObjectPool> _objectPoolMap = new();
+        private const int DefaultCapacity = 32;
+        private const int DefaultMaxSize = 128;
+        
         public T CreateObject<T>() where T:class, IPoolObject, new()
         {
             var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
             {
-                var defaultObj = new T();
-                pool = new ObjectPool(defaultObj.GetPoolParam(), typeof(T));
+                pool = new ObjectPool(typeof(T), DefaultCapacity, DefaultMaxSize);
                 _objectPoolMap.Add(type, pool);
             }
             
@@ -128,8 +123,7 @@ namespace NS
             
             if (!_objectPoolMap.TryGetValue(type, out var pool))
             {
-                var defaultObj = Activator.CreateInstance(type) as IPoolObject;
-                pool = new ObjectPool(defaultObj.GetPoolParam(), type);
+                pool = new ObjectPool(type, DefaultCapacity, DefaultMaxSize);
                 _objectPoolMap.Add(type, pool);
             }
             

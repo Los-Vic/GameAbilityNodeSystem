@@ -8,10 +8,10 @@ namespace NS
         [ExposedProp]
         public string Log;
 
-        [Port(Direction.Input, typeof(FlowPort))]
-        public string InPort;
-        [Port(Direction.Output, typeof(FlowPort))]
-        public string OutPort;
+        [Port(Direction.Input, typeof(ExecutePort))]
+        public string InPortExec;
+        [Port(Direction.Output, typeof(ExecutePort))]
+        public string OutPortExec;
         
     }
 }

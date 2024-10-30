@@ -11,15 +11,6 @@ namespace GameAbilitySystem.Logic.Effect
         }
         #region Object Pool
 
-        public ObjectPoolParam GetPoolParam()
-        {
-            return new ObjectPoolParam()
-            {
-                Capacity = GameAbilitySystemCfg.PoolSizeDefine.DefaultCapacity,
-                MaxSize = GameAbilitySystemCfg.PoolSizeDefine.DefaultMaxSize
-            };
-        }
-
         public void OnCreateFromPool()
         {
         }

@@ -13,7 +13,8 @@ namespace NSEditor
         {
             { typeof(int), new Color(0, 0.8f, 0, 1) },
             { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
-            { typeof(FlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
+            { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
+            { typeof(ExecutePort), new Color(0.8f, 0.8f, 0.8f, 1) },
         };
         
         
@@ -33,9 +34,10 @@ namespace NSEditor
                 case ENodeCategory.Value:
                     return new Color(0, 0.5f, 0, 1);
                 case ENodeCategory.Start:
-                    return new Color(0.6f, 0, 0, 1);
                 case ENodeCategory.Event:
                     return new Color(0.6f, 0, 0, 1);
+                case ENodeCategory.FlowControl:
+                    return new Color(0.5f,0.5f,0.5f,1);
             }
             return Color.magenta;
         }

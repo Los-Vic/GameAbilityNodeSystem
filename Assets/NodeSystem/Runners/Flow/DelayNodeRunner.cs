@@ -8,35 +8,23 @@ namespace NS
         private NodeSystemGraphRunner _graphRunner;
         private float _delay;
         private float _elapsedTime;
-        private bool _dependentNodesExecuted;
         
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
-            base.Init(nodeAsset, graphRunner);
             _node = (DelayNode)nodeAsset;
             _graphRunner = graphRunner;
         }
 
         public override void Execute(float dt = 0)
         {
-            Debug.Log($"Execute Delay Node, ElapsedTime[{_elapsedTime}]");
-            _elapsedTime += dt;
-
-            if (!_dependentNodesExecuted)
+            if (!DependentValNodesExecuted)
             {
-                _dependentNodesExecuted = true;
-                var nodeList = _graphRunner.GraphAssetRuntimeData.NodeValDependencyMap[_node.Id];
-                for (var i = nodeList.Count - 1; i >= 0; i--)
-                {
-                    var runner = _graphRunner.NodeRunners[nodeList[i]];
-                    runner.Execute();
-                }
-
-                var inPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.InFloatPort];
-                _delay = (float)_graphRunner.OutPortResultCached[inPort.connectPortId];
+                ExecuteDependentValNodes(_node.Id, _graphRunner);
+                _delay = (float)_graphRunner.GetInPortVal(_node.InPortFloat);
                 Debug.Log($"Input Delay [{_delay}]");
             }
-
+            
+            _elapsedTime += dt;
             if (_elapsedTime >= _delay)
             {
                 IsNodeRunnerCompleted = true;
@@ -45,7 +33,7 @@ namespace NS
 
         public override string GetNextNode()
         {
-            var port = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.OutPort];
+            var port = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.OutPortExec];
             if(string.IsNullOrEmpty(port.connectPortId))
                 return default;
             var connectPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[port.connectPortId];

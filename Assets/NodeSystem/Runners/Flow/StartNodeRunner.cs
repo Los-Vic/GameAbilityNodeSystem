@@ -7,9 +7,8 @@ namespace NS
         private string _nextNode;
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
-            base.Init(nodeAsset, graphRunner);
             var node = (StartNode)nodeAsset;
-            var port = graphRunner.GraphAssetRuntimeData.PortIdMap[node.OutPort];
+            var port = graphRunner.GraphAssetRuntimeData.PortIdMap[node.OutPortExec];
             if(string.IsNullOrEmpty(port.connectPortId))
                 return;
             
@@ -19,7 +18,6 @@ namespace NS
 
         public override void Execute(float dt = 0)
         {
-            Debug.Log("Execute StartNodeRunner");
             IsNodeRunnerCompleted = true;
         }
 

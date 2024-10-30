@@ -9,7 +9,7 @@ namespace NS
         //Flow
         Start = 0,
         Event = 1,
-        Flow = 2,
+        FlowControl = 2,
         //Executable
         ExecInstant = 100,
         ExecDebugInstant = 101,

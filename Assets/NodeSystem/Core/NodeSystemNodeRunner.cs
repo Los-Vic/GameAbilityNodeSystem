@@ -15,16 +15,7 @@
         }
 
         #region Pool Object
-
-        public ObjectPoolParam GetPoolParam()
-        {
-            return new ObjectPoolParam()
-            {
-                Capacity = 64,
-                MaxSize = 128
-            };
-        }
-
+        
         public virtual void OnCreateFromPool()
         {
         }

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace NS
+﻿namespace NS
 {
     public class IntNodeRunner:NodeSystemNodeRunner
     {
@@ -8,15 +6,13 @@ namespace NS
         private NodeSystemGraphRunner _graphRunner;
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
-            base.Init(nodeAsset, graphRunner);
             _node = ((IntNode)nodeAsset);
             _graphRunner = graphRunner;
         }
 
         public override void Execute(float dt = 0)
         {
-            Debug.Log($"Execute Int Node, Int Val[{_node.Val}]");
-            _graphRunner.OutPortResultCached.Add(_node.OutVal, _node.Val);
+            _graphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
         }
     }
 }

@@ -9,6 +9,6 @@ namespace NS
         public float Val;
 
         [Port(Direction.Output, typeof(float))]
-        public string OutVal;
+        public string OutPortVal;
     }
 }
