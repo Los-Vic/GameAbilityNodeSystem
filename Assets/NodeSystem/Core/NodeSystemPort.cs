@@ -25,9 +25,10 @@ namespace NS
             this.portType = portType.AssemblyQualifiedName;
         }
 
+        public static bool IsValidPortId(string portId) => !string.IsNullOrEmpty(portId);
+        public bool IsConnected() => !string.IsNullOrEmpty(connectPortId);
         public void ConnectTo(string portId) => connectPortId = portId;
         public void Disconnect() => connectPortId = null;
-
         public bool IsFlowPort() => portType == typeof(ExecutePort).AssemblyQualifiedName;
     }
 }

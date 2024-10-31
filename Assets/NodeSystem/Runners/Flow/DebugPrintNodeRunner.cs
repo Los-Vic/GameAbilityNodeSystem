@@ -15,15 +15,15 @@ namespace NS
         public override void Execute(float dt = 0)
         {
             Debug.Log(_node.Log);
-            IsNodeRunnerCompleted = true;
+            Complete();
         }
 
         public override string GetNextNode()
         {
-            var port = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.OutPortExec];
-            if(string.IsNullOrEmpty(port.connectPortId))
+            var port = _graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            if(!port.IsConnected())
                 return default;
-            var connectPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[port.connectPortId];
+            var connectPort = _graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

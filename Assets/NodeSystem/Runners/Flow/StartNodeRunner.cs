@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace NS
 {
     public class StartNodeRunner:NodeSystemFlowNodeRunner
@@ -8,17 +7,17 @@ namespace NS
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
             var node = (StartNode)nodeAsset;
-            var port = graphRunner.GraphAssetRuntimeData.PortIdMap[node.OutPortExec];
-            if(string.IsNullOrEmpty(port.connectPortId))
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(node.OutPortExec);
+            if(!port.IsConnected())
                 return;
             
-            var connectPort = graphRunner.GraphAssetRuntimeData.PortIdMap[port.connectPortId];
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             _nextNode = connectPort.belongNodeId;
         }
 
         public override void Execute(float dt = 0)
         {
-            IsNodeRunnerCompleted = true;
+            Complete();
         }
 
         public override string GetNextNode()

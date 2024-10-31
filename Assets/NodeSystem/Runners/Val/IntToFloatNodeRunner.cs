@@ -12,8 +12,7 @@
 
         public override void Execute(float dt = 0)
         {
-            var inValObj = _graphRunner.GetInPortVal(_node.InPortVal);
-            var inVal = inValObj != null ? (int)inValObj : 0;
+            var inVal = _graphRunner.GetInPortVal<int>(_node.InPortVal);
             var floatVal = (float)inVal;
             _graphRunner.SetOutPortVal(_node.OutPortVal, floatVal);
         }

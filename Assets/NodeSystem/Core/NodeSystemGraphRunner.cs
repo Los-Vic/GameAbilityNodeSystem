@@ -7,13 +7,13 @@ namespace NS
 {
     public class GraphAssetRuntimeData
     {
-        public NodeSystemGraphAsset Asset;
-        public readonly Dictionary<string, NodeSystemNode> NodeIdMap = new();
-        public readonly Dictionary<string, NodeSystemPort> PortIdMap = new();
-        public readonly Dictionary<string, List<string>> NodePortsMap = new();
+        public NodeSystemGraphAsset Asset { get; private set; }
+        private readonly Dictionary<string, NodeSystemNode> _nodeIdMap = new();
+        private readonly Dictionary<string, NodeSystemPort> _portIdMap = new();
+        private readonly Dictionary<string, List<string>> _nodePortsMap = new();
         //To execute flow node, we need output value of dependent value nodes
-        public readonly Dictionary<string, List<string>> NodeValDependencyMap = new();
-        public string StartNodeId;
+        private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
+        public string StartNodeId { get;private set; }
         
         private readonly List<string> _toRunNodeList = new();
 
@@ -24,15 +24,15 @@ namespace NS
             //Construct NodeIdMap & NodePortsMap
             foreach (var node in Asset.nodes)
             {
-                NodeIdMap.Add(node.Id, node);
-                NodePortsMap.Add(node.Id, new List<string>());
+                _nodeIdMap.Add(node.Id, node);
+                _nodePortsMap.Add(node.Id, new List<string>());
             }
 
             //Construct PortIdMap & NodePortsMap
             foreach (var port in Asset.ports)
             {
-                PortIdMap.Add(port.Id, port);
-                if (NodePortsMap.TryGetValue(port.belongNodeId, out var portList))
+                _portIdMap.Add(port.Id, port);
+                if (_nodePortsMap.TryGetValue(port.belongNodeId, out var portList))
                 {
                     portList.Add(port.Id);
                 }
@@ -50,24 +50,24 @@ namespace NS
                     continue;
 
                 var valueNodeList = new List<string>();
-                NodeValDependencyMap.Add(node.Id, valueNodeList);
+                _nodeValDependencyMap.Add(node.Id, valueNodeList);
                 
                 _toRunNodeList.Clear();
                 _toRunNodeList.Add(node.Id);
 
                 while (_toRunNodeList.Count > 0)
                 {
-                    foreach (var portId in NodePortsMap[_toRunNodeList[0]])
+                    foreach (var portId in _nodePortsMap[_toRunNodeList[0]])
                     {
-                        var port = PortIdMap[portId];
+                        var port = _portIdMap[portId];
                         if(port.IsFlowPort() || port.direction == Direction.Output)
                             continue;
                     
-                        if(string.IsNullOrEmpty(port.connectPortId))
+                        if(!NodeSystemPort.IsValidPortId(port.connectPortId))
                             continue;
                     
-                        var connectPort = PortIdMap[port.connectPortId];
-                        var connectNode = NodeIdMap[connectPort.belongNodeId];
+                        var connectPort = _portIdMap[port.connectPortId];
+                        var connectNode = _nodeIdMap[connectPort.belongNodeId];
                         if (!connectNode.IsValueNode()) 
                             continue;
                         valueNodeList.Add(connectNode.Id);
@@ -78,6 +78,11 @@ namespace NS
                 }
             }
         }
+
+        public NodeSystemNode GetNodeById(string id) => _nodeIdMap.GetValueOrDefault(id);
+        public NodeSystemPort GetPortById(string id) => _portIdMap.GetValueOrDefault(id);
+        public List<string> GetPortIdsOfNode(string nodeId) => _nodePortsMap.GetValueOrDefault(nodeId, new List<string>());
+        public List<string> GetDependentNodeIds(string nodeId) => _nodeValDependencyMap.GetValueOrDefault(nodeId, new List<string>());
     }
     
     public class NodeSystemGraphRunner:MonoBehaviour
@@ -95,25 +100,25 @@ namespace NS
 
         #region Port Val
 
-        public object GetInPortVal(string inPortId)
+        public T GetInPortVal<T>(string inPortId)
         {
-            var port = GraphAssetRuntimeData.PortIdMap[inPortId];
+            var port = GraphAssetRuntimeData.GetPortById(inPortId);
             if (port.direction != Direction.Input)
             {
                 Debug.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
-                return null;
+                return default;
             }
             
-            if (string.IsNullOrEmpty(port.connectPortId))
-                return null;
+            if (!NodeSystemPort.IsValidPortId(port.connectPortId))
+                return default;
                 
             inPortId = port.connectPortId;
-            return _outPortResultCached.GetValueOrDefault(inPortId);
+            return (T)_outPortResultCached.GetValueOrDefault(inPortId);
         }
 
         public void SetOutPortVal(string outPortId, object val)
         {
-            var port = GraphAssetRuntimeData.PortIdMap[outPortId];
+            var port = GraphAssetRuntimeData.GetPortById(outPortId);
             if (port.direction != Direction.Output)
             {
                 Debug.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
@@ -139,7 +144,7 @@ namespace NS
 
         private void Start()
         {
-            if (string.IsNullOrEmpty(GraphAssetRuntimeData.StartNodeId))
+            if (!NodeSystemNode.IsValidNodeId(GraphAssetRuntimeData.StartNodeId))
             {
                 Debug.Log("No Start Node");
                 return;
@@ -168,10 +173,10 @@ namespace NS
         {
             _curRunner.Execute(deltaTime);
 
-            while (_curRunner.IsNodeRunnerCompleted)
+            while (_curRunner.IsCompleted())
             {
                 var nextNode = _curRunner.GetNextNode();
-                if (string.IsNullOrEmpty(nextNode))
+                if (!NodeSystemNode.IsValidNodeId(nextNode))
                 {
                     EndGraphRunner();
                     break;

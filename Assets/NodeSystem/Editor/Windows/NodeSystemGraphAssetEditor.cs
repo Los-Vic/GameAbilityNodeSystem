@@ -139,7 +139,9 @@ namespace NSEditor
             {
                 if(badPorts.Contains(port))
                     continue;
-                if (badPortIds.Contains(port.connectPortId) || !portListMap.ContainsKey(port.Id))
+                if(!port.IsConnected())
+                    continue;
+                if (badPortIds.Contains(port.connectPortId) || !portMap.ContainsKey(port.connectPortId))
                 {
                     //Break Connection
                     port.Disconnect();

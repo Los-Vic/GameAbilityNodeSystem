@@ -8,6 +8,7 @@ namespace NS
         private NodeSystemGraphRunner _graphRunner;
         private float _delay;
         private float _elapsedTime;
+        private bool _started;
         
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
@@ -17,26 +18,27 @@ namespace NS
 
         public override void Execute(float dt = 0)
         {
-            if (!DependentValNodesExecuted)
+            if (!_started)
             {
                 ExecuteDependentValNodes(_node.Id, _graphRunner);
-                _delay = (float)_graphRunner.GetInPortVal(_node.InPortFloat);
+                _delay = _graphRunner.GetInPortVal<float>(_node.InPortFloat);
                 Debug.Log($"Input Delay [{_delay}]");
+                _started = true;
             }
             
             _elapsedTime += dt;
             if (_elapsedTime >= _delay)
             {
-                IsNodeRunnerCompleted = true;
+                Complete();
             }
         }
 
         public override string GetNextNode()
         {
-            var port = _graphRunner.GraphAssetRuntimeData.PortIdMap[_node.OutPortExec];
-            if(string.IsNullOrEmpty(port.connectPortId))
+            var port = _graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            if(!port.IsConnected())
                 return default;
-            var connectPort = _graphRunner.GraphAssetRuntimeData.PortIdMap[port.connectPortId];
+            var connectPort = _graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

@@ -63,7 +63,6 @@ namespace NSEditor
         private void ConstructTitle(Type type, NodeAttribute attribute)
         {
             title = attribute.Title;
-
             if (attribute.NodeCategory == ENodeCategory.ExecNonInstant)
             {
                 var img = new Image
@@ -106,6 +105,7 @@ namespace NSEditor
 
             port.portName = portAttribute.PortName;
             port.portColor = ElementColor.GetPortColor(portAttribute.PortType);
+            port.tooltip = portAttribute.PortType.Name;
             var nodePort = (string)fieldInfo.GetValue(Node);
             ViewPortToNodePort.Add(port, nodePort);
             NodePortToViewPort.Add(nodePort, port);
