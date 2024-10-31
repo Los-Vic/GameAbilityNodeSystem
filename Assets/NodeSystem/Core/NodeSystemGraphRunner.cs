@@ -5,100 +5,59 @@ using UnityEngine;
 
 namespace NS
 {
-    public class GraphAssetRuntimeData
+    public class NodeSystemGraphRunner:IPoolObject
     {
-        public NodeSystemGraphAsset Asset { get; private set; }
-        private readonly Dictionary<string, NodeSystemNode> _nodeIdMap = new();
-        private readonly Dictionary<string, NodeSystemPort> _portIdMap = new();
-        private readonly Dictionary<string, List<string>> _nodePortsMap = new();
-        //To execute flow node, we need output value of dependent value nodes
-        private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
-        public string StartNodeId { get;private set; }
-        
-        private readonly List<string> _toRunNodeList = new();
-
-        public void Init(NodeSystemGraphAsset asset)
-        {
-            Asset = asset;
-            
-            //Construct NodeIdMap & NodePortsMap
-            foreach (var node in Asset.nodes)
-            {
-                _nodeIdMap.Add(node.Id, node);
-                _nodePortsMap.Add(node.Id, new List<string>());
-            }
-
-            //Construct PortIdMap & NodePortsMap
-            foreach (var port in Asset.ports)
-            {
-                _portIdMap.Add(port.Id, port);
-                if (_nodePortsMap.TryGetValue(port.belongNodeId, out var portList))
-                {
-                    portList.Add(port.Id);
-                }
-            }
-
-            //Construct NodeValDependencyMap
-            foreach (var node in Asset.nodes)
-            {
-                var type = node.GetType();
-                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
-                if (nodeAttribute.NodeCategory == ENodeCategory.Start)
-                    StartNodeId = node.Id;
-
-                if (!node.IsFlowNode())
-                    continue;
-
-                var valueNodeList = new List<string>();
-                _nodeValDependencyMap.Add(node.Id, valueNodeList);
-                
-                _toRunNodeList.Clear();
-                _toRunNodeList.Add(node.Id);
-
-                while (_toRunNodeList.Count > 0)
-                {
-                    foreach (var portId in _nodePortsMap[_toRunNodeList[0]])
-                    {
-                        var port = _portIdMap[portId];
-                        if(port.IsFlowPort() || port.direction == Direction.Output)
-                            continue;
-                    
-                        if(!NodeSystemPort.IsValidPortId(port.connectPortId))
-                            continue;
-                    
-                        var connectPort = _portIdMap[port.connectPortId];
-                        var connectNode = _nodeIdMap[connectPort.belongNodeId];
-                        if (!connectNode.IsValueNode()) 
-                            continue;
-                        valueNodeList.Add(connectNode.Id);
-                        _toRunNodeList.Add(connectNode.Id);
-                    }
-                    
-                    _toRunNodeList.RemoveAt(0);
-                }
-            }
-        }
-
-        public NodeSystemNode GetNodeById(string id) => _nodeIdMap.GetValueOrDefault(id);
-        public NodeSystemPort GetPortById(string id) => _portIdMap.GetValueOrDefault(id);
-        public List<string> GetPortIdsOfNode(string nodeId) => _nodePortsMap.GetValueOrDefault(nodeId, new List<string>());
-        public List<string> GetDependentNodeIds(string nodeId) => _nodeValDependencyMap.GetValueOrDefault(nodeId, new List<string>());
-    }
-    
-    public class NodeSystemGraphRunner:MonoBehaviour
-    {
-        public NodeSystemGraphAsset asset;
+        private NodeSystemGraphAsset _asset;
+        private NodeSystem _nodeSystem;
         private readonly Dictionary<string, NodeSystemNodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
-        public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
-        private NodeSystem _nodeSystem;
-
+        //Run node runner
         private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
+        public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
+        
+        public void Init(NodeSystem system, NodeSystemGraphAsset asset)
+        {
+            _nodeSystem = system;
+            _asset = asset;
+            GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
+            CreateRunnerInstances();
+        }
+
+        private void DeInit()
+        {
+            DestroyRunnerInstances();
+        }
+
+        public void StartRunner()
+        {
+            if (!NodeSystemNode.IsValidNodeId(GraphAssetRuntimeData.StartNodeId))
+            {
+                Debug.Log("No Start Node");
+                return;
+            }
+            StartGraphRunner();
+        }
+
+        public void UpdateRunner(float deltaTime = 0)
+        {
+            if(!_isRunning)
+                return;
+            
+            UpdateCurNodeRunner(deltaTime);
+        }
+
+        public void StopRunner()
+        {
+            EndGraphRunner();
+        }
+        
+        public NodeSystemNodeRunner GetNodeRunner(string nodeId) => _nodeRunners.GetValueOrDefault(nodeId, NodeSystemNodeRunner.DefaultRunner);
+        
         #region Port Val
 
         public T GetInPortVal<T>(string inPortId)
@@ -133,9 +92,7 @@ namespace NS
         }
 
         #endregion
-       
-        public NodeSystemNodeRunner GetNodeRunner(string nodeId) => _nodeRunners.GetValueOrDefault(nodeId, NodeSystemNodeRunner.DefaultRunner);
-
+        
         #region Loop
 
         public void EnterLoop(string nodeId)
@@ -158,42 +115,25 @@ namespace NS
 
         #endregion
         
-        
-        private void Awake()
+        private void CreateRunnerInstances()
         {
-            _nodeSystem = new();
-            _nodeSystem.InitSystem();
-            GraphAssetRuntimeData = new();
-            GraphAssetRuntimeData.Init(asset);
-        }
-
-        private void Start()
-        {
-            if (!NodeSystemNode.IsValidNodeId(GraphAssetRuntimeData.StartNodeId))
+            foreach (var n in _asset.nodes)
             {
-                Debug.Log("No Start Node");
-                return;
-            }
-
-            //Create Runner Instances
-            foreach (var n in asset.nodes)
-            {
-                var runner = _nodeSystem.NodeRunnerFactory.CreateNodeRunner(n.GetType());
+                var runner = _nodeSystem.RunnerFactory.CreateNodeRunner(n.GetType());
                 runner.Init(n, this);
                 _nodeRunners.Add(n.Id, runner);
             }
-
-            StartGraphRunner();
         }
 
-        private void Update()
+        private void DestroyRunnerInstances()
         {
-            if(!_isRunning)
-                return;
-            
-            UpdateCurNodeRunner(Time.deltaTime);
+            foreach (var nodeRunners in _nodeRunners.Values)
+            {
+                _nodeSystem.RunnerFactory.DestroyNodeRunner(nodeRunners);
+            }
+            _nodeRunners.Clear();
         }
-
+        
         private void UpdateCurNodeRunner(float deltaTime = 0)
         {
             _curRunner.Execute(deltaTime);
@@ -228,7 +168,7 @@ namespace NS
         
         private void StartGraphRunner()
         {
-            Debug.Log("Start GraphRunner");
+            Debug.Log($"Start GraphRunner of {_asset.name}");
             _isRunning = true;
             _curRunner = _nodeRunners[GraphAssetRuntimeData.StartNodeId] as NodeSystemFlowNodeRunner;
 
@@ -237,9 +177,31 @@ namespace NS
         
         private void EndGraphRunner()
         {
-            Debug.Log("End GraphRunner");
+            Debug.Log($"End GraphRunner of {_asset.name}");
             _isRunning = false;
             _curRunner = null;
         }
+
+        #region Pool Object
+
+        public void OnCreateFromPool()
+        {
+        }
+
+        public void OnTakeFromPool()
+        {
+        }
+
+        public void OnReturnToPool()
+        {
+            DeInit();
+        }
+
+        public void OnDestroy()
+        {
+        }
+
+        #endregion
+       
     }
 }

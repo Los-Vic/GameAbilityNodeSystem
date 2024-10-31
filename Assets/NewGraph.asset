@@ -80,10 +80,10 @@ MonoBehaviour:
         guid: 7b020c64-4d75-4c51-a170-5717c85a3969
         position:
           serializedVersion: 2
-          x: 668
-          y: 94.4
-          width: 198.40002
-          height: 95.200005
+          x: 488
+          y: 83
+          width: 225
+          height: 97
         nodeName: Print
         Log: Total Complete
         InPortExec: befef84f-1b32-4b7a-b993-0313e2c2a3dd
@@ -196,10 +196,10 @@ MonoBehaviour:
         guid: 35090128-937d-41a8-8b15-338c6595651a
         position:
           serializedVersion: 2
-          x: -87.2
-          y: 358.4
-          width: 155.2
-          height: 95.20001
+          x: -87
+          y: 371
+          width: 153
+          height: 97
         nodeName: Int
         Val: 0
         OutPortVal: 71631626-afd2-4c3b-9fb6-732d3aa3d48a
@@ -353,10 +353,10 @@ MonoBehaviour:
         guid: aae2c840-4919-4cf6-908f-fde164dec838
         position:
           serializedVersion: 2
-          x: 668
-          y: 232.79999
-          width: 198.40002
-          height: 95.20001
+          x: 609
+          y: 250
+          width: 197
+          height: 97
         nodeName: Print
         Log: Complete
         InPortExec: b6bc7967-8b1b-438a-9f7a-c8af9e1b0125
@@ -383,10 +383,10 @@ MonoBehaviour:
         guid: 40779b08-b170-4138-a806-2e375a51f97c
         position:
           serializedVersion: 2
-          x: 164
-          y: 556.8
-          width: 155.20001
-          height: 95.20001
+          x: 146
+          y: 487
+          width: 153
+          height: 97
         nodeName: Int
         Val: 0
         OutPortVal: 91dd9909-5253-4c88-81e9-649e72406411
@@ -404,10 +404,10 @@ MonoBehaviour:
         guid: f0aad5f5-957c-4bc3-8198-7690619665f8
         position:
           serializedVersion: 2
-          x: 164
-          y: 675.2
-          width: 155.20001
-          height: 95.20001
+          x: 146
+          y: 625
+          width: 153
+          height: 97
         nodeName: Int
         Val: 2
         OutPortVal: 36953a61-4dc0-4fdd-8868-deeb9a31bf96

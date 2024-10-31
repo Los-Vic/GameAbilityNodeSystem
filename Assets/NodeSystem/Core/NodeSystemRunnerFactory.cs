@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace NS
 {
-    public class NodeSystemNodeRunnerFactory
+    public class NodeSystemRunnerFactory
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
         private readonly ObjectPoolMgr _objectPoolMgr = new();
@@ -25,6 +25,23 @@ namespace NS
 
             var runner = _objectPoolMgr.CreateObject(runnerType) as NodeSystemNodeRunner;
             return runner ?? NodeSystemNodeRunner.DefaultRunner;
+        }
+
+        public virtual void DestroyNodeRunner(NodeSystemNodeRunner runner)
+        {
+            if(runner == NodeSystemNodeRunner.DefaultRunner)
+                return;
+            _objectPoolMgr.DestroyObject(runner);
+        }
+
+        public virtual NodeSystemGraphRunner CreateGraphRunner()
+        {
+            return _objectPoolMgr.CreateObject<NodeSystemGraphRunner>();
+        }
+
+        public void DestroyGraphRunner(NodeSystemGraphRunner runner)
+        {
+            _objectPoolMgr.DestroyObject(runner);
         }
     }
 }
