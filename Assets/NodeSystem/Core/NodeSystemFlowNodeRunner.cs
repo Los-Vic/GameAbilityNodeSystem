@@ -3,12 +3,12 @@
     public class NodeSystemFlowNodeRunner:NodeSystemNodeRunner
     {
         private bool _isCompleted;
-        protected bool DependentValNodesExecuted { get; private set; }
+        private bool _dependentValNodesExecuted;
         
         public virtual void Reset()
         {
             _isCompleted = false;
-            DependentValNodesExecuted = false;
+            _dependentValNodesExecuted = false;
         }
         
         public virtual string GetNextNode()
@@ -21,17 +21,17 @@
         
         protected void ExecuteDependentValNodes(string flowNodeId, NodeSystemGraphRunner graphRunner)
         {
-            if(DependentValNodesExecuted)
+            if(_dependentValNodesExecuted)
                 return;
             
             var nodeList = graphRunner.GraphAssetRuntimeData.GetDependentNodeIds(flowNodeId);
             for (var i = nodeList.Count - 1; i >= 0; i--)
             {
-                var runner = graphRunner.NodeRunners[nodeList[i]];
+                var runner = graphRunner.GetNodeRunner(nodeList[i]);
                 runner.Execute();
             }
 
-            DependentValNodesExecuted = true;
+            _dependentValNodesExecuted = true;
         }
     }
 }

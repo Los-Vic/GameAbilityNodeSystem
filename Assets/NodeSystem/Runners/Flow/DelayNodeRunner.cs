@@ -16,6 +16,13 @@ namespace NS
             _graphRunner = graphRunner;
         }
 
+        public override void Reset()
+        {
+            base.Reset();
+            _started = false;
+            _elapsedTime = 0;
+        }
+
         public override void Execute(float dt = 0)
         {
             if (!_started)

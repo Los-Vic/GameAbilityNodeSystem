@@ -88,15 +88,16 @@ namespace NS
     public class NodeSystemGraphRunner:MonoBehaviour
     {
         public NodeSystemGraphAsset asset;
-        public readonly Dictionary<string, NodeSystemNodeRunner> NodeRunners = new();
+        private readonly Dictionary<string, NodeSystemNodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
-        public GraphAssetRuntimeData GraphAssetRuntimeData;
+        public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         private NodeSystem _nodeSystem;
 
         private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;
+        private readonly Stack<string> _runningLoopNodeIds = new();
 
         #region Port Val
 
@@ -133,6 +134,30 @@ namespace NS
 
         #endregion
        
+        public NodeSystemNodeRunner GetNodeRunner(string nodeId) => _nodeRunners.GetValueOrDefault(nodeId, NodeSystemNodeRunner.DefaultRunner);
+
+        #region Loop
+
+        public void EnterLoop(string nodeId)
+        {
+            _runningLoopNodeIds.Push(nodeId);
+        }
+        
+        public bool IsInLoop(out string loopNodeId)
+        {
+            loopNodeId = _runningLoopNodeIds.Count == 0 ? default : _runningLoopNodeIds.Peek();
+            return _runningLoopNodeIds.Count != 0;
+        }
+
+        public void ExitLoop()
+        {
+            if(_runningLoopNodeIds.Count == 0)
+                return;
+            _runningLoopNodeIds.Pop();
+        }
+
+        #endregion
+        
         
         private void Awake()
         {
@@ -155,7 +180,7 @@ namespace NS
             {
                 var runner = _nodeSystem.NodeRunnerFactory.CreateNodeRunner(n.GetType());
                 runner.Init(n, this);
-                NodeRunners.Add(n.Id, runner);
+                _nodeRunners.Add(n.Id, runner);
             }
 
             StartGraphRunner();
@@ -175,14 +200,23 @@ namespace NS
 
             while (_curRunner.IsCompleted())
             {
+                if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curRunner)
+                {
+                    _curRunner.Reset();
+                }
+                
                 var nextNode = _curRunner.GetNextNode();
                 if (!NodeSystemNode.IsValidNodeId(nextNode))
                 {
-                    EndGraphRunner();
-                    break;
+                    if (!NodeSystemNode.IsValidNodeId(loopNode))
+                    {
+                        EndGraphRunner();
+                        break;
+                    }
+                    nextNode = loopNode;
                 }
                 
-                _curRunner = NodeRunners[nextNode] as NodeSystemFlowNodeRunner;
+                _curRunner = _nodeRunners[nextNode] as NodeSystemFlowNodeRunner;
                 if (_curRunner == null)
                 {
                     EndGraphRunner();
@@ -196,7 +230,7 @@ namespace NS
         {
             Debug.Log("Start GraphRunner");
             _isRunning = true;
-            _curRunner = NodeRunners[GraphAssetRuntimeData.StartNodeId] as NodeSystemFlowNodeRunner;
+            _curRunner = _nodeRunners[GraphAssetRuntimeData.StartNodeId] as NodeSystemFlowNodeRunner;
 
             UpdateCurNodeRunner();
         }
