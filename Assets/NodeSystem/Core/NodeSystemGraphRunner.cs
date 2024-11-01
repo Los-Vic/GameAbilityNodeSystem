@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -25,12 +24,11 @@ namespace NS
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
-            CreateRunnerInstances();
         }
 
         private void DeInit()
         {
-            DestroyRunnerInstances();
+            StopGraphRunner();
         }
 
         public void StartRunner()
@@ -53,10 +51,20 @@ namespace NS
 
         public void StopRunner()
         {
-            EndGraphRunner();
+            StopGraphRunner();
         }
-        
-        public NodeSystemNodeRunner GetNodeRunner(string nodeId) => _nodeRunners.GetValueOrDefault(nodeId, NodeSystemNodeRunner.DefaultRunner);
+
+        public NodeSystemNodeRunner GetNodeRunner(string nodeId)
+        {
+            if (_nodeRunners.TryGetValue(nodeId, out var nodeRunner))
+                return nodeRunner;
+
+            var n = GraphAssetRuntimeData.GetNodeById(nodeId);
+            var runner = _nodeSystem.RunnerFactory.CreateNodeRunner(n.GetType());
+            runner.Init(n, this);
+            _nodeRunners.Add(n.Id, runner);
+            return runner;
+        }
         
         #region Port Val
 
@@ -114,16 +122,6 @@ namespace NS
         }
 
         #endregion
-        
-        private void CreateRunnerInstances()
-        {
-            foreach (var n in _asset.nodes)
-            {
-                var runner = _nodeSystem.RunnerFactory.CreateNodeRunner(n.GetType());
-                runner.Init(n, this);
-                _nodeRunners.Add(n.Id, runner);
-            }
-        }
 
         private void DestroyRunnerInstances()
         {
@@ -150,16 +148,16 @@ namespace NS
                 {
                     if (!NodeSystemNode.IsValidNodeId(loopNode))
                     {
-                        EndGraphRunner();
+                        StopGraphRunner();
                         break;
                     }
                     nextNode = loopNode;
                 }
                 
-                _curRunner = _nodeRunners[nextNode] as NodeSystemFlowNodeRunner;
+                _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
                 if (_curRunner == null)
                 {
-                    EndGraphRunner();
+                    StopGraphRunner();
                     break;
                 }
                 _curRunner.Execute();
@@ -170,16 +168,22 @@ namespace NS
         {
             Debug.Log($"Start GraphRunner of {_asset.name}");
             _isRunning = true;
-            _curRunner = _nodeRunners[GraphAssetRuntimeData.StartNodeId] as NodeSystemFlowNodeRunner;
+            _curRunner = GetNodeRunner(GraphAssetRuntimeData.StartNodeId) as NodeSystemFlowNodeRunner;
 
             UpdateCurNodeRunner();
         }
         
-        private void EndGraphRunner()
+        private void StopGraphRunner()
         {
-            Debug.Log($"End GraphRunner of {_asset.name}");
+            if(!_isRunning)
+                return;
+            
+            Debug.Log($"Stop GraphRunner of {_asset.name}");
             _isRunning = false;
             _curRunner = null;
+            _runningLoopNodeIds.Clear();
+            _outPortResultCached.Clear();
+            DestroyRunnerInstances();
         }
 
         #region Pool Object

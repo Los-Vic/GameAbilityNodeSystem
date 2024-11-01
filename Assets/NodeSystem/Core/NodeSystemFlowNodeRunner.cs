@@ -33,5 +33,10 @@
 
             _dependentValNodesExecuted = true;
         }
+
+        public override void OnReturnToPool()
+        {
+            Reset();
+        }
     }
 }
