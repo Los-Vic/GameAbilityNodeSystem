@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace NS
 {
-    [CreateAssetMenu(menuName = "NodeSystem/GraphAsset", fileName = "NewGraph")]
     public class NodeSystemGraphAsset:ScriptableObject
     {
         [SerializeReference]

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NodeSystemGraphControllerMono:MonoBehaviour
 {
-    public NodeSystemGraphAsset asset;
+    public DemoGraphAsset asset;
 
     private NodeSystem _system;
     private NodeSystemGraphController _controller;
@@ -26,7 +26,7 @@ public class NodeSystemGraphControllerMono:MonoBehaviour
 
     private void Start()
     {
-        _system = new NodeSystem();
+        _system = new DemoNodeSystem();
         _system.InitSystem();
         _controller = new NodeSystemGraphController();
         _controller.Init(_system, asset);

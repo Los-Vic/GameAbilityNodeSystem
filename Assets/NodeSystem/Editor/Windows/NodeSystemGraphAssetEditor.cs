@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using NS;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NSEditor
 {
-    [CustomEditor(typeof(NodeSystemGraphAsset))]
-    public class NodeSystemGraphAssetEditor:UnityEditor.Editor
+    [CustomEditor(typeof(NodeSystemGraphAsset), true)]
+    public class NodeSystemGraphAssetEditor:Editor
     {
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceId, int index)

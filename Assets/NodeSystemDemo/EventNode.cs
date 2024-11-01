@@ -1,8 +1,22 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using System;
+using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("NodeEvent", "Default/Event/NodeEvent", ENodeCategory.Event, ENodeNumsLimit.None, typeof(EventNodeRunner))]
+    public enum ENodeEventType
+    {
+        BeginPlay,
+        EndPlay
+    }
+    
+    [Serializable]
+    public class NodeEventParam:NodeSystemEventParamBase
+    {
+        public int IntParam1;
+        public int IntParam2;
+    }
+    
+    [Node("NodeEvent", "Demo/Event/NodeEvent", ENodeCategory.Event, ENodeNumsLimit.None, typeof(EventNodeRunner))]
     public class EventNode:NodeSystemNode
     {
         [Port(Direction.Output, typeof(ExecutePort))]
