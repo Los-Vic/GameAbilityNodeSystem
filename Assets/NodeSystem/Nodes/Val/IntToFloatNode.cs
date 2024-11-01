@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("IntToFloat", "Converter/IntToFloat", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntToFloatNodeRunner) )]
+    [Node("IntToFloat", "Default/Converter/IntToFloat", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntToFloatNodeRunner) )]
     public class IntToFloatNode:NodeSystemNode
     {
         [Port(Direction.Input, typeof(int))]

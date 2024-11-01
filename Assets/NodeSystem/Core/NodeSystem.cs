@@ -4,12 +4,18 @@ namespace NS
 {
     public class NodeSystem
     {
-        public NodeSystemRunnerFactory RunnerFactory;
+        public NodeSystemObjectFactory ObjectFactory;
         private readonly Dictionary<NodeSystemGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         
         public virtual void InitSystem()
         {
-            RunnerFactory = new NodeSystemRunnerFactory();
+            ObjectFactory = new NodeSystemObjectFactory();
+        }
+
+        public virtual void DeInitSystem()
+        {
+            ObjectFactory.Clear();
+            _graphAssetRuntimeDataMap.Clear();
         }
 
         public GraphAssetRuntimeData GetGraphRuntimeData(NodeSystemGraphAsset asset)

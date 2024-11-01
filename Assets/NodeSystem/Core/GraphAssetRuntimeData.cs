@@ -12,7 +12,6 @@ namespace NS
         private readonly Dictionary<string, List<string>> _nodePortsMap = new();
         //To execute flow node, we need output value of dependent value nodes
         private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
-        public string StartNodeId { get;private set; }
         
         private readonly List<string> _toRunNodeList = new();
 
@@ -40,12 +39,7 @@ namespace NS
             //Construct NodeValDependencyMap
             foreach (var node in Asset.nodes)
             {
-                var type = node.GetType();
-                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
-                if (nodeAttribute.NodeCategory == ENodeCategory.Start)
-                    StartNodeId = node.Id;
-
-                if (!node.IsFlowNode())
+                if (!node.IsExecNode())
                     continue;
 
                 var valueNodeList = new List<string>();

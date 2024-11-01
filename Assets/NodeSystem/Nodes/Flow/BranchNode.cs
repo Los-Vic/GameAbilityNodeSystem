@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Branch", "Flow/Branch", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(BranchNodeRunner))]
+    [Node("Branch", "Default/FlowControl/Branch", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(BranchNodeRunner))]
     public class BranchNode:NodeSystemNode
     {
         [Port(Direction.Input,typeof(ExecutePort))]

@@ -29,7 +29,7 @@ namespace NS
             {
                 ExecuteDependentValNodes(_node.Id, _graphRunner);
                 _delay = _graphRunner.GetInPortVal<float>(_node.InPortFloat);
-                Debug.Log($"Input Delay [{_delay}]");
+                NodeSystemLogger.Log($"Input Delay [{_delay}]");
                 _started = true;
             }
             

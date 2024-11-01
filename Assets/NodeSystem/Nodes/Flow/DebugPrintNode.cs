@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Print","Debug/Print", ENodeCategory.ExecDebugInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
+    [Node("Print","Default/Debug/Print", ENodeCategory.ExecDebugInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
     public class DebugPrintNode:NodeSystemNode
     {
         [ExposedProp]

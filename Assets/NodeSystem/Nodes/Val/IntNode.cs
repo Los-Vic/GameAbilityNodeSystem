@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Int", "Literal/Int", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntNodeRunner))]
+    [Node("Int", "Default/Literal/Int", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntNodeRunner))]
     public class IntNode:NodeSystemNode
     {
         [ExposedProp]

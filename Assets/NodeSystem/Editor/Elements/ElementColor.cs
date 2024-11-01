@@ -33,7 +33,6 @@ namespace NSEditor
                     return new Color(0, 0.3f, 0.7f, 1);
                 case ENodeCategory.Value:
                     return new Color(0, 0.5f, 0, 1);
-                case ENodeCategory.Start:
                 case ENodeCategory.Event:
                     return new Color(0.6f, 0, 0, 1);
                 case ENodeCategory.FlowControl:

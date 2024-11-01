@@ -28,6 +28,11 @@ namespace NS
     public class ExposedPropAttribute:Attribute
     {
     }
+    
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class EventTypeAttribute:Attribute
+    {
+    }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class PortAttribute : Attribute

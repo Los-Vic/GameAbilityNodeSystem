@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("ForLoop", "Flow/ForLoop", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(ForLoopNodeRunner))]
+    [Node("ForLoop", "Default/FlowControl/ForLoop", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(ForLoopNodeRunner))]
     public class ForLoopNode:NodeSystemNode
     {
         [Port(Direction.Input, typeof(ExecutePort))]

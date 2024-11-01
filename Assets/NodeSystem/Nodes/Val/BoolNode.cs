@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Bool", "Literal/Bool", ENodeCategory.Value, ENodeNumsLimit.None, typeof(BoolNodeRunner))]
+    [Node("Bool", "Default/Literal/Bool", ENodeCategory.Value, ENodeNumsLimit.None, typeof(BoolNodeRunner))]
     public class BoolNode : NodeSystemNode
     {
         [ExposedProp] public bool Val;

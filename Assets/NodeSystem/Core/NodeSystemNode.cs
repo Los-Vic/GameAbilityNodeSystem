@@ -7,10 +7,8 @@ namespace NS
     public enum ENodeCategory
     {
         //------Flow Node Start------
-        //Flow Control
-        Start = 0,
-        Event = 1,
-        FlowControl = 2,
+        Event = 0,
+        FlowControl = 1,
         //Executable
         ExecInstant = 100,
         ExecDebugInstant = 101,
@@ -56,7 +54,7 @@ namespace NS
 
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
         
-        public bool IsFlowNode()
+        public bool IsExecNode()
         {
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute == null)
@@ -78,5 +76,18 @@ namespace NS
 
             return nodeAttribute.NodeCategory is ENodeCategory.Value;
         }
+
+        public bool IsEventNode()
+        {
+            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
+            if (nodeAttribute == null)
+            {
+                return false;
+            }
+
+            return nodeAttribute.NodeCategory is ENodeCategory.Event;
+        }
+
+        public virtual string DisplayName() => nodeName;
     }
 }

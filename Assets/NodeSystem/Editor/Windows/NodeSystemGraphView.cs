@@ -8,6 +8,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
 namespace NSEditor
 {
@@ -72,53 +73,25 @@ namespace NSEditor
         {
             [SerializeReference]
             public List<NodeSystemNode> Nodes = new();
-            [SerializeReference]
-            public List<NodeSystemPort> Ports = new();
         }
         
         private void OnUnserializeAndPaste(string operationname, string data)
         {
             Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Paste Nodes");
             var content = JsonUtility.FromJson<CopyContent>(data);
+            var portIdMap = new Dictionary<string, string>();
+            var newNodeList = new List<NodeSystemNode>();
+            var newPortList = new List<NodeSystemPort>();
+
+            var randomOffset = 100 * (Random.value * 2 - 1);
+            //Create new nodes & ports
             foreach (var node in content.Nodes)
             {
-                GraphAsset.AddNode(node, false);
-            }
-
-            foreach (var port in content.Ports)
-            {
-                GraphAsset.AddPort(port);
-            }
-            ReDrawGraph();
-        }
-
-        //Only Support Copy Nodes And ExposedProp Fields
-        private string OnSerializeGraphElements(IEnumerable<GraphElement> elements)
-        {
-            var content = new CopyContent();
-            var nodeIdMap = new Dictionary<string, string>();
-            var portIdMap = new Dictionary<string, string>();
-            
-            //Create new nodes & ports
-            foreach (var elem in elements)
-            {
-                if (elem is not NodeSystemEditorNode editorNode) 
-                    continue;
-                var node = editorNode.Node;
                 var type = node.GetType();
-
-                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
-                if (nodeAttribute is { NodeNumsLimit: ENodeNumsLimit.Singleton })
-                {
-                    Debug.LogWarning($"Can't copy SingletonNode [{node.nodeName}]");
-                    continue;
-                }
-
                 var newNode = (NodeSystemNode)Activator.CreateInstance(type);
-                newNode.Position = new Rect(node.Position.x + 50, node.Position.y + 50, node.Position.width,
+                newNode.Position = new Rect(node.Position.x + 200 + randomOffset, node.Position.y + 200 + randomOffset, node.Position.width,
                     node.Position.height);
-                nodeIdMap.Add(node.Id, newNode.Id);
-                content.Nodes.Add(newNode);
+                newNodeList.Add(newNode);
                 
                 foreach (var fieldInfo in type.GetFields())
                 {
@@ -133,12 +106,12 @@ namespace NSEditor
 
                     var newPort = new NodeSystemPort(newNode.Id, port.direction, attribute.PortType, port.connectPortId);
                     portIdMap.Add(port.Id, newPort.Id);
-                    content.Ports.Add(newPort);
+                    newPortList.Add(newPort);
                 }
             }
-
+            
             //Assign new portId
-            foreach (var node in content.Nodes)
+            foreach (var node in newNodeList)
             {
                 var type = node.GetType();
                 foreach (var fieldInfo in type.GetFields())
@@ -152,11 +125,45 @@ namespace NSEditor
                 }
             }
             
-            foreach (var port in content.Ports)
+            foreach (var port in newPortList)
             {
                 if(port.connectPortId == null)
                     continue;
                 port.connectPortId = portIdMap.GetValueOrDefault(port.connectPortId);
+            }
+            
+            //Add new nodes & ports
+            foreach (var node in newNodeList)
+            {
+                GraphAsset.AddNode(node, false);
+            }
+
+            foreach (var port in newPortList)
+            {
+                GraphAsset.AddPort(port);
+            }
+            
+            ReDrawGraph();
+        }
+
+        //Only Support Copy Nodes And ExposedProp Fields
+        private string OnSerializeGraphElements(IEnumerable<GraphElement> elements)
+        {
+            var content = new CopyContent();
+            foreach (var elem in elements)
+            {
+                if (elem is not NodeSystemEditorNode editorNode) 
+                    continue;
+                var node = editorNode.Node;
+                var type = node.GetType();
+
+                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
+                if (nodeAttribute is { NodeNumsLimit: ENodeNumsLimit.Singleton })
+                {
+                    Debug.LogWarning($"Can't copy SingletonNode [{node.nodeName}]");
+                    continue;
+                }
+                content.Nodes.Add(node);
             }
 
             var js = JsonUtility.ToJson(content);

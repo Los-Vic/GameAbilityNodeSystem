@@ -1,4 +1,6 @@
-﻿namespace NS
+﻿using CommonObjectPool;
+
+namespace NS
 {
     public class NodeSystemNodeRunner:IPoolObject
     {

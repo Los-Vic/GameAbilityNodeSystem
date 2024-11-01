@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Delay", "Executable/Delay", ENodeCategory.ExecNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
+    [Node("Delay", "Default/NonInstantAction/Delay", ENodeCategory.ExecNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
     public class DelayNode:NodeSystemNode
     {
         [Port(Direction.Input, typeof(ExecutePort))]

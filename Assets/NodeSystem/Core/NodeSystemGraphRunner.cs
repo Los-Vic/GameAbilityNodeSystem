@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using CommonObjectPool;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
 namespace NS
 {
@@ -13,34 +13,69 @@ namespace NS
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
         //Run node runner
+        private NodeSystemNode _eventNode;
         private NodeSystemFlowNodeRunner _curRunner;
         private bool _isRunning;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         
-        public void Init(NodeSystem system, NodeSystemGraphAsset asset)
+        public void Init(NodeSystem system, NodeSystemGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam)
         {
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
+
+            _eventNode = GraphAssetRuntimeData.GetNodeById(eventNodeId);
+            if (!_eventNode.IsEventNode())
+            {
+                NodeSystemLogger.LogError($"Not valid event node {eventNodeId} of {asset.name}");
+                return;
+            }
+
+            var eventNodeRunner = GetNodeRunner(eventNodeId) as NodeSystemEventNodeRunner;
+            if (eventNodeRunner == null)
+            {
+                NodeSystemLogger.LogError($"Not valid event node runner {eventNodeId} of {asset.name}");
+                return;
+            }
+            eventNodeRunner.SetUpEventParam(eventParam);
         }
 
         private void DeInit()
         {
-            StopGraphRunner();
+            StopRunner();
         }
-
+        
         public void StartRunner()
         {
-            if (!NodeSystemNode.IsValidNodeId(GraphAssetRuntimeData.StartNodeId))
+            if (_isRunning)
             {
-                Debug.Log("No Start Node");
                 return;
             }
-            StartGraphRunner();
-        }
+            
+            NodeSystemLogger.Log($"Start graph of {_asset.name}, event {_eventNode.DisplayName()}");
+            _isRunning = true;
+            _curRunner = GetNodeRunner(_eventNode.Id) as NodeSystemFlowNodeRunner;
 
+            UpdateCurNodeRunner();
+        }
+        
+        public void StopRunner()
+        {
+            if (!_isRunning)
+            {
+                return;
+            }
+            
+            NodeSystemLogger.Log($"Stop GraphRunner of {_asset.name}, event {_eventNode.DisplayName()}");
+            _isRunning = false;
+            _curRunner = null;
+            _runningLoopNodeIds.Clear();
+            _outPortResultCached.Clear();
+            DestroyRunnerInstances();
+        }
+        
         public void UpdateRunner(float deltaTime = 0)
         {
             if(!_isRunning)
@@ -49,10 +84,7 @@ namespace NS
             UpdateCurNodeRunner(deltaTime);
         }
 
-        public void StopRunner()
-        {
-            StopGraphRunner();
-        }
+        public bool IsRunning() => _isRunning;
 
         public NodeSystemNodeRunner GetNodeRunner(string nodeId)
         {
@@ -60,11 +92,12 @@ namespace NS
                 return nodeRunner;
 
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
-            var runner = _nodeSystem.RunnerFactory.CreateNodeRunner(n.GetType());
+            var runner = _nodeSystem.ObjectFactory.CreateNodeRunner(n.GetType());
             runner.Init(n, this);
             _nodeRunners.Add(n.Id, runner);
             return runner;
         }
+        
         
         #region Port Val
 
@@ -73,7 +106,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(inPortId);
             if (port.direction != Direction.Input)
             {
-                Debug.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
+                NodeSystemLogger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
                 return default;
             }
             
@@ -89,7 +122,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(outPortId);
             if (port.direction != Direction.Output)
             {
-                Debug.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
+                NodeSystemLogger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
                 return;
             }
             
@@ -127,10 +160,11 @@ namespace NS
         {
             foreach (var nodeRunners in _nodeRunners.Values)
             {
-                _nodeSystem.RunnerFactory.DestroyNodeRunner(nodeRunners);
+                _nodeSystem.ObjectFactory.DestroyNodeRunner(nodeRunners);
             }
             _nodeRunners.Clear();
         }
+        
         
         private void UpdateCurNodeRunner(float deltaTime = 0)
         {
@@ -148,7 +182,7 @@ namespace NS
                 {
                     if (!NodeSystemNode.IsValidNodeId(loopNode))
                     {
-                        StopGraphRunner();
+                        StopRunner();
                         break;
                     }
                     nextNode = loopNode;
@@ -157,33 +191,11 @@ namespace NS
                 _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
                 if (_curRunner == null)
                 {
-                    StopGraphRunner();
+                    StopRunner();
                     break;
                 }
                 _curRunner.Execute();
             }
-        }
-        
-        private void StartGraphRunner()
-        {
-            Debug.Log($"Start GraphRunner of {_asset.name}");
-            _isRunning = true;
-            _curRunner = GetNodeRunner(GraphAssetRuntimeData.StartNodeId) as NodeSystemFlowNodeRunner;
-
-            UpdateCurNodeRunner();
-        }
-        
-        private void StopGraphRunner()
-        {
-            if(!_isRunning)
-                return;
-            
-            Debug.Log($"Stop GraphRunner of {_asset.name}");
-            _isRunning = false;
-            _curRunner = null;
-            _runningLoopNodeIds.Clear();
-            _outPortResultCached.Clear();
-            DestroyRunnerInstances();
         }
 
         #region Pool Object

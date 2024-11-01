@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Float", "Literal/Float", ENodeCategory.Value, ENodeNumsLimit.None, typeof(FloatNodeRunner))]
+    [Node("Float", "Default/Literal/Float", ENodeCategory.Value, ENodeNumsLimit.None, typeof(FloatNodeRunner))]
     public class FloatNode:NodeSystemNode
     {
         [ExposedProp]

@@ -48,12 +48,18 @@ namespace NSEditor
                     CreatePort(fieldInfo, portAttribute);
                 }
                 
+                //Create EventType
+                var eventTypeAttribute = fieldInfo.GetCustomAttribute<EventTypeAttribute>();
+                if (eventTypeAttribute != null)
+                {
+                    CreateEventTypeExtension(fieldInfo, node);
+                }
+                
                 //Create Extensions
                 var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
                 if (exposedPropAttribute != null)
                 {
-                    var propertyField = DrawField(fieldInfo.Name);
-                    propertyField?.RegisterValueChangeCallback(OnFieldChangeCallback);
+                    DrawField(fieldInfo.Name);
                 }
             }
             
@@ -119,10 +125,18 @@ namespace NSEditor
                 outputContainer.Add(port);
             }
         }
-        
-        private void OnFieldChangeCallback(SerializedPropertyChangeEvent evt)
+
+        private void CreateEventTypeExtension(FieldInfo fieldInfo, NodeSystemNode node)
         {
-            
+            var propertyField = DrawField(fieldInfo.Name);
+            propertyField?.RegisterValueChangeCallback(OnEventTypeFieldChangeCallback);
+            var val = fieldInfo.GetValue(node);
+            title = val.ToString();
+        }
+        
+        private void OnEventTypeFieldChangeCallback(SerializedPropertyChangeEvent evt)
+        {
+            title = evt.changedProperty.enumDisplayNames[evt.changedProperty.enumValueIndex];
         }
 
         public void SavePosition()
