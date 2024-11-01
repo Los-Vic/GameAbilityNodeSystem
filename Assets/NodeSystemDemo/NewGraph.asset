@@ -188,10 +188,10 @@ MonoBehaviour:
         guid: e97f4cae-e43d-4cd7-b1bd-d2af6526aa8b
         position:
           serializedVersion: 2
-          x: 713.6
-          y: 706.4
-          width: 148
-          height: 95.19995
+          x: 701
+          y: 708
+          width: 189
+          height: 97
         nodeName: Print
         Log: ForEach
         InPortExec: 3ce9498b-ff87-4cb8-a4ea-640e9e9cea0e

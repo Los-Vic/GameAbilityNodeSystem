@@ -53,7 +53,6 @@ namespace NSEditor
             this.AddManipulator(new ClickSelector());
             this.AddManipulator(new ContentZoomer());
             
-            
             //Add Node To Graph View
             ReDrawGraph();
             

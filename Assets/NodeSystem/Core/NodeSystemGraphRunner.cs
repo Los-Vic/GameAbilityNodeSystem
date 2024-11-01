@@ -8,6 +8,7 @@ namespace NS
     {
         private NodeSystemGraphAsset _asset;
         private NodeSystem _nodeSystem;
+        private bool _isValid;
         private readonly Dictionary<string, NodeSystemNodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
@@ -25,6 +26,7 @@ namespace NS
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
+            _isValid = false;
 
             _eventNode = GraphAssetRuntimeData.GetNodeById(eventNodeId);
             if (!_eventNode.IsEventNode())
@@ -40,6 +42,7 @@ namespace NS
                 return;
             }
             eventNodeRunner.SetUpEventParam(eventParam);
+            _isValid = true;
         }
 
         private void DeInit()
@@ -49,7 +52,7 @@ namespace NS
         
         public void StartRunner()
         {
-            if (_isRunning)
+            if (_isRunning || !_isValid)
             {
                 return;
             }
