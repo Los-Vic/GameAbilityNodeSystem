@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using GameAbilitySystem.Logic.Effect;
-using GameAbilitySystem.Logic.Observe;
-using GameAbilitySystem.Logic.ValueDecorator;
 using NS;
 
-namespace GameAbilitySystem.Logic.Attribute
+namespace GameAbilitySystem.Logic
 {
     public struct AttributeChangeMsg<T> where T:IEquatable<T>, IComparable<T>
     {

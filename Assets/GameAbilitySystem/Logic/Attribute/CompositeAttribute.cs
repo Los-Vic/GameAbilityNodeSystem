@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using GameAbilitySystem.Logic.Observe;
 using NS;
 
-namespace GameAbilitySystem.Logic.Attribute
+namespace GameAbilitySystem.Logic
 {
     public struct CompositeAttributeCreateParam<T> where T:IEquatable<T>, IComparable<T>
     {

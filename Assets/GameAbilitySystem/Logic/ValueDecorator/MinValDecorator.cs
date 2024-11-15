@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameAbilitySystem.Logic.ValueDecorator
+namespace GameAbilitySystem.Logic
 {
     public class MinValDecorator<T>:IValueDecorator<T> where T:IEquatable<T>, IComparable<T>
     {

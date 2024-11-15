@@ -1,7 +1,7 @@
 ﻿using NS;
 using UnityEngine;
 
-namespace GameAbilitySystem.Logic.Ability
+namespace GameAbilitySystem.Logic
 {
     [CreateAssetMenu(menuName = "GameAbilitySystem/AbilityAsset", fileName = "NewAbility")]
     public class AbilityAsset : NodeSystemGraphAsset

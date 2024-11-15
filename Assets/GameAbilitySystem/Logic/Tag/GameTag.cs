@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace GameAbilitySystem.Logic.Tag
+namespace GameAbilitySystem.Logic
 {
-
     public class TagContainer
     {
         internal readonly Dictionary<GameAbilitySystemCfg.EGameTag, GameTag> Tags = new();

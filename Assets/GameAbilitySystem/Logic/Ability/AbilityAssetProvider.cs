@@ -1,4 +1,4 @@
-﻿namespace GameAbilitySystem.Logic.Ability
+﻿namespace GameAbilitySystem.Logic
 {
     public class AbilityAssetProvider
     {

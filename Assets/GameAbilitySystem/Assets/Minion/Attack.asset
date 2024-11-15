@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc43657444bc45678e56c4e5a491cca7, type: 3}
+  m_Name: Attack
+  m_EditorClassIdentifier: 
+  nodes: []
+  ports: []
+  firstClassAttributePrototypes:
+  - {fileID: 11400000, guid: c728eba14c73dc94d90f49fa312e19a8, type: 2}
+  - {fileID: 11400000, guid: d026747d725401540af3757348e26caf, type: 2}
+  - {fileID: 11400000, guid: 0adc47f776a3a3547a8854da083603de, type: 2}
+  references:
+    version: 2
+    RefIds: []

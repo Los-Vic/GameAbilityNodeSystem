@@ -16,17 +16,6 @@
 
         #endregion
 
-
-        #region Object Pool
-
-        public static class PoolSizeDefine
-        {
-            public const int DefaultCapacity = 512;
-            public const int DefaultMaxSize = 1024;
-        }
-
-        #endregion
-
         #region Tag
 
         public enum EGameTag

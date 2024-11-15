@@ -1,4 +1,6 @@
-﻿namespace GameAbilitySystem.Logic.ValueDecorator
+﻿using System;
+
+namespace GameAbilitySystem.Logic
 {
     public interface IValueDecorator<T>
     {

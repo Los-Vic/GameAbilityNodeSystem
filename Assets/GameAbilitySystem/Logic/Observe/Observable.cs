@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameAbilitySystem.Logic.Observe
+namespace GameAbilitySystem.Logic
 {
     public class Observable<T>
     {

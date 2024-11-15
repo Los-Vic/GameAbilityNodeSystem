@@ -1,7 +1,5 @@
 ﻿using System;
 using CommonObjectPool;
-using GameAbilitySystem.Logic.Ability;
-using GameAbilitySystem.Logic.Attribute;
 using NS;
 
 namespace GameAbilitySystem.Logic

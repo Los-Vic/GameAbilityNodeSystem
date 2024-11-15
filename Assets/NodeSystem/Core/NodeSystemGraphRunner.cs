@@ -21,6 +21,13 @@ namespace NS
 
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         
+        /// <summary>
+        /// Graph Runner需要以一个事件节点作为起点
+        /// </summary>
+        /// <param name="system"></param>
+        /// <param name="asset"></param>
+        /// <param name="eventNodeId"></param>
+        /// <param name="eventParam"></param>
         public void Init(NodeSystem system, NodeSystemGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam)
         {
             _nodeSystem = system;
@@ -144,7 +151,7 @@ namespace NS
             _runningLoopNodeIds.Push(nodeId);
         }
         
-        public bool IsInLoop(out string loopNodeId)
+        private bool IsInLoop(out string loopNodeId)
         {
             loopNodeId = _runningLoopNodeIds.Count == 0 ? default : _runningLoopNodeIds.Peek();
             return _runningLoopNodeIds.Count != 0;

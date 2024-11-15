@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using GameAbilitySystem.Logic.Ability;
-using GameAbilitySystem.Logic.Attribute;
-using GameAbilitySystem.Logic.Effect;
 using NS;
 
-namespace GameAbilitySystem.Logic.Unit
+namespace GameAbilitySystem.Logic
 {
     public class GameUnit<T>: IPoolObject where T:IEquatable<T>, IComparable<T>
     {

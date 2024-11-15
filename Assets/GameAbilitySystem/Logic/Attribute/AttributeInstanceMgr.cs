@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameAbilitySystem.Logic.Effect;
-using GameAbilitySystem.Logic.Unit;
 
-namespace GameAbilitySystem.Logic.Attribute
+namespace GameAbilitySystem.Logic
 {
     public class AttributeInstanceMgr<T> where T:IEquatable<T>, IComparable<T>
     {

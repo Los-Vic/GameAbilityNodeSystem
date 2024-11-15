@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GameAbilitySystem.Logic.Ability
+namespace GameAbilitySystem.Logic
 {
     public class AbilityInstanceMgr<T> where T:IEquatable<T>, IComparable<T>
     {

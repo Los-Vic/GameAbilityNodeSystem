@@ -1,8 +1,6 @@
 ﻿using System;
-using GameAbilitySystem.Logic.Effect;
-using GameAbilitySystem.Logic.Unit;
 
-namespace GameAbilitySystem.Logic.Attribute
+namespace GameAbilitySystem.Logic
 {
     public interface IAttributeValSetter<T> where T:IEquatable<T>, IComparable<T>
     {

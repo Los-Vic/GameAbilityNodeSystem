@@ -2,7 +2,7 @@
 using CommonObjectPool;
 using NS;
 
-namespace GameAbilitySystem.Logic.Effect
+namespace GameAbilitySystem.Logic
 {
     public class GameEffect<T>:IPoolObject where T:IEquatable<T>, IComparable<T>
     {
