@@ -9,23 +9,22 @@ namespace GameAbilitySystem.Logic
         public AbilityAssetProvider AbilityAssetProvider;
     }
     
-    public class GameAbilitySystem
+    public class GameAbilitySystem:NodeSystem
     {
         //Mgr
-        internal readonly ObjectPoolMgr ObjectPoolMgr;
-        internal readonly AttributeInstanceMgr AttributeInstanceMgr;
-        internal readonly AbilityInstanceMgr AbilityInstanceMgr;
-        internal readonly GameAbilityNodeSystem NodeSystem;
+        internal ObjectPoolMgr ObjectPoolMgr;
+        internal AttributeInstanceMgr AttributeInstanceMgr;
+        internal AbilityInstanceMgr AbilityInstanceMgr;
 
         //Provider
         internal AbilityAssetProvider AbilityAssetProvider;
         
-        protected GameAbilitySystem()
+        public override void InitSystem()
         {
+            base.InitSystem();
             ObjectPoolMgr = new ObjectPoolMgr();
             AttributeInstanceMgr = new AttributeInstanceMgr(this);
             AbilityInstanceMgr = new AbilityInstanceMgr(this);
-            NodeSystem = new GameAbilityNodeSystem();
         }
 
         public virtual void SetUpProviders(ProviderSetUp setUp)

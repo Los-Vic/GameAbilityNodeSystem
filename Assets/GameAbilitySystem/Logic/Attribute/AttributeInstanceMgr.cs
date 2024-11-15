@@ -7,14 +7,14 @@ namespace GameAbilitySystem.Logic
     public class AttributeInstanceMgr 
     {
         private readonly GameAbilitySystem _system;
-        private readonly Dictionary<GameAbilitySystemCfg.ESimpleAttributeType, IAttributeValSetter> _attributeValSetters = new();
+        private readonly Dictionary<ESimpleAttributeType, IAttributeValSetter> _attributeValSetters = new();
 
         public AttributeInstanceMgr(GameAbilitySystem sys)
         {
             _system = sys;
         }
 
-        public void RegisterAttributeSetter(GameAbilitySystemCfg.ESimpleAttributeType type, IAttributeValSetter setter)
+        public void RegisterAttributeSetter(ESimpleAttributeType type, IAttributeValSetter setter)
         {
             _attributeValSetters.TryAdd(type, setter);
         }

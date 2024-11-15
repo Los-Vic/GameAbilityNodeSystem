@@ -17,7 +17,7 @@ namespace GameAbilitySystem.Logic
             var abilityAsset = _system.AbilityAssetProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
             {
-                Debug.LogError($"Fail to get ActiveAbilityBp of {id}");
+                Debug.LogError($"Fail to get ActiveAbilityAsset of {id}");
                 return default;
             }
             
@@ -27,7 +27,7 @@ namespace GameAbilitySystem.Logic
                 Asset = abilityAsset
             };
             
-            ability.Init(ref param);
+            ability.Init(_system, ref param);
             return ability;
         }
 

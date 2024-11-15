@@ -102,7 +102,7 @@ namespace NS
                 return nodeRunner;
 
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
-            var runner = _nodeSystem.ObjectFactory.CreateNodeRunner(n.GetType());
+            var runner = _nodeSystem.NodeObjectFactory.CreateNodeRunner(n.GetType());
             runner.Init(n, this);
             _nodeRunners.Add(n.Id, runner);
             return runner;
@@ -170,7 +170,7 @@ namespace NS
         {
             foreach (var nodeRunners in _nodeRunners.Values)
             {
-                _nodeSystem.ObjectFactory.DestroyNodeRunner(nodeRunners);
+                _nodeSystem.NodeObjectFactory.DestroyNodeRunner(nodeRunners);
             }
             _nodeRunners.Clear();
         }

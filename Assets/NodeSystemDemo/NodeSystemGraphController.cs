@@ -29,7 +29,7 @@ namespace NS
         {
             foreach (var graphRunner in _graphRunners)
             {
-                _system.ObjectFactory.DestroyGraphRunner(graphRunner);
+                _system.NodeObjectFactory.DestroyGraphRunner(graphRunner);
             }
             _graphRunners.Clear();
         }
@@ -41,7 +41,7 @@ namespace NS
                 NodeSystemLogger.LogWarning($"Not found {eventType} node!");
                 return;
             }
-            var graphRunner = _system.ObjectFactory.CreateGraphRunner();
+            var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
             graphRunner.Init(_system, _asset, nodeId, param);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
@@ -61,7 +61,7 @@ namespace NS
             foreach (var runner in _pendingDestroyGraphRunners)
             {
                 _graphRunners.Remove(runner);
-                _system.ObjectFactory.DestroyGraphRunner(runner);
+                _system.NodeObjectFactory.DestroyGraphRunner(runner);
             }
             _pendingDestroyGraphRunners.Clear();
         }

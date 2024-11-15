@@ -15,14 +15,14 @@ namespace GameAbilitySystem.Logic
 
     public struct SimpleAttributeCreateParam
     {
-        public GameAbilitySystemCfg.ESimpleAttributeType Type;
+        public ESimpleAttributeType Type;
         public FP DefaultVal;
         public List<IValueDecorator> Decorators;
     }
     
     public class SimpleAttribute:IPoolObject
     {
-        public GameAbilitySystemCfg.ESimpleAttributeType Type { get; private set; }
+        public ESimpleAttributeType Type { get; private set; }
         
         private FP _val;
         private List<IValueDecorator> _valDecorators;

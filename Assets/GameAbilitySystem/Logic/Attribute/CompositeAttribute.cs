@@ -7,14 +7,14 @@ namespace GameAbilitySystem.Logic
 {
     public struct CompositeAttributeCreateParam
     {
-        public GameAbilitySystemCfg.ECompositeAttributeType Type;
+        public ECompositeAttributeType Type;
         public List<SimpleAttribute> SimpleAttributes;
         public Func<List<FP>, FP> ValEquation;
     }
     
     public class CompositeAttribute:IPoolObject
     {
-        public GameAbilitySystemCfg.ECompositeAttributeType Type { get; private set; }
+        public ECompositeAttributeType Type { get; private set; }
 
         private List<SimpleAttribute> _simpleAttributes;
         private Func<List<FP>, FP> _valEquation;

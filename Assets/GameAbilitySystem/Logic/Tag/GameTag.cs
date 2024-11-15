@@ -4,7 +4,7 @@ namespace GameAbilitySystem.Logic
 {
     public class TagContainer
     {
-        internal readonly Dictionary<GameAbilitySystemCfg.EGameTag, GameTag> Tags = new();
+        internal readonly Dictionary<EGameTag, GameTag> Tags = new();
         internal readonly ITagOwner Owner;
 
         public TagContainer(ITagOwner o)
@@ -16,15 +16,15 @@ namespace GameAbilitySystem.Logic
     public interface ITagOwner
     {
         TagContainer GetTagContainer();
-        bool HasTag(GameAbilitySystemCfg.EGameTag t);
+        bool HasTag(EGameTag t);
     }
     
     public class GameTag
     {
-        internal readonly GameAbilitySystemCfg.EGameTag EffectTagEnum;
+        internal readonly EGameTag EffectTagEnum;
         internal readonly List<ITagOwner> Owners = new();
 
-        internal GameTag(GameAbilitySystemCfg.EGameTag t)
+        internal GameTag(EGameTag t)
         {
             EffectTagEnum = t;
         }
