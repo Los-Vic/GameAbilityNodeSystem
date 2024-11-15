@@ -9,12 +9,13 @@ namespace GameAbilitySystem.Logic
         public AbilityAssetProvider AbilityAssetProvider;
     }
     
-    public class GameAbilitySystem<T> where T:IEquatable<T>, IComparable<T>
+    public class GameAbilitySystem
     {
         //Mgr
         internal readonly ObjectPoolMgr ObjectPoolMgr;
-        internal readonly AttributeInstanceMgr<T> AttributeInstanceMgr;
-        internal readonly AbilityInstanceMgr<T> AbilityInstanceMgr;
+        internal readonly AttributeInstanceMgr AttributeInstanceMgr;
+        internal readonly AbilityInstanceMgr AbilityInstanceMgr;
+        internal readonly GameAbilityNodeSystem NodeSystem;
 
         //Provider
         internal AbilityAssetProvider AbilityAssetProvider;
@@ -22,8 +23,9 @@ namespace GameAbilitySystem.Logic
         protected GameAbilitySystem()
         {
             ObjectPoolMgr = new ObjectPoolMgr();
-            AttributeInstanceMgr = new AttributeInstanceMgr<T>(this);
-            AbilityInstanceMgr = new AbilityInstanceMgr<T>(this);
+            AttributeInstanceMgr = new AttributeInstanceMgr(this);
+            AbilityInstanceMgr = new AbilityInstanceMgr(this);
+            NodeSystem = new GameAbilityNodeSystem();
         }
 
         public virtual void SetUpProviders(ProviderSetUp setUp)

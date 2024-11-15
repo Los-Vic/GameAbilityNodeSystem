@@ -1,17 +1,18 @@
 ﻿using System;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public class MaxValDecorator<T>:IValueDecorator<T> where T:IEquatable<T>, IComparable<T>
+    public class MaxValDecorator:IValueDecorator
     {
-        private readonly T _maxVal;
+        private readonly FP _maxVal;
         
-        public MaxValDecorator(T maxVal)
+        public MaxValDecorator(FP maxVal)
         {
             _maxVal = maxVal;
         }
         
-        public bool Process(in T inVal, out T outVal)
+        public bool Process(in FP inVal, out FP outVal)
         {
             if (inVal.CompareTo(_maxVal) <= 0)
             {

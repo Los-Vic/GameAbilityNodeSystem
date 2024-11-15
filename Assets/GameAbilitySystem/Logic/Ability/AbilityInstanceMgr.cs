@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace GameAbilitySystem.Logic
 {
-    public class AbilityInstanceMgr<T> where T:IEquatable<T>, IComparable<T>
+    public class AbilityInstanceMgr
     {
-        private readonly GameAbilitySystem<T> _system;
+        private readonly GameAbilitySystem _system;
 
-        public AbilityInstanceMgr(GameAbilitySystem<T> sys)
+        public AbilityInstanceMgr(GameAbilitySystem sys)
         {
             _system = sys;
         }
 
-        internal GameAbility<T> CreateAbility(uint id)
+        internal GameAbility CreateAbility(uint id)
         {
             var abilityAsset = _system.AbilityAssetProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
@@ -21,7 +21,7 @@ namespace GameAbilitySystem.Logic
                 return default;
             }
             
-            var ability = _system.ObjectPoolMgr.CreateObject<GameAbility<T>>();
+            var ability = _system.ObjectPoolMgr.CreateObject<GameAbility>();
             var param = new AbilityCreateParam()
             {
                 Asset = abilityAsset
@@ -31,7 +31,7 @@ namespace GameAbilitySystem.Logic
             return ability;
         }
 
-        internal void DestroyAbility(GameAbility<T> ability)
+        internal void DestroyAbility(GameAbility ability)
         {
             _system.ObjectPoolMgr.DestroyObject(ability);
         }

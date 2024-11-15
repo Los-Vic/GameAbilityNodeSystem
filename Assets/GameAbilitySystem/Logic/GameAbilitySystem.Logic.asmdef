@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "GUID:298dff7fd453955449dc9e26ac2623e6",
-        "GUID:0d49cbbc2fccff8428f6578b639d237c"
+        "GUID:0d49cbbc2fccff8428f6578b639d237c",
+        "Smf.Math"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

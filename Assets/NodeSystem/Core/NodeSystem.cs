@@ -4,7 +4,7 @@ namespace NS
 {
     public class NodeSystem
     {
-        public NodeSystemObjectFactory ObjectFactory;
+        public NodeSystemObjectFactory ObjectFactory { get; private set; }
         private readonly Dictionary<NodeSystemGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         
         public virtual void InitSystem()

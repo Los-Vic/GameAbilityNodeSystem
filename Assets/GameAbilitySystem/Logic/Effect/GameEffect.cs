@@ -4,7 +4,7 @@ using NS;
 
 namespace GameAbilitySystem.Logic
 {
-    public class GameEffect<T>:IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class GameEffect:IPoolObject
     {
         private void UnInit()
         {

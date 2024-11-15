@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using NS;
 
 namespace GameAbilitySystem.Logic
 {
-    public class GameUnit<T>: IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class GameUnit: IPoolObject
     {
-        private GameAbilitySystem<T> _sys;
+        private GameAbilitySystem _sys;
         
         //Attributes
-        internal readonly Dictionary<GameAbilitySystemCfg.ESimpleAttributeType, SimpleAttribute<T>> SimpleAttributes = new();
-        internal readonly Dictionary<GameAbilitySystemCfg.ECompositeAttributeType, CompositeAttribute<T>> CompositeAttributes = new();
+        internal readonly Dictionary<GameAbilitySystemCfg.ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
+        internal readonly Dictionary<GameAbilitySystemCfg.ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
 
         //Abilities
-        internal readonly List<GameAbility<T>> GameAbilities = new();
+        internal readonly List<GameAbility> GameAbilities = new();
         
         //Effects
-        internal readonly List<GameEffect<T>> GameEffects = new();
+        internal readonly List<GameEffect> GameEffects = new();
         
-
-        public void Init(GameAbilitySystem<T> sys)
+        public void Init(GameAbilitySystem sys)
         {
             _sys = sys;
         }
@@ -47,7 +45,7 @@ namespace GameAbilitySystem.Logic
         
         #region Attributes
 
-        public void AddSimpleAttribute(ref SimpleAttributeCreateParam<T> param)
+        public void AddSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
             var attribute = _sys.AttributeInstanceMgr.CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
@@ -61,12 +59,12 @@ namespace GameAbilitySystem.Logic
             }
         }
 
-        public SimpleAttribute<T> GetSimpleAttribute(GameAbilitySystemCfg.ESimpleAttributeType type)
+        public SimpleAttribute GetSimpleAttribute(GameAbilitySystemCfg.ESimpleAttributeType type)
         {
             return SimpleAttributes.GetValueOrDefault(type);
         }
 
-        public void AddCompositeAttribute(ref CompositeAttributeCreateParam<T> param)
+        public void AddCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
             var attribute = _sys.AttributeInstanceMgr.CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
@@ -80,7 +78,7 @@ namespace GameAbilitySystem.Logic
             }
         }
 
-        public CompositeAttribute<T> GetCompositeAttribute(GameAbilitySystemCfg.ECompositeAttributeType type)
+        public CompositeAttribute GetCompositeAttribute(GameAbilitySystemCfg.ECompositeAttributeType type)
         {
             return CompositeAttributes.GetValueOrDefault(type);
         }

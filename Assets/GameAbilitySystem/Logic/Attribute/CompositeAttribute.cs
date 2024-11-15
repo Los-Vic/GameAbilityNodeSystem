@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using NS;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public struct CompositeAttributeCreateParam<T> where T:IEquatable<T>, IComparable<T>
+    public struct CompositeAttributeCreateParam
     {
         public GameAbilitySystemCfg.ECompositeAttributeType Type;
-        public List<SimpleAttribute<T>> SimpleAttributes;
-        public Func<List<T>, T> ValEquation;
+        public List<SimpleAttribute> SimpleAttributes;
+        public Func<List<FP>, FP> ValEquation;
     }
     
-    public class CompositeAttribute<T>:IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class CompositeAttribute:IPoolObject
     {
         public GameAbilitySystemCfg.ECompositeAttributeType Type { get; private set; }
 
-        private List<SimpleAttribute<T>> _simpleAttributes;
-        private Func<List<T>, T> _valEquation;
-        private readonly List<T> _simpleAttributeVals = new();
-        public readonly Observable<AttributeChangeMsg<T>> OnValChanged = new();
+        private List<SimpleAttribute> _simpleAttributes;
+        private Func<List<FP>, FP> _valEquation;
+        private readonly List<FP> _simpleAttributeVals = new();
+        public readonly Observable<AttributeChangeMsg> OnValChanged = new();
 
-        public T Val
+        public FP Val
         {
             get
             {
@@ -38,7 +38,7 @@ namespace GameAbilitySystem.Logic
             }
         }
         
-        public void Init(ref CompositeAttributeCreateParam<T> param)
+        public void Init(ref CompositeAttributeCreateParam param)
         {
             if(_simpleAttributes == null)
                 return;
@@ -65,7 +65,7 @@ namespace GameAbilitySystem.Logic
                     _simpleAttributeVals[attributeIndex] = data.NewVal;
                     var newVal = _valEquation.Invoke(_simpleAttributeVals);
 
-                    OnValChanged.NotifyObservers(new AttributeChangeMsg<T>()
+                    OnValChanged.NotifyObservers(new AttributeChangeMsg()
                     {
                         OldVal = oldVal,
                         NewVal = newVal,

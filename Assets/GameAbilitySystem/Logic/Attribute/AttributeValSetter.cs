@@ -1,24 +1,25 @@
 ﻿using System;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public interface IAttributeValSetter<T> where T:IEquatable<T>, IComparable<T>
+    public interface IAttributeValSetter
     {
-        void SetAttributeVal(GameUnit<T> unit, SimpleAttribute<T> attribute, T newVal, GameEffect<T> changedByEffect = null);
+        void SetAttributeVal(GameUnit unit, SimpleAttribute attribute, FP newVal, GameEffect changedByEffect = null);
     }
 
-    public class DefaultAttributeValSetter<T> : IAttributeValSetter<T> where T:IEquatable<T>, IComparable<T>
+    public class DefaultAttributeValSetter : IAttributeValSetter
     {
-        public static readonly DefaultAttributeValSetter<T> Instance = new();
+        public static readonly DefaultAttributeValSetter Instance = new();
         private DefaultAttributeValSetter(){}
         
-        public void SetAttributeVal(GameUnit<T> unit, SimpleAttribute<T> attribute, T newVal, GameEffect<T> changedByEffect = null)
+        public void SetAttributeVal(GameUnit unit, SimpleAttribute attribute, FP newVal, GameEffect changedByEffect = null)
         {
             var oldVal = attribute.Val;
             if(newVal.Equals(oldVal))
                 return;
             attribute.SetVal(newVal);
-            attribute.OnValChanged.NotifyObservers(new AttributeChangeMsg<T>()
+            attribute.OnValChanged.NotifyObservers(new AttributeChangeMsg()
             {
                 OldVal = oldVal,
                 NewVal = newVal,

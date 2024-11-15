@@ -2,7 +2,7 @@
 
 namespace GameAbilitySystem.Logic
 {
-    public class AttributePrototype:NodeSystemGraphAsset
+    public class GameAbilityNodeSystem:NodeSystem
     {
         
     }

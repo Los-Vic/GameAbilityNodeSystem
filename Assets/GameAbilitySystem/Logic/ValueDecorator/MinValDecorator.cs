@@ -1,17 +1,18 @@
 ﻿using System;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public class MinValDecorator<T>:IValueDecorator<T> where T:IEquatable<T>, IComparable<T>
+    public class MinValDecorator:IValueDecorator
     {
-        private readonly T _minVal;
+        private readonly FP _minVal;
         
-        public MinValDecorator(T minVal)
+        public MinValDecorator(FP minVal)
         {
             _minVal = minVal;
         }
         
-        public bool Process(in T inVal, out T outVal)
+        public bool Process(in FP inVal, out FP outVal)
         {
             if (inVal.CompareTo(_minVal) >= 0)
             {

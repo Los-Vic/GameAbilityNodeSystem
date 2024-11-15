@@ -1,9 +1,10 @@
 ﻿using System;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public interface IValueDecorator<T>
+    public interface IValueDecorator
     {
-        public bool Process(in T inVal, out T outVal);
+        public bool Process(in FP inVal, out FP outVal);
     }
 }

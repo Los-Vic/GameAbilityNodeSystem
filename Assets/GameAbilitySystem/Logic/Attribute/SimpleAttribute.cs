@@ -1,33 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
+using MissQ;
 using NS;
 
 namespace GameAbilitySystem.Logic
 {
-    public struct AttributeChangeMsg<T> where T:IEquatable<T>, IComparable<T>
+    public struct AttributeChangeMsg
     {
-        public T OldVal;
-        public T NewVal;
-        public GameEffect<T> ChangedByEffect;
+        public FP OldVal;
+        public FP NewVal;
+        public GameEffect ChangedByEffect;
     }
 
-    public struct SimpleAttributeCreateParam<T> where T:IEquatable<T>, IComparable<T>
+    public struct SimpleAttributeCreateParam
     {
         public GameAbilitySystemCfg.ESimpleAttributeType Type;
-        public T DefaultVal;
-        public List<IValueDecorator<T>> Decorators;
+        public FP DefaultVal;
+        public List<IValueDecorator> Decorators;
     }
     
-    public class SimpleAttribute<T>:IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class SimpleAttribute:IPoolObject
     {
         public GameAbilitySystemCfg.ESimpleAttributeType Type { get; private set; }
         
-        private T _val;
-        private List<IValueDecorator<T>> _valDecorators;
-        public readonly Observable<AttributeChangeMsg<T>> OnValChanged = new();
+        private FP _val;
+        private List<IValueDecorator> _valDecorators;
+        public readonly Observable<AttributeChangeMsg> OnValChanged = new();
         
-        public void Init(ref SimpleAttributeCreateParam<T> param)
+        public void Init(ref SimpleAttributeCreateParam param)
         {
             Type = param.Type;
             _valDecorators = param.Decorators;
@@ -48,9 +49,9 @@ namespace GameAbilitySystem.Logic
             OnValChanged.Reset();
         }
 
-        public T Val => _val;
+        public FP Val => _val;
         
-        internal void SetVal(T newVal)
+        internal void SetVal(FP newVal)
         {
             _val = newVal;
             if (_valDecorators == null) return;

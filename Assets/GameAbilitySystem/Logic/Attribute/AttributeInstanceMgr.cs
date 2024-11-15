@@ -1,53 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
-    public class AttributeInstanceMgr<T> where T:IEquatable<T>, IComparable<T>
+    public class AttributeInstanceMgr 
     {
-        private readonly GameAbilitySystem<T> _system;
-        private readonly Dictionary<GameAbilitySystemCfg.ESimpleAttributeType, IAttributeValSetter<T>> _attributeValSetters = new();
+        private readonly GameAbilitySystem _system;
+        private readonly Dictionary<GameAbilitySystemCfg.ESimpleAttributeType, IAttributeValSetter> _attributeValSetters = new();
 
-        public AttributeInstanceMgr(GameAbilitySystem<T> sys)
+        public AttributeInstanceMgr(GameAbilitySystem sys)
         {
             _system = sys;
         }
 
-        public void RegisterAttributeSetter(GameAbilitySystemCfg.ESimpleAttributeType type, IAttributeValSetter<T> setter)
+        public void RegisterAttributeSetter(GameAbilitySystemCfg.ESimpleAttributeType type, IAttributeValSetter setter)
         {
             _attributeValSetters.TryAdd(type, setter);
         }
         
-        public void SetAttributeVal(GameUnit<T> unit, SimpleAttribute<T> attribute, T newVal, GameEffect<T> effect = null)
+        public void SetAttributeVal(GameUnit unit, SimpleAttribute attribute, FP newVal, GameEffect effect = null)
         {
             var setter = _attributeValSetters.TryGetValue(attribute.Type, out var s)
-                ? s : DefaultAttributeValSetter<T>.Instance;
+                ? s : DefaultAttributeValSetter.Instance;
             
             setter.SetAttributeVal(unit, attribute, newVal, effect);
         }
 
         #region Attribute Instance Create/Destroy
 
-        internal SimpleAttribute<T> CreateSimpleAttribute(ref SimpleAttributeCreateParam<T> param)
+        internal SimpleAttribute CreateSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = _system.ObjectPoolMgr.CreateObject<SimpleAttribute<T>>();
+            var attribute = _system.ObjectPoolMgr.CreateObject<SimpleAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
-        internal void DestroySimpleAttribute(SimpleAttribute<T> attribute)
+        internal void DestroySimpleAttribute(SimpleAttribute attribute)
         {
             _system.ObjectPoolMgr.DestroyObject(attribute);
         }
 
-        internal CompositeAttribute<T> CreateCompositeAttribute(ref CompositeAttributeCreateParam<T> param)
+        internal CompositeAttribute CreateCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = _system.ObjectPoolMgr.CreateObject<CompositeAttribute<T>>();
+            var attribute = _system.ObjectPoolMgr.CreateObject<CompositeAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
-        internal void DestroyCompositeAttribute(CompositeAttribute<T> attribute)
+        internal void DestroyCompositeAttribute(CompositeAttribute attribute)
         {
             _system.ObjectPoolMgr.DestroyObject(attribute);
         }

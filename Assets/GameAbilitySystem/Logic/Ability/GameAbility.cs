@@ -1,6 +1,5 @@
 ﻿using System;
 using CommonObjectPool;
-using NS;
 
 namespace GameAbilitySystem.Logic
 {
@@ -9,7 +8,7 @@ namespace GameAbilitySystem.Logic
         public AbilityAsset Asset;
     }
     
-    public class GameAbility<T> :IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class GameAbility :IPoolObject
     {
         internal AbilityAsset Asset;
         public uint ID => Asset?.abilityID ?? 0;

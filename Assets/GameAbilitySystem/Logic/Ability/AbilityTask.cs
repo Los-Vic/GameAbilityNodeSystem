@@ -4,7 +4,7 @@ using NS;
 
 namespace GameAbilitySystem.Logic
 {
-    public class AbilityTask<T> :IPoolObject where T:IEquatable<T>, IComparable<T>
+    public class AbilityTask
     {
         
         public void Init(AbilityAsset asset)
