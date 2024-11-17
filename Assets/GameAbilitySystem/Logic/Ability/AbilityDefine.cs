@@ -2,7 +2,8 @@
 {
     public enum ESimpleAttributeType
     {
-        //这里添加新的属性
+        None = 0,
+        MinionMana = 1
     }
 
     public enum ECompositeAttributeType

@@ -1,10 +1,11 @@
-﻿using System;
-using CommonObjectPool;
+﻿using CommonObjectPool;
+using MissQ;
 
 namespace GameAbilitySystem.Logic
 {
     public struct AbilityCreateParam
     {
+        public uint Id;
         public AbilityAsset Asset;
     }
     
@@ -14,10 +15,16 @@ namespace GameAbilitySystem.Logic
         internal readonly GameAbilityGraphController GraphController = new();
         internal GameUnit Owner;
         
-        public uint ID => Asset?.abilityID ?? 0;
+        //Cooldown
+        internal bool IsInCooldown;
+        internal FP Cooldown;
+        internal FP CooldownCounter;
+        
+        internal uint ID { get; private set; }
         
         internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
         {
+            ID = param.Id;
             Asset = param.Asset;
             GraphController.Init(sys, Asset);
         }
@@ -27,6 +34,21 @@ namespace GameAbilitySystem.Logic
             GraphController.UnInit();
         }
 
+        internal void UpdateAbility(FP dt)
+        {
+            if (IsInCooldown)
+            {
+                CooldownCounter += dt;
+                if (CooldownCounter >= Cooldown)
+                {
+                    CooldownCounter = 0;
+                    IsInCooldown = false;
+                }
+            }
+            
+            GraphController.UpdateGraphs((float)dt);
+        }
+        
         //获得和移除Ability
         internal void OnAddAbility(GameUnit owner)
         {
@@ -44,10 +66,18 @@ namespace GameAbilitySystem.Logic
             Owner = null;
         }
         
-        //执行Ability
-        public virtual bool CheckAbility()
+        //检测技能执行条件是否满足
+        internal virtual bool CheckAbility()
         {
             return true;
+        }
+
+        //提交执行技能的消耗，并开始冷却计时
+        internal virtual void CommitAbility()
+        {
+            CooldownCounter = 0;
+            IsInCooldown = true;
+            
         }
 
         //非事件触发

@@ -9,16 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
-  m_Name: NewAbility
+  m_Script: {fileID: 11500000, guid: 3b0dbc82c8d04a07a071ee5fe9c9e7ed, type: 3}
+  m_Name: AbilityEffectParamConfig
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
-  abilityName: "\u6D4B\u8BD5"
-  cooldown: Zero
-  costs:
-  - attributeType: 1
-    costVal: Zero
-  references:
-    version: 2
-    RefIds: []
+  paramElements:
+  - paramName: Zero
+    paramVals:
+    - 0
+  - paramName: Common/Cooldown
+    paramVals:
+    - 3
+  - paramName: Common/Cost
+    paramVals:
+    - 1

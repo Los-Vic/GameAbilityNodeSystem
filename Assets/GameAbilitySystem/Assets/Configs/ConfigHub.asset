@@ -9,16 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
-  m_Name: NewAbility
+  m_Script: {fileID: 11500000, guid: c14fa32173f84514b241d79ab6405d2f, type: 3}
+  m_Name: ConfigHub
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
-  abilityName: "\u6D4B\u8BD5"
-  cooldown: Zero
-  costs:
-  - attributeType: 1
-    costVal: Zero
-  references:
-    version: 2
-    RefIds: []
+  abilityConfig: {fileID: 11400000, guid: 22cc1982183696c4e8b881f195c0da5d, type: 2}
+  abilityEffectParamConfig: {fileID: 11400000, guid: 8879d2bdfb9315c45ac12343c630e621, type: 2}
