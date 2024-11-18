@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using CommonObjectPool;
 using MissQ;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public struct CompositeAttributeCreateParam
     {

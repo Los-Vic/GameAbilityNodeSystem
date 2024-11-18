@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     [System.Serializable]
     public class AbilityConfigElement

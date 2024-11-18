@@ -1,7 +1,7 @@
-﻿using GameAbilitySystem.Logic;
+﻿using NS;
 using UnityEditor.Experimental.GraphView;
 
-namespace NS
+namespace GAS.Logic
 {
     [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", ENodeCategory.Event, ENodeNumsLimit.None, typeof(DefaultEventNodeRunner))]
     public class DefaultEventNode:NodeSystemNode

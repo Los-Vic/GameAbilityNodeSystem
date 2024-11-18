@@ -4,7 +4,7 @@ using CommonObjectPool;
 using MissQ;
 using NS;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public struct AttributeChangeMsg
     {

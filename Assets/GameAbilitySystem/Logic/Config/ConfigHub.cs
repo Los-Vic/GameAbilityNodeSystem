@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     [CreateAssetMenu(menuName = "GameAbilitySystem/ConfigHub", fileName = "ConfigHub")]
     public class ConfigHub:ScriptableObject

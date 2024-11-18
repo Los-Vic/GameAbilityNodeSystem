@@ -1,23 +1,21 @@
-﻿using System;
-using CommonObjectPool;
+﻿using CommonObjectPool;
 using NS;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
-    public class ProviderSetUp
-    {
-        public AbilityAssetProvider AbilityAssetProvider;
-    }
-    
     public class GameAbilitySystem:NodeSystem
     {
         //Mgr
-        internal ObjectPoolMgr ObjectPoolMgr;
-        internal AttributeInstanceMgr AttributeInstanceMgr;
-        internal AbilityInstanceMgr AbilityInstanceMgr;
-
+        internal ObjectPoolMgr ObjectPoolMgr { get; private set; }
+        internal AttributeInstanceMgr AttributeInstanceMgr { get; private set; }
+        internal AbilityInstanceMgr AbilityInstanceMgr { get; private set; }
         //Provider
-        internal AbilityAssetProvider AbilityAssetProvider;
+        internal IAssetConfigProvider AssetConfigProvider { get; private set; }
+        
+        public GameAbilitySystem(IAssetConfigProvider provider)
+        {
+            AssetConfigProvider = provider;
+        }
         
         public override void InitSystem()
         {
@@ -26,10 +24,6 @@ namespace GameAbilitySystem.Logic
             AttributeInstanceMgr = new AttributeInstanceMgr(this);
             AbilityInstanceMgr = new AbilityInstanceMgr(this);
         }
-
-        public virtual void SetUpProviders(ProviderSetUp setUp)
-        {
-            AbilityAssetProvider = setUp.AbilityAssetProvider;
-        }
+        
     }
 }

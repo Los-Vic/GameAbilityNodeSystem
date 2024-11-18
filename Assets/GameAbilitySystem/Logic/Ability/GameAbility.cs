@@ -1,12 +1,13 @@
 ﻿using CommonObjectPool;
 using MissQ;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public struct AbilityCreateParam
     {
         public uint Id;
         public AbilityAsset Asset;
+        public uint Lv;
     }
     
     public class GameAbility :IPoolObject
@@ -14,6 +15,7 @@ namespace GameAbilitySystem.Logic
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
         internal GameUnit Owner;
+        internal uint Lv;
         
         //Cooldown
         internal bool IsInCooldown;
@@ -27,6 +29,7 @@ namespace GameAbilitySystem.Logic
             ID = param.Id;
             Asset = param.Asset;
             GraphController.Init(sys, Asset);
+            Lv = param.Lv;
         }
 
         private void UnInit()
@@ -41,8 +44,7 @@ namespace GameAbilitySystem.Logic
                 CooldownCounter += dt;
                 if (CooldownCounter >= Cooldown)
                 {
-                    CooldownCounter = 0;
-                    IsInCooldown = false;
+                    ResetCooldown();
                 }
             }
             
@@ -55,12 +57,12 @@ namespace GameAbilitySystem.Logic
             Owner = owner;
             GraphController.RunGraph(EDefaultEvent.OnAddAbility);
             
-            //todo: Register to game event
+            //todo: Graph register to game event
         }
 
         internal void OnRemoveAbility()
         {
-            //todo: Unregister to game event
+            //todo: Graph unregister to game event
             
             GraphController.RunGraph(EDefaultEvent.OnRemoveAbility);
             Owner = null;
@@ -69,6 +71,16 @@ namespace GameAbilitySystem.Logic
         //检测技能执行条件是否满足
         internal virtual bool CheckAbility()
         {
+            if (IsInCooldown)
+                return false;
+
+            foreach (var costElement in Asset.costs)
+            {
+                var costNums = Owner.Sys.AssetConfigProvider.GetAbilityEffectParamVal(costElement.costVal, Lv);
+                if (Owner.GetSimpleAttributeValue(costElement.attributeType) < costNums)
+                    return false;
+            }
+
             return true;
         }
 
@@ -87,10 +99,17 @@ namespace GameAbilitySystem.Logic
         {
             if (!CheckAbility())
                 return;
-            
-            
+
+            CommitAbility();
+            GraphController.RunGraph(EDefaultEvent.OnActivateAbility);
         }
 
+        internal void ResetCooldown()
+        {
+            CooldownCounter = 0;
+            IsInCooldown = false;
+        }
+        
         #region Object Pool
 
         public void OnCreateFromPool()

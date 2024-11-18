@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using GameAbilitySystem.Logic;
+using GAS.Logic;
 using NS;
 using NSEditor;
 using Sirenix.OdinInspector.Editor;
@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace GameAbilitySystem.Editor
+namespace GAS.Editor
 {
     [CustomEditor(typeof(AbilityAsset), true)]
     public class AbilityAssetEditor:OdinEditor

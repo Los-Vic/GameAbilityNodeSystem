@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     [Serializable]
     public struct CostElement

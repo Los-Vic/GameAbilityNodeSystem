@@ -2,7 +2,7 @@
 using CommonObjectPool;
 using NS;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public class AbilityTask
     {

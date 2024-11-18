@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public class AbilityInstanceMgr
     {
@@ -14,7 +14,7 @@ namespace GameAbilitySystem.Logic
 
         internal GameAbility CreateAbility(uint id)
         {
-            var abilityAsset = _system.AbilityAssetProvider.GetAbilityAsset(id);
+            var abilityAsset = _system.AssetConfigProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
             {
                 Debug.LogError($"Fail to get ActiveAbilityAsset of {id}");

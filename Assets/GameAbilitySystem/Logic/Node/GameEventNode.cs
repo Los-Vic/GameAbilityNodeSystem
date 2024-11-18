@@ -1,8 +1,8 @@
 ﻿using System;
-using GameAbilitySystem.Logic;
+using NS;
 using UnityEditor.Experimental.GraphView;
 
-namespace NS
+namespace GAS.Logic
 {
     [Serializable]
     public class NodeEventParam:NodeSystemEventParamBase

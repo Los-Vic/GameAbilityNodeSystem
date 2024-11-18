@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public class TagContainer
     {

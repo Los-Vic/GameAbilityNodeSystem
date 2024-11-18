@@ -1,6 +1,6 @@
 {
     "name": "GameAbilitySystem",
-    "rootNamespace": "",
+    "rootNamespace": "GAS",
     "references": [
         "GUID:9211b54bab341cb47ae2fb64d0129850",
         "GUID:298dff7fd453955449dc9e26ac2623e6",

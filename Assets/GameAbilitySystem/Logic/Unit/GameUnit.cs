@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
+using MissQ;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public class GameUnit: IPoolObject
     {
-        private GameAbilitySystem _sys;
+        internal GameAbilitySystem Sys { get;private set; }
         
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
@@ -20,7 +21,7 @@ namespace GameAbilitySystem.Logic
         
         internal void Init(GameAbilitySystem sys)
         {
-            _sys = sys;
+            Sys = sys;
         }
 
         private void UnInit()
@@ -28,13 +29,13 @@ namespace GameAbilitySystem.Logic
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
             {
-                _sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
+                Sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
             }
             SimpleAttributes.Clear();
 
             foreach (var attribute in CompositeAttributes.Values)
             {
-                _sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
+                Sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
             }
             CompositeAttributes.Clear();
             
@@ -47,7 +48,7 @@ namespace GameAbilitySystem.Logic
 
         internal void AddSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = _sys.AttributeInstanceMgr.CreateSimpleAttribute(ref param);
+            var attribute = Sys.AttributeInstanceMgr.CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
         }
 
@@ -55,7 +56,7 @@ namespace GameAbilitySystem.Logic
         {
             if (SimpleAttributes.Remove(type, out var attribute))
             {
-                _sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
+                Sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
             }
         }
 
@@ -64,9 +65,15 @@ namespace GameAbilitySystem.Logic
             return SimpleAttributes.GetValueOrDefault(type);
         }
 
+        internal FP GetSimpleAttributeValue(ESimpleAttributeType type)
+        {
+            var attribute = GetSimpleAttribute(type);
+            return attribute?.Val ?? 0;
+        }
+
         internal void AddCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = _sys.AttributeInstanceMgr.CreateCompositeAttribute(ref param);
+            var attribute = Sys.AttributeInstanceMgr.CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
         }
 
@@ -74,7 +81,7 @@ namespace GameAbilitySystem.Logic
         {
             if (CompositeAttributes.Remove(type, out var attribute))
             {
-                _sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
+                Sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
             }
         }
 
@@ -89,7 +96,7 @@ namespace GameAbilitySystem.Logic
 
         internal void GrantAbility(uint abilityId)
         {
-            var ability = _sys.AbilityInstanceMgr.CreateAbility(abilityId);
+            var ability = Sys.AbilityInstanceMgr.CreateAbility(abilityId);
             GameAbilities.Add(ability);
             ability.OnAddAbility(this);
         }

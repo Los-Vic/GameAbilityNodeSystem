@@ -1,4 +1,4 @@
-﻿namespace GameAbilitySystem.Logic
+﻿namespace GAS.Logic
 {
     public enum EDefaultEvent
     {

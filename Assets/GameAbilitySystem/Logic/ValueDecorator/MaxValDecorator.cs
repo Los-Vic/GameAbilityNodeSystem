@@ -1,7 +1,7 @@
 ﻿using System;
 using MissQ;
 
-namespace GameAbilitySystem.Logic
+namespace GAS.Logic
 {
     public class MaxValDecorator:IValueDecorator
     {
