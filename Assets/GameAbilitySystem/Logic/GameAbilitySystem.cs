@@ -24,6 +24,15 @@ namespace GAS.Logic
             AttributeInstanceMgr = new AttributeInstanceMgr(this);
             AbilityInstanceMgr = new AbilityInstanceMgr(this);
         }
-        
+
+        public override void UnInitSystem()
+        {
+            base.UnInitSystem();
+        }
+
+        public void Update(float deltaTime)
+        {
+            
+        }
     }
 }

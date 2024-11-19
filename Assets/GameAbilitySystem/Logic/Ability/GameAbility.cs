@@ -10,7 +10,7 @@ namespace GAS.Logic
         public uint Lv;
     }
     
-    public class GameAbility :IPoolObject
+    public class GameAbility :IPoolObject, ITickable
     {
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
@@ -37,18 +37,18 @@ namespace GAS.Logic
             GraphController.UnInit();
         }
 
-        internal void UpdateAbility(FP dt)
+        public void OnTick(float deltaTime)
         {
             if (IsInCooldown)
             {
-                CooldownCounter += dt;
+                CooldownCounter += deltaTime;
                 if (CooldownCounter >= Cooldown)
                 {
                     ResetCooldown();
                 }
             }
             
-            GraphController.UpdateGraphs((float)dt);
+            GraphController.UpdateGraphs(deltaTime);
         }
         
         //获得和移除Ability
@@ -69,11 +69,13 @@ namespace GAS.Logic
         }
         
         //检测技能执行条件是否满足
-        internal virtual bool CheckAbility()
+        internal bool CheckAbility()
         {
+            //Cooldown
             if (IsInCooldown)
                 return false;
 
+            //Cost
             foreach (var costElement in Asset.costs)
             {
                 var costNums = Owner.Sys.AssetConfigProvider.GetAbilityEffectParamVal(costElement.costVal, Lv);
@@ -85,11 +87,17 @@ namespace GAS.Logic
         }
 
         //提交执行技能的消耗，并开始冷却计时
-        internal virtual void CommitAbility()
+        internal void CommitAbility()
         {
-            CooldownCounter = 0;
-            IsInCooldown = true;
+            ResetCooldown();
             
+            foreach (var costElement in Asset.costs)
+            {
+                var costNums = Owner.Sys.AssetConfigProvider.GetAbilityEffectParamVal(costElement.costVal, Lv);
+                var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
+                var newVal = attribute.Val - costNums;
+                Owner.Sys.AttributeInstanceMgr.SetAttributeVal(Owner, attribute, newVal);
+            }
         }
 
         //非事件触发

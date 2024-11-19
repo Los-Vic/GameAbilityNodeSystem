@@ -38,6 +38,8 @@ namespace GAS.Logic
         [LabelText("消耗")]
         public List<CostElement> costs = new();
         
+        [LabelText("每帧更新")]
+        public bool isTickable = true;
         
         #if UNITY_EDITOR
         public static List<string> GetParams()

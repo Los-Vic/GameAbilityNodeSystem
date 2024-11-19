@@ -6,7 +6,6 @@ namespace GAS.Logic
     public class AbilityInstanceMgr
     {
         private readonly GameAbilitySystem _system;
-
         public AbilityInstanceMgr(GameAbilitySystem sys)
         {
             _system = sys;
