@@ -4,12 +4,14 @@ namespace NS
 {
     public class NodeSystem
     {
-        public NodeSystemObjectFactory NodeObjectFactory { get; private set; }
+        public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
+        public NodeSystemTaskScheduler TaskScheduler { get; protected set; }
         private readonly Dictionary<NodeSystemGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         
         public virtual void InitSystem()
         {
             NodeObjectFactory = new NodeSystemObjectFactory();
+            TaskScheduler = new NodeSystemTaskScheduler();
         }
 
         public virtual void UnInitSystem()

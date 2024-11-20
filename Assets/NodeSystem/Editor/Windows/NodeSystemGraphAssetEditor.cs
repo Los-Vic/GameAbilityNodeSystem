@@ -14,7 +14,8 @@ namespace NSEditor
         public static bool OnOpenAsset(int instanceId, int index)
         {
             var asset = EditorUtility.InstanceIDToObject(instanceId);
-            if (asset.GetType() != typeof(NodeSystemGraphAsset)) 
+            var type = asset.GetType();
+            if (!typeof(NodeSystemGraphAsset).IsAssignableFrom(type)) 
                 return false;
             NodeSystemEditorWindow.Open((NodeSystemGraphAsset)asset);
             return true;
