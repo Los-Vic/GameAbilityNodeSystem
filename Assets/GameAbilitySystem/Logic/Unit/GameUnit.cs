@@ -65,7 +65,7 @@ namespace GAS.Logic
             return SimpleAttributes.GetValueOrDefault(type);
         }
 
-        internal FP GetSimpleAttributeValue(ESimpleAttributeType type)
+        internal FP GetSimpleAttributeVal(ESimpleAttributeType type)
         {
             var attribute = GetSimpleAttribute(type);
             return attribute?.Val ?? 0;
@@ -90,6 +90,12 @@ namespace GAS.Logic
             return CompositeAttributes.GetValueOrDefault(type);
         }
 
+        internal FP GetCompositeAttributeVal(ECompositeAttributeType type)
+        {
+            var attribute = GetCompositeAttribute(type);
+            return attribute?.Val ?? 0;
+        }
+        
         #endregion
 
         #region Abilities

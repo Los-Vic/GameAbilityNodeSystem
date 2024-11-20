@@ -1,4 +1,5 @@
 ﻿using CommonObjectPool;
+using GAS.Logic.Value;
 using MissQ;
 
 namespace GAS.Logic
@@ -23,6 +24,7 @@ namespace GAS.Logic
         internal FP CooldownCounter;
         
         internal uint ID { get; private set; }
+        private bool _tickable;
         
         internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
         {
@@ -30,15 +32,22 @@ namespace GAS.Logic
             Asset = param.Asset;
             GraphController.Init(sys, Asset);
             Lv = param.Lv;
+
+            _tickable = Asset.isTickable;
         }
 
         private void UnInit()
         {
+            ResetCooldown();
+            _tickable = false;
             GraphController.UnInit();
         }
 
         public void OnTick(float deltaTime)
         {
+            if(!_tickable)
+                return;
+            
             if (IsInCooldown)
             {
                 CooldownCounter += deltaTime;
@@ -50,13 +59,21 @@ namespace GAS.Logic
             
             GraphController.UpdateGraphs(deltaTime);
         }
+
+        //变更等级
+        internal void ChangeAbilityLevel(uint newLv)
+        {
+            Lv = newLv;
+            Cooldown = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
+        }
         
         //获得和移除Ability
         internal void OnAddAbility(GameUnit owner)
         {
             Owner = owner;
-            GraphController.RunGraph(EDefaultEvent.OnAddAbility);
+            Cooldown = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
             
+            GraphController.RunGraph(EDefaultEvent.OnAddAbility);
             //todo: Graph register to game event
         }
 
@@ -78,8 +95,8 @@ namespace GAS.Logic
             //Cost
             foreach (var costElement in Asset.costs)
             {
-                var costNums = Owner.Sys.AssetConfigProvider.GetAbilityEffectParamVal(costElement.costVal, Lv);
-                if (Owner.GetSimpleAttributeValue(costElement.attributeType) < costNums)
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
+                if (Owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
                     return false;
             }
 
@@ -89,11 +106,11 @@ namespace GAS.Logic
         //提交执行技能的消耗，并开始冷却计时
         internal void CommitAbility()
         {
-            ResetCooldown();
+            StartCooldown();
             
             foreach (var costElement in Asset.costs)
             {
-                var costNums = Owner.Sys.AssetConfigProvider.GetAbilityEffectParamVal(costElement.costVal, Lv);
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
                 var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
                 Owner.Sys.AttributeInstanceMgr.SetAttributeVal(Owner, attribute, newVal);
@@ -101,8 +118,7 @@ namespace GAS.Logic
         }
 
         //非事件触发
-        // 1. 玩家主动触发
-        // 2. 时间触发
+        //  时间触发
         internal void ActivateAbility()
         {
             if (!CheckAbility())
@@ -112,10 +128,16 @@ namespace GAS.Logic
             GraphController.RunGraph(EDefaultEvent.OnActivateAbility);
         }
 
-        internal void ResetCooldown()
+        private void ResetCooldown()
         {
             CooldownCounter = 0;
             IsInCooldown = false;
+        }
+
+        private void StartCooldown()
+        {
+            if(Cooldown > 0)
+                IsInCooldown = true;
         }
         
         #region Object Pool

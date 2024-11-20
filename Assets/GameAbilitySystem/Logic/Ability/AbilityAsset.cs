@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GAS.Logic.Value;
 using NS;
 using Sirenix.OdinInspector;
 using UnityEngine;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace GAS.Logic
 {
@@ -15,13 +12,10 @@ namespace GAS.Logic
     {
         [LabelText("属性")]
         public ESimpleAttributeType attributeType;
-        [LabelText("消耗值")]
-        [ValueDropdown(nameof(GetParams))]
-        public string costVal;
+        [BoxGroup("消耗值"), HideLabel]
+        [SerializeReference]
+        public ValuePickerBase costVal;
         
-#if UNITY_EDITOR
-        public static List<string> GetParams => AbilityAsset.GetParams();
-#endif
     }
     
     [CreateAssetMenu(menuName = "GameAbilitySystem/AbilityAsset", fileName = "NewAbility")]
@@ -31,31 +25,17 @@ namespace GAS.Logic
         [LabelText("技能名")]
         public string abilityName;
 
-        [LabelText("冷却")]
-        [ValueDropdown(nameof(GetParams))]
-        public string cooldown;
+        [BoxGroup("冷却"), HideLabel]
+        [SerializeReference]
+        public ValuePickerBase cooldown;
 
-        [LabelText("消耗")]
+        [BoxGroup("消耗")]
+        [LabelText("消耗属性列表")]
         public List<CostElement> costs = new();
         
+        [BoxGroup("更新")]
         [LabelText("每帧更新")]
+        [InfoBox("不需要冷却和延迟等基于时间的行为，则不需要勾选")]
         public bool isTickable = true;
-        
-        #if UNITY_EDITOR
-        public static List<string> GetParams()
-        {
-            var result = new List<string>();
-            var cfg = AssetDatabase.LoadAssetAtPath<AbilityEffectParamConfig>(
-                "Assets/GameAbilitySystem/Assets/Configs/AbilityEffectParamConfig.asset");
-            if (cfg == null)
-                return result;
-            
-            foreach (var element in cfg.paramElements)
-            {
-                result.Add(element.paramName);
-            }
-            return result;
-        }
-        #endif
     }
 }
