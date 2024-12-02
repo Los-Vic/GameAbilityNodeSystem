@@ -12,12 +12,12 @@ namespace NS
     public class NodeSystemTask: IPoolObject
     {
         public string TaskName { get; private set; }
-        internal Func<ENodeSystemTaskRunStatus> StartTask { get; private set; }
-        internal Action EndTask { get; private set; }
-        internal Action CancelTask { get; private set; }
-        internal Func<float, ENodeSystemTaskRunStatus> UpdateTask { get; private set; }
+        public Func<ENodeSystemTaskRunStatus> StartTask { get; private set; }
+        public Action EndTask { get; private set; }
+        public Action CancelTask { get; private set; }
+        public Func<float, ENodeSystemTaskRunStatus> UpdateTask { get; private set; }
 
-        internal void InitTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
+        public void InitTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ENodeSystemTaskRunStatus> updateTask = null)
         {
             TaskName = taskName;
@@ -28,15 +28,15 @@ namespace NS
         }
         
         #region PoolObject
-        public void OnCreateFromPool()
+        public virtual void OnCreateFromPool()
         {
         }
 
-        public void OnTakeFromPool()
+        public virtual void OnTakeFromPool()
         {
         }
 
-        public void OnReturnToPool()
+        public virtual void OnReturnToPool()
         {
             StartTask = null;
             EndTask = null;
@@ -44,7 +44,7 @@ namespace NS
             UpdateTask = null;
         }
 
-        public void OnDestroy()
+        public virtual void OnDestroy()
         {
         }
         #endregion

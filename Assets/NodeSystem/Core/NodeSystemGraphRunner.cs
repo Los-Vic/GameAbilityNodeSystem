@@ -149,10 +149,14 @@ namespace NS
             _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
         }
 
-        public void StartTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
+        public NodeSystemTask CreateTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ENodeSystemTaskRunStatus> updateTask = null)
         {
-            var task = _nodeSystem.TaskScheduler.CreateTask(taskName, this, startTask, endTask, cancelTask, updateTask);
+            return _nodeSystem.TaskScheduler.CreateTask(taskName, this, startTask, endTask, cancelTask, updateTask);
+        }
+
+        public void StartTask(NodeSystemTask task)
+        {
             _nodeSystem.TaskScheduler.StartTask(task);
         }
         

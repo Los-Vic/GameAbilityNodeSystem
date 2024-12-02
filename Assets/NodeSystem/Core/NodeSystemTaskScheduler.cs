@@ -10,8 +10,9 @@ namespace NS
             Func<ENodeSystemTaskRunStatus> startTask, Action endTask,
             Action cancelTask,
             Func<float, ENodeSystemTaskRunStatus> updateTask = null);
-
+        
         void StartTask(NodeSystemTask task);
+        void ArrangeTaskUpdatePolicy(NodeSystemTask task);
         void CancelTask(NodeSystemTask task);
         void CancelTasksOfGraphRunner(NodeSystemGraphRunner runner);
         bool HasTaskRunning(NodeSystemGraphRunner runner);
@@ -24,7 +25,7 @@ namespace NS
     
     public class NodeSystemTaskScheduler:INodeSystemTaskScheduler
     {
-        private readonly ObjectPoolMgr _poolMgr;
+        protected readonly ObjectPoolMgr PoolMgr;
 
         private readonly List<NodeSystemTask> _updateList = new();
         private readonly List<NodeSystemTask> _traversalUpdateList = new();
@@ -35,13 +36,13 @@ namespace NS
         
         public NodeSystemTaskScheduler(ObjectPoolMgr poolMgr)
         {
-            _poolMgr = poolMgr;
+            PoolMgr = poolMgr;
         }
 
         public NodeSystemTask CreateTask(string taskName, NodeSystemGraphRunner runner, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ENodeSystemTaskRunStatus> updateTask = null)
         {
-            var task = _poolMgr.CreateObject<NodeSystemTask>();
+            var task = PoolMgr.CreateObject<NodeSystemTask>();
             task.InitTask(taskName, startTask, endTask, cancelTask, updateTask);
             
             _graphRunnerTasksMap.TryAdd(runner, new List<NodeSystemTask>());
@@ -60,6 +61,12 @@ namespace NS
                 EndTask(task);
                 return;
             }
+
+            ArrangeTaskUpdatePolicy(task);
+        }
+
+        public void ArrangeTaskUpdatePolicy(NodeSystemTask task)
+        {
             _pendingAddToUpdateList.Add(task);
         }
         
@@ -128,7 +135,7 @@ namespace NS
             foreach (var t in runnerTasks)
             {
                 _taskGraphRunnerMap.Remove(t);
-                _poolMgr.DestroyObject(t);
+                PoolMgr.DestroyObject(t);
             }
         }
         
@@ -145,7 +152,7 @@ namespace NS
                     }
                 }
             }
-            _poolMgr.DestroyObject(task);
+            PoolMgr.DestroyObject(task);
         }
         public void EndTask(NodeSystemTask task)
         {

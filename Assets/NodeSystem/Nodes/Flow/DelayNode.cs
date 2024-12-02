@@ -33,7 +33,8 @@ namespace NS
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
             NodeSystemLogger.Log($"input delay [{_delay}]");
             
-            GraphRunner.StartTask(DelayTaskName, StartTask, EndTask, CancelTask, UpdateTask);
+            var task = GraphRunner.CreateTask(DelayTaskName, StartTask, EndTask, CancelTask, UpdateTask);
+            GraphRunner.StartTask(task);
         }
         
         public override string GetNextNode()
