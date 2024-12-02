@@ -70,6 +70,9 @@ namespace GAS.Logic
         {
             Owner = owner;
             Cooldown = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
+            //如果有冷却时间，则必须开启Tickable
+            if (Cooldown > 0)
+                _tickable = true;
             
             GraphController.RunGraph(EDefaultEvent.OnAddAbility);
             //todo: Graph register to game event
