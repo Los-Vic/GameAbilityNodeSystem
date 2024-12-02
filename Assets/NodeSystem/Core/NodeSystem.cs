@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
+using CommonObjectPool;
 
 namespace NS
 {
     public class NodeSystem
     {
+        public ObjectPoolMgr PoolMgr { get; private set; }
         public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
-        public NodeSystemTaskScheduler TaskScheduler { get; protected set; }
+        public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
+        
         private readonly Dictionary<NodeSystemGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         
         public virtual void InitSystem()
         {
-            NodeObjectFactory = new NodeSystemObjectFactory();
-            TaskScheduler = new NodeSystemTaskScheduler();
+            PoolMgr = new ObjectPoolMgr();
+            NodeObjectFactory = new NodeSystemObjectFactory(PoolMgr);
+            TaskScheduler = new NodeSystemTaskScheduler(PoolMgr);
         }
 
         public virtual void UnInitSystem()
@@ -20,6 +24,11 @@ namespace NS
             _graphAssetRuntimeDataMap.Clear();
         }
 
+        public virtual void UpdateSystem(float dt)
+        {
+            TaskScheduler.UpdateScheduler(dt);
+        }
+        
         public GraphAssetRuntimeData GetGraphRuntimeData(NodeSystemGraphAsset asset)
         {
             if (_graphAssetRuntimeDataMap.TryGetValue(asset, out var runtimeData))

@@ -2,12 +2,17 @@
 {
     public class NodeSystemFlowNodeRunner:NodeSystemNodeRunner
     {
-        private bool _isCompleted;
         private bool _dependentValNodesExecuted;
-        
+        protected NodeSystemGraphRunner GraphRunner { get; private set; }
+
+        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            GraphRunner = graphRunner;
+        }
+
         public virtual void Reset()
         {
-            _isCompleted = false;
             _dependentValNodesExecuted = false;
         }
         
@@ -16,18 +21,21 @@
             return default;
         }
 
-        public bool IsCompleted() => _isCompleted;
-        protected void Complete() => _isCompleted = true;
+        protected void Complete()
+        {
+            GraphRunner.MoveToNextNode();
+            GraphRunner.ExecuteRunner();
+        }
         
-        protected void ExecuteDependentValNodes(string flowNodeId, NodeSystemGraphRunner graphRunner)
+        protected void ExecuteDependentValNodes(string flowNodeId)
         {
             if(_dependentValNodesExecuted)
                 return;
             
-            var nodeList = graphRunner.GraphAssetRuntimeData.GetDependentNodeIds(flowNodeId);
+            var nodeList = GraphRunner.GraphAssetRuntimeData.GetDependentNodeIds(flowNodeId);
             for (var i = nodeList.Count - 1; i >= 0; i--)
             {
-                var runner = graphRunner.GetNodeRunner(nodeList[i]);
+                var runner = GraphRunner.GetNodeRunner(nodeList[i]);
                 runner.Execute();
             }
 

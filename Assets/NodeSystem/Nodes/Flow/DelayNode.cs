@@ -17,48 +17,56 @@ namespace NS
     public class DelayNodeRunner:NodeSystemFlowNodeRunner
     {
         private DelayNode _node;
-        private NodeSystemGraphRunner _graphRunner;
         private float _delay;
         private float _elapsedTime;
-        private bool _started;
+        private const string DelayTaskName = "DelayNodeTask";
         
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (DelayNode)nodeAsset;
-            _graphRunner = graphRunner;
         }
 
-        public override void Reset()
+        public override void Execute()
         {
-            base.Reset();
-            _started = false;
-            _elapsedTime = 0;
-        }
-
-        public override void Execute(float dt = 0)
-        {
-            if (!_started)
-            {
-                ExecuteDependentValNodes(_node.Id, _graphRunner);
-                _delay = _graphRunner.GetInPortVal<float>(_node.InPortFloat);
-                NodeSystemLogger.Log($"Input Delay [{_delay}]");
-                _started = true;
-            }
+            ExecuteDependentValNodes(_node.Id);
+            _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
+            NodeSystemLogger.Log($"input delay [{_delay}]");
             
-            _elapsedTime += dt;
-            if (_elapsedTime >= _delay)
-            {
-                Complete();
-            }
+            GraphRunner.StartTask(DelayTaskName, StartTask, EndTask, CancelTask, UpdateTask);
         }
-
+        
         public override string GetNextNode()
         {
-            var port = _graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return default;
-            var connectPort = _graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
+        }
+        
+        private ENodeSystemTaskRunStatus UpdateTask(float dt)
+        {
+            _elapsedTime += dt;
+            if (_elapsedTime >= _delay)
+                return ENodeSystemTaskRunStatus.End;
+
+            return ENodeSystemTaskRunStatus.Running;
+        }
+
+        private void CancelTask()
+        {
+        }
+
+        private void EndTask()
+        {
+           Complete();
+        }
+
+        private ENodeSystemTaskRunStatus StartTask()
+        {
+            _elapsedTime = 0;
+            return ENodeSystemTaskRunStatus.Running;
         }
     }
 }

@@ -34,7 +34,7 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
         
-        public override void Execute(float dt = 0)
+        public override void Execute()
         {
             Complete();
         }

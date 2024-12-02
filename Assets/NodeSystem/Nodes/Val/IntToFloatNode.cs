@@ -22,7 +22,7 @@ namespace NS
             _graphRunner = graphRunner;
         }
 
-        public override void Execute(float dt = 0)
+        public override void Execute()
         {
             var inVal = _graphRunner.GetInPortVal<int>(_node.InPortVal);
             var floatVal = (float)inVal;

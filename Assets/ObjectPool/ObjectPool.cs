@@ -16,7 +16,6 @@ namespace CommonObjectPool
     public class ObjectPool
     {
         private readonly UnityEngine.Pool.ObjectPool<IPoolObject> _pool;
-        private readonly List<IPoolObject> _activeObjects = new List<IPoolObject>();
         private readonly Type _poolObjectType;
 
         //Constructor
@@ -26,11 +25,11 @@ namespace CommonObjectPool
             if (!t.IsAssignableFrom(type))
             {
                 Debug.LogError(
-                    $"[ObjectPool]Create object pool failed: type [{type}] can not assign to IPoolObject");
+                    $"[ObjectPool]create object pool failed: type [{type}] can not assign to IPoolObject");
                 return;
             }
 
-            Debug.Log($"[ObjectPool]Create object pool success: type [{type}]");
+            Debug.Log($"[ObjectPool]create object pool success: type [{type}]");
             _poolObjectType = type;
             _pool = new UnityEngine.Pool.ObjectPool<IPoolObject>(CreateItem, OnTakeFromPool, OnReturnToPool,
                 OnDestroyItem,
@@ -40,23 +39,18 @@ namespace CommonObjectPool
         public IPoolObject CreateObject()
         {
             var obj = _pool.Get();
-            _activeObjects.Add(obj);
             obj.OnTakeFromPool();
             return obj;
         }
 
         public void DestroyObject(IPoolObject obj)
         {
-            if (!_activeObjects.Remove(obj))
-                return;
-
             obj.OnReturnToPool();
             _pool.Release(obj);
         }
 
         public void Clear()
         {
-            _activeObjects.Clear();
             _pool.Clear();
         }
         
@@ -91,14 +85,8 @@ namespace CommonObjectPool
         public (int, int) LogState()
         {
             Debug.Log(
-                $"[ObjectPool][{_poolObjectType.Name}]: Active/Total/PoolActive:[{_activeObjects.Count}/{_pool.CountAll}/{_pool.CountActive}]");
-            if (_activeObjects.Count != _pool.CountActive)
-            {
-                Debug.LogError(
-                    $"[ObjectPool][{_poolObjectType.Name}] has different active count: Active/Total/PoolActive:[{_activeObjects.Count}/{_pool.CountAll}/{_pool.CountActive}]");
-            }
-
-            return (_activeObjects.Count, _pool.CountAll);
+                $"[ObjectPool][{_poolObjectType.Name}]: total/pool active:[{_pool.CountAll}/{_pool.CountActive}]");
+            return (_pool.CountActive, _pool.CountAll);
         }
 
         #endregion
@@ -130,7 +118,7 @@ namespace CommonObjectPool
             var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
             {
-                Debug.LogError($"Create object failed: type {type} can not assign to IPoolObject");
+                Debug.LogError($"create object failed: type {type} can not assign to IPoolObject");
                 return default;
             }
 
@@ -164,6 +152,14 @@ namespace CommonObjectPool
                 pool.Clear();
             }
             _objectPoolMap.Clear();
+        }
+
+        public void Log()
+        {
+            foreach (var pool in _objectPoolMap.Values)
+            {
+                pool.LogState();
+            }
         }
     }
 }

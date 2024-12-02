@@ -11,7 +11,7 @@ namespace NS
             
         }
         
-        public virtual void Execute(float dt = 0)
+        public virtual void Execute()
         {
            
         }

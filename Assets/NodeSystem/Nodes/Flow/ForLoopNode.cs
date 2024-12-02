@@ -24,7 +24,6 @@ namespace NS
     public class ForLoopNodeRunner:NodeSystemFlowNodeRunner
     {
         private ForLoopNode _node;
-        private NodeSystemGraphRunner _graphRunner;
         private bool _started;
         private int _startIndex;
         private int _endIndex;
@@ -33,8 +32,8 @@ namespace NS
         
         public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (ForLoopNode)nodeAsset;
-            _graphRunner = graphRunner;
         }
 
         public override void Reset()
@@ -46,15 +45,15 @@ namespace NS
             _started = false;
         }
 
-        public override void Execute(float dt = 0)
+        public override void Execute()
         {
             if (!_started)
             {
-                ExecuteDependentValNodes(_node.Id, _graphRunner);
-                _graphRunner.EnterLoop(_node.Id);
+                ExecuteDependentValNodes(_node.Id);
+                GraphRunner.EnterLoop(_node.Id);
                 _started = true;
-                _startIndex = _graphRunner.GetInPortVal<int>(_node.InStartIndex);
-                _endIndex = _graphRunner.GetInPortVal<int>(_node.InEndIndex);
+                _startIndex = GraphRunner.GetInPortVal<int>(_node.InStartIndex);
+                _endIndex = GraphRunner.GetInPortVal<int>(_node.InEndIndex);
                 _curIndex = _startIndex;
                 _started = true;
             }
@@ -63,7 +62,7 @@ namespace NS
             if (_curIndex > _endIndex)
             {
                 _outPortId = _node.OutCompleteExecPort;
-                _graphRunner.ExitLoop();
+                GraphRunner.ExitLoop();
             }
             else
             {
@@ -75,11 +74,11 @@ namespace NS
 
         public override string GetNextNode()
         {
-            var outPort = _graphRunner.GraphAssetRuntimeData.GetPortById(_outPortId);
+            var outPort = GraphRunner.GraphAssetRuntimeData.GetPortById(_outPortId);
             if (!outPort.IsConnected())
                 return default;
 
-            var connectPort = _graphRunner.GraphAssetRuntimeData.GetPortById(outPort.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(outPort.connectPortId);
             return connectPort.belongNodeId;
         }
     }

@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CommonObjectPool;
 using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
+    public enum EGraphRunnerEnd
+    {
+        Completed,
+        Canceled,
+    }
+    
     public class NodeSystemGraphRunner:IPoolObject
     {
         private NodeSystemGraphAsset _asset;
@@ -16,36 +23,35 @@ namespace NS
         //Run node runner
         private NodeSystemNode _eventNode;
         private NodeSystemFlowNodeRunner _curRunner;
-        private bool _isRunning;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
+        private Action<NodeSystemGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
-        
+        public string AssetName => _asset?.name ?? "";
+        public string EventName => _eventNode?.DisplayName() ?? "";
+
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
-        /// <param name="system"></param>
-        /// <param name="asset"></param>
-        /// <param name="eventNodeId"></param>
-        /// <param name="eventParam"></param>
-        public void Init(NodeSystem system, NodeSystemGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam)
+        public void Init(NodeSystem system, NodeSystemGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam
+        , Action<NodeSystemGraphRunner, EGraphRunnerEnd> onRunnerRunEnd)
         {
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
             _isValid = false;
-
+            _onRunnerRunEnd = onRunnerRunEnd;
             _eventNode = GraphAssetRuntimeData.GetNodeById(eventNodeId);
             if (!_eventNode.IsEventNode())
             {
-                NodeSystemLogger.LogError($"Not valid event node {eventNodeId} of {asset.name}");
+                NodeSystemLogger.LogError($"not valid event node {eventNodeId} of {asset.name}");
                 return;
             }
 
             var eventNodeRunner = GetNodeRunner(eventNodeId) as NodeSystemEventNodeRunner;
             if (eventNodeRunner == null)
             {
-                NodeSystemLogger.LogError($"Not valid event node runner {eventNodeId} of {asset.name}");
+                NodeSystemLogger.LogError($"not valid event node runner {eventNodeId} of {asset.name}");
                 return;
             }
             eventNodeRunner.SetUpEventParam(eventParam);
@@ -54,48 +60,102 @@ namespace NS
 
         private void DeInit()
         {
-            StopRunner();
+            _nodeSystem.TaskScheduler.CancelTasksOfGraphRunner(this);
+            _onRunnerRunEnd = null;
+            _asset = null;
+            _eventNode = null;
+            _isValid = false;
+            GraphAssetRuntimeData = null;
+            _nodeSystem = null;
+            Clear();
         }
-        
-        public void StartRunner()
-        {
-            if (_isRunning || !_isValid)
-            {
-                return;
-            }
-            
-            NodeSystemLogger.Log($"Start graph of {_asset.name}, event {_eventNode.DisplayName()}");
-            _isRunning = true;
-            _curRunner = GetNodeRunner(_eventNode.Id) as NodeSystemFlowNodeRunner;
 
-            UpdateCurNodeRunner();
-        }
-        
-        public void StopRunner()
+        private void Clear()
         {
-            if (!_isRunning)
-            {
-                return;
-            }
-            
-            NodeSystemLogger.Log($"Stop GraphRunner of {_asset.name}, event {_eventNode.DisplayName()}");
-            _isRunning = false;
             _curRunner = null;
             _runningLoopNodeIds.Clear();
             _outPortResultCached.Clear();
             DestroyRunnerInstances();
         }
-        
-        public void UpdateRunner(float deltaTime = 0)
+
+        private bool IsRunning()
         {
-            if(!_isRunning)
+            return _nodeSystem.TaskScheduler.HasTaskRunning(this);
+        }
+        
+        public void StartRunner()
+        {
+            if (!_isValid)
+            {
+                NodeSystemLogger.LogError($"start graph of {_asset.name} failed. not valid.");
                 return;
+            }
+
+            if (IsRunning())
+            {
+                NodeSystemLogger.LogError($"start graph of {_asset.name} failed. already running.");
+                return;
+            }
             
-            UpdateCurNodeRunner(deltaTime);
+            NodeSystemLogger.Log($"start graph of {_asset.name}, event:{_eventNode.DisplayName()}");
+            _curRunner = GetNodeRunner(_eventNode.Id) as NodeSystemFlowNodeRunner;
+            ExecuteRunner();
+        }
+        
+        private void CompleteRunner()
+        {
+            NodeSystemLogger.Log($"complete graph of {_asset.name}, event:{_eventNode.DisplayName()}");
+            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
+
+            Clear();
         }
 
-        public bool IsRunning() => _isRunning;
+        public void CancelRunner()
+        {
+            NodeSystemLogger.Log($"cancel graph of {_asset.name}, event:{_eventNode.DisplayName()}");
+            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
+            
+            Clear();
+        }
+        
+        internal void ExecuteRunner()
+        {
+            if (_curRunner == null)
+            {
+                CompleteRunner();
+                return;
+            }
+            _curRunner.Execute();
+        }
 
+        internal void MoveToNextNode()
+        {
+            if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curRunner)
+            {
+                _curRunner.Reset();
+            }
+                
+            var nextNode = _curRunner.GetNextNode();
+            if (!NodeSystemNode.IsValidNodeId(nextNode))
+            {
+                if (!NodeSystemNode.IsValidNodeId(loopNode))
+                {
+                    _curRunner = null;
+                    return;
+                }
+                nextNode = loopNode;
+            }
+                
+            _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
+        }
+
+        public void StartTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
+            Func<float, ENodeSystemTaskRunStatus> updateTask = null)
+        {
+            var task = _nodeSystem.TaskScheduler.CreateTask(taskName, this, startTask, endTask, cancelTask, updateTask);
+            _nodeSystem.TaskScheduler.StartTask(task);
+        }
+        
         public NodeSystemNodeRunner GetNodeRunner(string nodeId)
         {
             if (_nodeRunners.TryGetValue(nodeId, out var nodeRunner))
@@ -175,39 +235,6 @@ namespace NS
             _nodeRunners.Clear();
         }
         
-        
-        private void UpdateCurNodeRunner(float deltaTime = 0)
-        {
-            _curRunner.Execute(deltaTime);
-
-            while (_curRunner.IsCompleted())
-            {
-                if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curRunner)
-                {
-                    _curRunner.Reset();
-                }
-                
-                var nextNode = _curRunner.GetNextNode();
-                if (!NodeSystemNode.IsValidNodeId(nextNode))
-                {
-                    if (!NodeSystemNode.IsValidNodeId(loopNode))
-                    {
-                        StopRunner();
-                        break;
-                    }
-                    nextNode = loopNode;
-                }
-                
-                _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
-                if (_curRunner == null)
-                {
-                    StopRunner();
-                    break;
-                }
-                _curRunner.Execute();
-            }
-        }
-
         #region Pool Object
 
         public void OnCreateFromPool()

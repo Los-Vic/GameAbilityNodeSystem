@@ -57,7 +57,7 @@ namespace GAS.Logic
             _runner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
         }
 
-        public override void Execute(float dt = 0)
+        public override void Execute()
         {
             Complete();
         }

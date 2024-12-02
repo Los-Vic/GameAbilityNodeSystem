@@ -56,8 +56,6 @@ namespace GAS.Logic
                     ResetCooldown();
                 }
             }
-            
-            GraphController.UpdateGraphs(deltaTime);
         }
 
         //变更等级

@@ -10,7 +10,6 @@ namespace GAS.Logic
         private NodeSystemGraphAsset _asset;
 
         private readonly List<NodeSystemGraphRunner> _graphRunners = new();
-        private readonly List<NodeSystemGraphRunner> _pendingDestroyGraphRunners = new();
         private readonly Dictionary<EGameEvent, string> _gameEventTypeIdMap = new();
         private readonly Dictionary<EDefaultEvent, string> _defaultEventIdMap = new();
 
@@ -51,7 +50,7 @@ namespace GAS.Logic
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, param);
+            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }
@@ -64,28 +63,14 @@ namespace GAS.Logic
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, null);
+            graphRunner.Init(_system, _asset, nodeId, null, OnRunGraphEnd);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }
 
-        internal void UpdateGraphs(float deltaTime)
+        private void OnRunGraphEnd(NodeSystemGraphRunner runner, EGraphRunnerEnd endType)
         {
-            foreach (var runner in _graphRunners)
-            {
-                runner.UpdateRunner(deltaTime);
-                if (!runner.IsRunning())
-                {
-                    _pendingDestroyGraphRunners.Add(runner);
-                }
-            }
-
-            foreach (var runner in _pendingDestroyGraphRunners)
-            {
-                _graphRunners.Remove(runner);
-                _system.NodeObjectFactory.DestroyGraphRunner(runner);
-            }
-            _pendingDestroyGraphRunners.Clear();
+            _graphRunners.Remove(runner);
         }
     }
 }

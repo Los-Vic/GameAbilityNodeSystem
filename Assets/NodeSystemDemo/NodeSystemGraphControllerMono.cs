@@ -34,7 +34,7 @@ public class NodeSystemGraphControllerMono:MonoBehaviour
 
     private void Update()
     {
-        _controller.UpdateGraphs(Time.deltaTime);
+        _system.UpdateSystem(Time.deltaTime);
     }
 
     private void OnDestroy()

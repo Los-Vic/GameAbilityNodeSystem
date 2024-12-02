@@ -264,7 +264,7 @@ MonoBehaviour:
   asset: {fileID: 11400000, guid: 9c7e0a223ee53634b881cc124fd95998, type: 2}
   eventType: 0
   eventParam:
-    IntParam1: 0
+    IntParam1: 3
     IntParam2: 0
 --- !u!114 &927528896
 MonoBehaviour:

@@ -8,8 +8,13 @@ namespace NS
     public class NodeSystemObjectFactory
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
-        private readonly ObjectPoolMgr _objectPoolMgr = new();
+        private readonly ObjectPoolMgr _objectPoolMgr;
 
+        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr)
+        {
+            _objectPoolMgr = objectPoolMgr;
+        }
+        
         public void Clear()
         {
             _objectPoolMgr.Clear();
