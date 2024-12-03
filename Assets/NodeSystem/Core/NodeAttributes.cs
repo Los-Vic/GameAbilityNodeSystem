@@ -8,19 +8,19 @@ namespace NS
     {
         public string Title { get; private set; }
         public string MenuItem { get; private set; }
-
-        public ENodeCategory NodeCategory { get; private set; }
-        public ENodeNumsLimit NodeNumsLimit { get; private set; }
-        
+        public int NodeCategory { get; private set; }
+        public bool IsSingleton { get; private set; }
         public Type NodeRunnerType { get; private set; }
+        public int Scope { get; private set; }
 
-        public NodeAttribute(string title, string menuItem, ENodeCategory nodeCategory, ENodeNumsLimit nodeNumsLimit, Type runnerType)
+        public NodeAttribute(string title, string menuItem, int nodeCategory, Type runnerType, int scope = 0, bool isSingleton = false)
         {
             Title = title;
             MenuItem = menuItem;
             NodeCategory = nodeCategory;
-            NodeNumsLimit = nodeNumsLimit;
+            IsSingleton = isSingleton;
             NodeRunnerType = runnerType;
+            Scope = scope;
         }
     }
     

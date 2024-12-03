@@ -6,6 +6,7 @@ using NS;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Node = NS.Node;
 
 namespace NSEditor
 {
@@ -21,11 +22,14 @@ namespace NSEditor
         }
     }
     
-    public class NodeSystemSearchProvider:ScriptableObject, ISearchWindowProvider
+    public class NodeSearchProvider:ScriptableObject, ISearchWindowProvider
     {
-        public NodeSystemGraphView GraphView;
+        public NodeGraphView GraphView { get; set; }
         public VisualElement Target;
         private static List<SearchContextElement> _elements;
+        private List<int> _scopeList = new List<int>();
+        
+        public void SetScopeList(List<int> scopeList) => _scopeList = scopeList;
         
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
         {
@@ -44,6 +48,8 @@ namespace NSEditor
                         continue;
                     var att = (NodeAttribute)attribute;
                     if (string.IsNullOrEmpty(att.MenuItem))
+                        continue;
+                    if(!_scopeList.Contains(att.Scope))
                         continue;
                     _elements.Add(new SearchContextElement(type, att.MenuItem));
                 }
@@ -109,18 +115,18 @@ namespace NSEditor
             var graphMousePosition = GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             var element = (SearchContextElement)searchTreeEntry.userData;
-            if (!element.TargetType.IsSubclassOf(typeof(NodeSystemNode)))
+            if (!element.TargetType.IsSubclassOf(typeof(Node)))
             {
                 Debug.LogError($"Can't add node of invalid type [{element.TargetType}]");
                 return false;
             }
             
-            var node = (NodeSystemNode)Activator.CreateInstance(element.TargetType);
+            var node = (Node)Activator.CreateInstance(element.TargetType);
             node.Position = new Rect(graphMousePosition, Vector2.one);
             var nodeAttribute = node.GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute != null)
             {
-                if (nodeAttribute.NodeNumsLimit == ENodeNumsLimit.Singleton &&
+                if (nodeAttribute.IsSingleton &&
                     GraphView.GraphAsset.HasNodeName(node.nodeName))
                 {
                     Debug.LogWarning($"Can't add SingletonNode [{node.nodeName}]");

@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("Bool", "Default/Literal/Bool", ENodeCategory.Value, ENodeNumsLimit.None, typeof(BoolNodeRunner))]
-    public class BoolNode : NodeSystemNode
+    [Node("Bool", "Default/Literal/Bool", (int)ENodeCategory.Value,  typeof(BoolNodeRunner))]
+    public class BoolNode : Node
     {
         [ExposedProp] public bool Val;
 
@@ -11,11 +11,11 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class BoolNodeRunner:NodeSystemNodeRunner
+    public class BoolNodeRunner:NodeRunner
     {
         private BoolNode _node;
-        private NodeSystemGraphRunner _graphRunner;
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        private NodeGraphRunner _graphRunner;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             _node = ((BoolNode)nodeAsset);
             _graphRunner = graphRunner;

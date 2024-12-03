@@ -8,7 +8,7 @@ namespace NS
     /// 暂不支持多线端口
     /// </summary>
     [Serializable]
-    public class NodeSystemPort
+    public class NodePort
     {
         [SerializeField] private string guid = Guid.NewGuid().ToString();
         public string Id => guid;
@@ -17,7 +17,7 @@ namespace NS
         public Direction direction;
         public string portType;
         
-        public NodeSystemPort(string belongNodeId, Direction direction, Type portType, string connectPortId = null)
+        public NodePort(string belongNodeId, Direction direction, Type portType, string connectPortId = null)
         {
             this.belongNodeId = belongNodeId;
             this.direction = direction;

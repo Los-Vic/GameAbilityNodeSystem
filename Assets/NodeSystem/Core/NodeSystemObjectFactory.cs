@@ -20,37 +20,37 @@ namespace NS
             _objectPoolMgr.Clear();
         }
         
-        public virtual NodeSystemNodeRunner CreateNodeRunner(Type type)
+        public virtual NodeRunner CreateNodeRunner(Type type)
         {
             if (!_cachedNodeToNodeRunnerTypeMap.TryGetValue(type, out var runnerType))
             {
                 var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
                 if (nodeAttribute == null)
                 {
-                    return NodeSystemNodeRunner.DefaultRunner;
+                    return NodeRunner.DefaultRunner;
                 }
 
                 runnerType = nodeAttribute.NodeRunnerType;
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 
-            var runner = _objectPoolMgr.CreateObject(runnerType) as NodeSystemNodeRunner;
-            return runner ?? NodeSystemNodeRunner.DefaultRunner;
+            var runner = _objectPoolMgr.CreateObject(runnerType) as NodeRunner;
+            return runner ?? NodeRunner.DefaultRunner;
         }
 
-        public virtual void DestroyNodeRunner(NodeSystemNodeRunner runner)
+        public virtual void DestroyNodeRunner(NodeRunner runner)
         {
-            if(runner == NodeSystemNodeRunner.DefaultRunner)
+            if(runner == NodeRunner.DefaultRunner)
                 return;
             _objectPoolMgr.DestroyObject(runner);
         }
 
-        public virtual NodeSystemGraphRunner CreateGraphRunner()
+        public virtual NodeGraphRunner CreateGraphRunner()
         {
-            return _objectPoolMgr.CreateObject<NodeSystemGraphRunner>();
+            return _objectPoolMgr.CreateObject<NodeGraphRunner>();
         }
 
-        public virtual void DestroyGraphRunner(NodeSystemGraphRunner runner)
+        public virtual void DestroyGraphRunner(NodeGraphRunner runner)
         {
             _objectPoolMgr.DestroyObject(runner);
         }

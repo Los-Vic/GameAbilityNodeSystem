@@ -16,8 +16,8 @@ namespace NS
         public int IntParam2;
     }
     
-    [Node("NodeEvent", "Demo/Event/NodeEvent", ENodeCategory.Event, ENodeNumsLimit.None, typeof(EventNodeRunner))]
-    public class EventNode:NodeSystemNode
+    [Node("NodeEvent", "Demo/Event/NodeEvent", (int)ENodeCategory.Event, typeof(EventEventNodeRunner))]
+    public class EventNode:Node
     {
         [Port(Direction.Output, typeof(ExecutePort))]
         public string OutPortExec;
@@ -36,12 +36,12 @@ namespace NS
         }
     }
     
-    public class EventNodeRunner:NodeSystemEventNodeRunner
+    public class EventEventNodeRunner:EventNodeRunner
     {
         private string _nextNode;
         private EventNode _node;
         
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (EventNode)nodeAsset;

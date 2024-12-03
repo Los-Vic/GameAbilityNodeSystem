@@ -11,21 +11,21 @@ namespace NS
         Canceled,
     }
     
-    public class NodeSystemGraphRunner:IPoolObject
+    public class NodeGraphRunner:IPoolObject
     {
-        private NodeSystemGraphAsset _asset;
+        private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
         private bool _isValid;
-        private readonly Dictionary<string, NodeSystemNodeRunner> _nodeRunners = new();
+        private readonly Dictionary<string, NodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
         //Run node runner
-        private NodeSystemNode _eventNode;
-        private NodeSystemFlowNodeRunner _curRunner;
+        private Node _eventNode;
+        private FlowNodeRunner _curRunner;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
-        private Action<NodeSystemGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
+        private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string EventName => _eventNode?.DisplayName() ?? "";
@@ -33,8 +33,8 @@ namespace NS
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
-        public void Init(NodeSystem system, NodeSystemGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam
-        , Action<NodeSystemGraphRunner, EGraphRunnerEnd> onRunnerRunEnd)
+        public void Init(NodeSystem system, NodeGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam
+        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd)
         {
             _nodeSystem = system;
             _asset = asset;
@@ -48,7 +48,7 @@ namespace NS
                 return;
             }
 
-            var eventNodeRunner = GetNodeRunner(eventNodeId) as NodeSystemEventNodeRunner;
+            var eventNodeRunner = GetNodeRunner(eventNodeId) as EventNodeRunner;
             if (eventNodeRunner == null)
             {
                 NodeSystemLogger.LogError($"not valid event node runner {eventNodeId} of {asset.name}");
@@ -98,7 +98,7 @@ namespace NS
             }
             
             NodeSystemLogger.Log($"start graph of {_asset.name}, event:{_eventNode.DisplayName()}");
-            _curRunner = GetNodeRunner(_eventNode.Id) as NodeSystemFlowNodeRunner;
+            _curRunner = GetNodeRunner(_eventNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
@@ -136,9 +136,9 @@ namespace NS
             }
                 
             var nextNode = _curRunner.GetNextNode();
-            if (!NodeSystemNode.IsValidNodeId(nextNode))
+            if (!Node.IsValidNodeId(nextNode))
             {
-                if (!NodeSystemNode.IsValidNodeId(loopNode))
+                if (!Node.IsValidNodeId(loopNode))
                 {
                     _curRunner = null;
                     return;
@@ -146,21 +146,21 @@ namespace NS
                 nextNode = loopNode;
             }
                 
-            _curRunner = GetNodeRunner(nextNode) as NodeSystemFlowNodeRunner;
+            _curRunner = GetNodeRunner(nextNode) as FlowNodeRunner;
         }
 
-        public NodeSystemTask CreateTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
+        public NodeTask CreateTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ENodeSystemTaskRunStatus> updateTask = null)
         {
             return _nodeSystem.TaskScheduler.CreateTask(taskName, this, startTask, endTask, cancelTask, updateTask);
         }
 
-        public void StartTask(NodeSystemTask task)
+        public void StartTask(NodeTask task)
         {
             _nodeSystem.TaskScheduler.StartTask(task);
         }
         
-        public NodeSystemNodeRunner GetNodeRunner(string nodeId)
+        public NodeRunner GetNodeRunner(string nodeId)
         {
             if (_nodeRunners.TryGetValue(nodeId, out var nodeRunner))
                 return nodeRunner;
@@ -184,7 +184,7 @@ namespace NS
                 return default;
             }
             
-            if (!NodeSystemPort.IsValidPortId(port.connectPortId))
+            if (!NodePort.IsValidPortId(port.connectPortId))
                 return default;
                 
             inPortId = port.connectPortId;

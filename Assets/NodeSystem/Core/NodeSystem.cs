@@ -9,13 +9,13 @@ namespace NS
         public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
         public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
         
-        private readonly Dictionary<NodeSystemGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
+        private readonly Dictionary<NodeGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         
         public virtual void InitSystem()
         {
             PoolMgr = new ObjectPoolMgr();
             NodeObjectFactory = new NodeSystemObjectFactory(PoolMgr);
-            TaskScheduler = new NodeSystemTaskScheduler(PoolMgr);
+            TaskScheduler = new NodeTaskScheduler(PoolMgr);
         }
 
         public virtual void UnInitSystem()
@@ -29,7 +29,7 @@ namespace NS
             TaskScheduler.UpdateScheduler(dt);
         }
         
-        public GraphAssetRuntimeData GetGraphRuntimeData(NodeSystemGraphAsset asset)
+        public GraphAssetRuntimeData GetGraphRuntimeData(NodeGraphAsset asset)
         {
             if (_graphAssetRuntimeDataMap.TryGetValue(asset, out var runtimeData))
                 return runtimeData;

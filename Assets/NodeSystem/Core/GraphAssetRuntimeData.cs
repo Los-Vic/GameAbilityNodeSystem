@@ -6,16 +6,16 @@ namespace NS
 {
      public class GraphAssetRuntimeData
     {
-        public NodeSystemGraphAsset Asset { get; private set; }
-        private readonly Dictionary<string, NodeSystemNode> _nodeIdMap = new();
-        private readonly Dictionary<string, NodeSystemPort> _portIdMap = new();
+        public NodeGraphAsset Asset { get; private set; }
+        private readonly Dictionary<string, Node> _nodeIdMap = new();
+        private readonly Dictionary<string, NodePort> _portIdMap = new();
         private readonly Dictionary<string, List<string>> _nodePortsMap = new();
         //To execute flow node, we need output value of dependent value nodes
         private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
         
         private readonly List<string> _toRunNodeList = new();
 
-        public void Init(NodeSystemGraphAsset asset)
+        public void Init(NodeGraphAsset asset)
         {
             Asset = asset;
             
@@ -56,7 +56,7 @@ namespace NS
                         if(port.IsFlowPort() || port.direction == Direction.Output)
                             continue;
                     
-                        if(!NodeSystemPort.IsValidPortId(port.connectPortId))
+                        if(!NodePort.IsValidPortId(port.connectPortId))
                             continue;
                     
                         var connectPort = _portIdMap[port.connectPortId];
@@ -72,8 +72,8 @@ namespace NS
             }
         }
 
-        public NodeSystemNode GetNodeById(string id) => _nodeIdMap.GetValueOrDefault(id);
-        public NodeSystemPort GetPortById(string id) => _portIdMap.GetValueOrDefault(id);
+        public Node GetNodeById(string id) => _nodeIdMap.GetValueOrDefault(id);
+        public NodePort GetPortById(string id) => _portIdMap.GetValueOrDefault(id);
         public List<string> GetPortIdsOfNode(string nodeId) => _nodePortsMap.GetValueOrDefault(nodeId, new List<string>());
         public List<string> GetDependentNodeIds(string nodeId) => _nodeValDependencyMap.GetValueOrDefault(nodeId, new List<string>());
     }

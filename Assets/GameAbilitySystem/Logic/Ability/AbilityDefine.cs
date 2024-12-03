@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace GAS.Logic
 {
+    [DrawWithUnity]
     public enum ESimpleAttributeType
     {
         [InspectorName("无")]

@@ -5,20 +5,20 @@ using UnityEngine;
 
 namespace NS
 {
-    public class NodeSystemGraphAsset:ScriptableObject
+    public class NodeGraphAsset:ScriptableObject
     {
         [SerializeReference]
         //[HideInInspector]
-        public List<NodeSystemNode> nodes = new();
+        public List<Node> nodes = new();
         [SerializeReference] 
-        public List<NodeSystemPort> ports = new();
+        public List<NodePort> ports = new();
         
 #if UNITY_EDITOR
-        private Dictionary<string, NodeSystemNode> _nodeMap = new();
-        private Dictionary<string, NodeSystemPort> _portMap = new();
+        private Dictionary<string, Node> _nodeMap = new();
+        private Dictionary<string, NodePort> _portMap = new();
 
-        public NodeSystemNode GetNode(string id) => _nodeMap.GetValueOrDefault(id);
-        public NodeSystemPort GetPort(string id) => _portMap.GetValueOrDefault(id);
+        public Node GetNode(string id) => _nodeMap.GetValueOrDefault(id);
+        public NodePort GetPort(string id) => _portMap.GetValueOrDefault(id);
         public void LoadMap()
         {
             _nodeMap.Clear();
@@ -34,7 +34,7 @@ namespace NS
             }
         }
 
-        public void AddNode(NodeSystemNode node, bool needCreatePorts = true)
+        public void AddNode(Node node, bool needCreatePorts = true)
         {
             nodes.Add(node);
             _nodeMap.Add(node.Id, node);
@@ -49,13 +49,13 @@ namespace NS
                 var attribute = fieldInfo.GetCustomAttribute<PortAttribute>();
                 if(attribute == null)
                     continue;
-                var port = new NodeSystemPort(node.Id, attribute.PortDirection, attribute.PortType);
+                var port = new NodePort(node.Id, attribute.PortDirection, attribute.PortType);
                 fieldInfo.SetValue(node, port.Id);
                 AddPort(port);
             }
         }
 
-        public void RemoveNode(NodeSystemNode node)
+        public void RemoveNode(Node node)
         {
             nodes.Remove(node);
             _nodeMap.Remove(node.Id);
@@ -76,13 +76,13 @@ namespace NS
             }
         }
 
-        public void AddPort(NodeSystemPort port)
+        public void AddPort(NodePort port)
         {
             ports.Add(port);
             _portMap.Add(port.Id, port);
         }
 
-        public void RemovePort(NodeSystemPort port)
+        public void RemovePort(NodePort port)
         {
             ports.Remove(port);
             _portMap.Remove(port.Id);

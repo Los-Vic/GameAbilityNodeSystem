@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("ForLoop", "Default/FlowControl/ForLoop", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(ForLoopNodeRunner))]
-    public class ForLoopNode:NodeSystemNode
+    [Node("ForLoop", "Default/FlowControl/ForLoop", (int)ENodeCategory.FlowControl, typeof(ForLoopFlowNodeRunner))]
+    public class ForLoopNode:Node
     {
         [Port(Direction.Input, typeof(ExecutePort))]
         public string InExecPort;
@@ -21,7 +21,7 @@ namespace NS
         public string OutForEachExecPort;
     }
     
-    public class ForLoopNodeRunner:NodeSystemFlowNodeRunner
+    public class ForLoopFlowNodeRunner:FlowNodeRunner
     {
         private ForLoopNode _node;
         private bool _started;
@@ -30,7 +30,7 @@ namespace NS
         private int _curIndex;
         private string _outPortId;
         
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (ForLoopNode)nodeAsset;

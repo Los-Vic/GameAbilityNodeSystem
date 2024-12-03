@@ -16,20 +16,11 @@ MonoBehaviour:
   ports: []
   abilityName: "\u6D4B\u8BD5"
   cooldown:
-    rid: 3736469724414345275
-  costs:
-  - attributeType: 1
-    costVal:
-      rid: 3736469724414345274
+    rid: -2
+  costs: []
   isTickable: 1
   references:
     version: 2
     RefIds:
-    - rid: 3736469724414345274
-      type: {class: ValuePickerParam, ns: GAS.Logic.Value, asm: GameAbilitySystem.Logic}
-      data:
-        paramName: Zero
-    - rid: 3736469724414345275
-      type: {class: ValuePickerParam, ns: GAS.Logic.Value, asm: GameAbilitySystem.Logic}
-      data:
-        paramName: Zero
+    - rid: -2
+      type: {class: , ns: , asm: }

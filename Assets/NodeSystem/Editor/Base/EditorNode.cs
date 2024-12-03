@@ -7,19 +7,20 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Node = NS.Node;
 
 namespace NSEditor
 {
-    public class NodeSystemEditorNode:Node
+    public class EditorNode : UnityEditor.Experimental.GraphView.Node
     {
-        public NodeSystemNode Node { get; private set; }
+        public Node Node { get; private set; }
         public readonly Dictionary<Port, string> ViewPortToNodePort = new();
         public readonly Dictionary<string, Port> NodePortToViewPort = new();
 
         private SerializedObject _graphAssetObject;
         private SerializedProperty _serializedNode;
-        
-        public NodeSystemEditorNode(NodeSystemNode node, SerializedObject graphAssetObject)
+
+        public virtual void Draw(Node node, SerializedObject graphAssetObject)
         {
             _graphAssetObject = graphAssetObject;
             AddToClassList("node-graph-node");
@@ -28,7 +29,7 @@ namespace NSEditor
             var type = node.GetType();
             var att = type.GetCustomAttribute<NodeAttribute>();
             ConstructTitle(type, att);
-            
+
 
             //Add Class To Uss
             var depths = att.MenuItem.Split('/');
@@ -36,9 +37,8 @@ namespace NSEditor
             {
                 AddToClassList(depth.ToLower().Replace(' ', '-'));
             }
+
             this.name = type.Name;
-            
-            
             foreach (var fieldInfo in type.GetFields())
             {
                 //Create Ports
@@ -47,14 +47,14 @@ namespace NSEditor
                 {
                     CreatePort(fieldInfo, portAttribute);
                 }
-                
+
                 //Create EventType
                 var eventTypeAttribute = fieldInfo.GetCustomAttribute<EventTypeAttribute>();
                 if (eventTypeAttribute != null)
                 {
-                    CreateEventTypeExtension(fieldInfo, node);
+                    CreateEventTypeExtension(fieldInfo, Node);
                 }
-                
+
                 //Create Extensions
                 var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
                 if (exposedPropAttribute != null)
@@ -62,55 +62,46 @@ namespace NSEditor
                     DrawField(fieldInfo.Name);
                 }
             }
-            
             RefreshExpandedState();
         }
 
-        private void ConstructTitle(Type type, NodeAttribute attribute)
+        protected virtual Color GetNodeColor(int nodeCategory)
+        {
+            return Color.magenta;
+        }
+
+        protected virtual Color GetPortColor(Type type)
+        {
+            return Color.magenta;
+        }
+        
+        protected virtual void ConstructTitle(Type type, NodeAttribute attribute)
         {
             title = attribute.Title;
-            if (attribute.NodeCategory == ENodeCategory.ExecNonInstant)
-            {
-                var img = new Image
-                {
-                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/clock.png"),
-                    style = { width = 28 , paddingRight = 6 }
-                };
-                titleButtonContainer.Add(img);
-            }
-            else if(attribute.NodeCategory == ENodeCategory.ExecDebugInstant)
-            {
-                var img = new Image
-                {
-                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/debug.png"),
-                    style = { width = 32 , paddingRight = 4 }
-                };
-                titleButtonContainer.Add(img);
-            }
-            
             var box = new Box
             {
                 style =
                 {
-                    backgroundColor = ElementColor.GetNodeColor(attribute.NodeCategory)
+                    backgroundColor = GetNodeColor(attribute.NodeCategory)
                 }
             };
             titleContainer.Add(box);
             box.SendToBack();
             box.StretchToParentSize();
-            
+
             var txtElement = titleContainer.Q<Label>();
             txtElement.style.fontSize = 16;
             txtElement.style.unityFontStyleAndWeight = new StyleEnum<FontStyle>() { value = FontStyle.Bold };
         }
-        
+
         private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)
         {
-            var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection, portAttribute.PortCapacity,
+            var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection,
+                portAttribute.PortCapacity,
                 portAttribute.PortType);
 
             port.portName = portAttribute.PortName;
-            port.portColor = ElementColor.GetPortColor(portAttribute.PortType);
+            port.portColor = GetPortColor(portAttribute.PortType);
             port.tooltip = portAttribute.PortType.Name;
             var nodePort = (string)fieldInfo.GetValue(Node);
             ViewPortToNodePort.Add(port, nodePort);
@@ -126,14 +117,14 @@ namespace NSEditor
             }
         }
 
-        private void CreateEventTypeExtension(FieldInfo fieldInfo, NodeSystemNode node)
+        private void CreateEventTypeExtension(FieldInfo fieldInfo, Node node)
         {
             var propertyField = DrawField(fieldInfo.Name);
             propertyField?.RegisterValueChangeCallback(OnEventTypeFieldChangeCallback);
             var val = fieldInfo.GetValue(node);
             title = val.ToString();
         }
-        
+
         private void OnEventTypeFieldChangeCallback(SerializedPropertyChangeEvent evt)
         {
             title = evt.changedProperty.enumDisplayNames[evt.changedProperty.enumValueIndex];
@@ -147,7 +138,7 @@ namespace NSEditor
         private void FetchSerializedProperty()
         {
             var nodes = _graphAssetObject.FindProperty("nodes");
-            if (!nodes.isArray) 
+            if (!nodes.isArray)
                 return;
             for (var i = 0; i < nodes.arraySize; ++i)
             {
@@ -159,7 +150,7 @@ namespace NSEditor
                 }
             }
         }
-        
+
         private PropertyField DrawField(string fieldInfoName)
         {
             if (_serializedNode == null)
@@ -168,7 +159,7 @@ namespace NSEditor
                 if (_serializedNode == null)
                     return default;
             }
-            
+
             var prop = _serializedNode.FindPropertyRelative(fieldInfoName);
             var field = new PropertyField();
             field.bindingPath = prop.propertyPath;

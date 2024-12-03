@@ -122,10 +122,6 @@ namespace GAS.Logic
         //  时间触发
         internal void ActivateAbility()
         {
-            if (!CheckAbility())
-                return;
-
-            CommitAbility();
             GraphController.RunGraph(EDefaultEvent.OnActivateAbility);
         }
 

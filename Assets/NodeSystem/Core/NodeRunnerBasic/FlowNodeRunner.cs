@@ -1,11 +1,11 @@
 ﻿namespace NS
 {
-    public class NodeSystemFlowNodeRunner:NodeSystemNodeRunner
+    public class FlowNodeRunner:NodeRunner
     {
         private bool _dependentValNodesExecuted;
-        protected NodeSystemGraphRunner GraphRunner { get; private set; }
+        protected NodeGraphRunner GraphRunner { get; private set; }
 
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             GraphRunner = graphRunner;

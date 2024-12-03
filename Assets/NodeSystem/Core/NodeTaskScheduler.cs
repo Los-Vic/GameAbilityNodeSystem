@@ -6,53 +6,53 @@ namespace NS
 {
     public interface INodeSystemTaskScheduler
     {
-        NodeSystemTask CreateTask(string taskName, NodeSystemGraphRunner runner,
+        NodeTask CreateTask(string taskName, NodeGraphRunner runner,
             Func<ENodeSystemTaskRunStatus> startTask, Action endTask,
             Action cancelTask,
             Func<float, ENodeSystemTaskRunStatus> updateTask = null);
         
-        void StartTask(NodeSystemTask task);
-        void ArrangeTaskUpdatePolicy(NodeSystemTask task);
-        void CancelTask(NodeSystemTask task);
-        void CancelTasksOfGraphRunner(NodeSystemGraphRunner runner);
-        bool HasTaskRunning(NodeSystemGraphRunner runner);
+        void StartTask(NodeTask task);
+        void ArrangeTaskUpdatePolicy(NodeTask task);
+        void CancelTask(NodeTask task);
+        void CancelTasksOfGraphRunner(NodeGraphRunner runner);
+        bool HasTaskRunning(NodeGraphRunner runner);
         void UpdateScheduler(float dt);
-        void DestroyTasks(NodeSystemGraphRunner runner);
-        void DestroyTask(NodeSystemTask task);
-        void EndTask(NodeSystemTask task);
+        void DestroyTasks(NodeGraphRunner runner);
+        void DestroyTask(NodeTask task);
+        void EndTask(NodeTask task);
     }
     
     
-    public class NodeSystemTaskScheduler:INodeSystemTaskScheduler
+    public class NodeTaskScheduler:INodeSystemTaskScheduler
     {
         protected readonly ObjectPoolMgr PoolMgr;
 
-        private readonly List<NodeSystemTask> _updateList = new();
-        private readonly List<NodeSystemTask> _traversalUpdateList = new();
-        private readonly List<NodeSystemTask> _pendingAddToUpdateList = new();
+        private readonly List<NodeTask> _updateList = new();
+        private readonly List<NodeTask> _traversalUpdateList = new();
+        private readonly List<NodeTask> _pendingAddToUpdateList = new();
 
-        private readonly Dictionary<NodeSystemGraphRunner, List<NodeSystemTask>> _graphRunnerTasksMap = new();
-        private readonly Dictionary<NodeSystemTask, NodeSystemGraphRunner> _taskGraphRunnerMap = new();
+        private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
+        private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
-        public NodeSystemTaskScheduler(ObjectPoolMgr poolMgr)
+        public NodeTaskScheduler(ObjectPoolMgr poolMgr)
         {
             PoolMgr = poolMgr;
         }
 
-        public NodeSystemTask CreateTask(string taskName, NodeSystemGraphRunner runner, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
+        public NodeTask CreateTask(string taskName, NodeGraphRunner runner, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ENodeSystemTaskRunStatus> updateTask = null)
         {
-            var task = PoolMgr.CreateObject<NodeSystemTask>();
+            var task = PoolMgr.CreateObject<NodeTask>();
             task.InitTask(taskName, startTask, endTask, cancelTask, updateTask);
             
-            _graphRunnerTasksMap.TryAdd(runner, new List<NodeSystemTask>());
+            _graphRunnerTasksMap.TryAdd(runner, new List<NodeTask>());
             _graphRunnerTasksMap[runner].Add(task);
             _taskGraphRunnerMap.Add(task, runner);
             
             return task;
         }
 
-        public void StartTask(NodeSystemTask task)
+        public void StartTask(NodeTask task)
         {
             NodeSystemLogger.Log($"start task, asset:{_taskGraphRunnerMap[task].AssetName}, event:{_taskGraphRunnerMap[task].EventName}");
             var status = task.StartTask?.Invoke() ?? ENodeSystemTaskRunStatus.End;
@@ -65,12 +65,12 @@ namespace NS
             ArrangeTaskUpdatePolicy(task);
         }
 
-        public void ArrangeTaskUpdatePolicy(NodeSystemTask task)
+        public void ArrangeTaskUpdatePolicy(NodeTask task)
         {
             _pendingAddToUpdateList.Add(task);
         }
         
-        public void CancelTask(NodeSystemTask task)
+        public void CancelTask(NodeTask task)
         {
             _updateList.Remove(task);
             _pendingAddToUpdateList.Remove(task);
@@ -79,7 +79,7 @@ namespace NS
             DestroyTask(task);
         }
 
-        public void CancelTasksOfGraphRunner(NodeSystemGraphRunner runner)
+        public void CancelTasksOfGraphRunner(NodeGraphRunner runner)
         {
             var cancelTaskSuccess = false;
             if (_graphRunnerTasksMap.TryGetValue(runner, out var tasks))
@@ -101,7 +101,7 @@ namespace NS
             DestroyTasks(runner);
         }
 
-        public bool HasTaskRunning(NodeSystemGraphRunner runner)
+        public bool HasTaskRunning(NodeGraphRunner runner)
         {
             return _graphRunnerTasksMap.ContainsKey(runner);
         }
@@ -127,7 +127,7 @@ namespace NS
             _pendingAddToUpdateList.Clear();
         }
 
-        public void DestroyTasks(NodeSystemGraphRunner runner)
+        public void DestroyTasks(NodeGraphRunner runner)
         {
             if (!_graphRunnerTasksMap.Remove(runner, out var runnerTasks)) 
                 return;
@@ -139,7 +139,7 @@ namespace NS
             }
         }
         
-        public void DestroyTask(NodeSystemTask task)
+        public void DestroyTask(NodeTask task)
         {
             if (_taskGraphRunnerMap.Remove(task, out var runner))
             {
@@ -154,7 +154,7 @@ namespace NS
             }
             PoolMgr.DestroyObject(task);
         }
-        public void EndTask(NodeSystemTask task)
+        public void EndTask(NodeTask task)
         {
             _updateList.Remove(task);
             NodeSystemLogger.Log($"end task, asset:{_taskGraphRunnerMap[task].AssetName}, event:{_taskGraphRunnerMap[task].EventName}");

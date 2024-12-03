@@ -27,7 +27,7 @@ namespace NS
     }
     
     [Serializable]
-    public class NodeSystemNode
+    public class Node
     {
         [SerializeField] private string guid = Guid.NewGuid().ToString();
         [SerializeField] private Rect position;
@@ -41,7 +41,7 @@ namespace NS
             set => position = value;
         }
 
-        public NodeSystemNode()
+        public Node()
         {
 #if UNITY_EDITOR
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
@@ -62,8 +62,8 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is ENodeCategory.ExecInstant or ENodeCategory.ExecDebugInstant
-                or ENodeCategory.ExecNonInstant or ENodeCategory.FlowControl;
+            return nodeAttribute.NodeCategory is (int)ENodeCategory.ExecInstant or (int)ENodeCategory.ExecDebugInstant
+                or (int)ENodeCategory.ExecNonInstant or (int)ENodeCategory.FlowControl;
         }
 
         public bool IsValueNode()
@@ -74,7 +74,7 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is ENodeCategory.Value;
+            return nodeAttribute.NodeCategory is (int)ENodeCategory.Value;
         }
 
         public bool IsEventNode()
@@ -85,7 +85,7 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is ENodeCategory.Event;
+            return nodeAttribute.NodeCategory is (int)ENodeCategory.Event;
         }
 
         public virtual string DisplayName() => nodeName;

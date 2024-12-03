@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("IntToFloat", "Default/Converter/IntToFloat", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntToFloatNodeRunner) )]
-    public class IntToFloatNode:NodeSystemNode
+    [Node("IntToFloat", "Default/Converter/IntToFloat", (int)ENodeCategory.Value,  typeof(IntToFloatNodeRunner) )]
+    public class IntToFloatNode:Node
     {
         [Port(Direction.Input, typeof(int))]
         public string InPortVal;
@@ -12,11 +12,11 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class IntToFloatNodeRunner:NodeSystemNodeRunner
+    public class IntToFloatNodeRunner:NodeRunner
     {
         private IntToFloatNode _node;
-        private NodeSystemGraphRunner _graphRunner;
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        private NodeGraphRunner _graphRunner;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             _node = (IntToFloatNode)nodeAsset;
             _graphRunner = graphRunner;

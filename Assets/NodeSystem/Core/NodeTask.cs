@@ -9,7 +9,7 @@ namespace NS
         End,
     }
     
-    public class NodeSystemTask: IPoolObject
+    public class NodeTask: IPoolObject
     {
         public string TaskName { get; private set; }
         public Func<ENodeSystemTaskRunStatus> StartTask { get; private set; }

@@ -4,7 +4,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    public class AbilityTask:NodeSystemTask
+    public class AbilityTask:NodeTask
     {
     }
 }

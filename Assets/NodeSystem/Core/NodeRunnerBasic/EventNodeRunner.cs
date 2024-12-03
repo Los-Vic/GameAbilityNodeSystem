@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    public class NodeSystemEventNodeRunner:NodeSystemFlowNodeRunner
+    public class EventNodeRunner:FlowNodeRunner
     {
         public virtual void SetUpEventParam(NodeSystemEventParamBase paramBase)
         {

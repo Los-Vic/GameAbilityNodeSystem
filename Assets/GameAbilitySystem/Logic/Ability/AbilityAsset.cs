@@ -19,7 +19,7 @@ namespace GAS.Logic
     }
     
     [CreateAssetMenu(menuName = "GameAbilitySystem/AbilityAsset", fileName = "NewAbility")]
-    public class AbilityAsset : NodeSystemGraphAsset
+    public class AbilityAsset : NodeGraphAsset
     {
         [Title("技能")]
         [LabelText("技能名")]
@@ -35,7 +35,7 @@ namespace GAS.Logic
         
         [BoxGroup("更新")]
         [LabelText("每帧更新")]
-        [InfoBox("不需要冷却和延迟等基于时间的行为，则不需要勾选")]
+        [InfoBox("不需要冷却等基于时间的行为，则不需要勾选")]
         public bool isTickable = true;
     }
 }

@@ -1,10 +1,11 @@
 ﻿using NS;
 using UnityEditor.Experimental.GraphView;
+using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", ENodeCategory.Event, ENodeNumsLimit.None, typeof(DefaultEventNodeRunner))]
-    public class DefaultEventNode:NodeSystemNode
+    [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", (int)ENodeCategory.Event, typeof(DefaultEventEventNodeRunner))]
+    public class DefaultEventNode:Node
     {
         [Port(Direction.Output, typeof(ExecutePort))]
         public string OutPortExec;
@@ -18,12 +19,12 @@ namespace GAS.Logic
         }
     }
     
-    public class DefaultEventNodeRunner:NodeSystemEventNodeRunner
+    public class DefaultEventEventNodeRunner:EventNodeRunner
     {
         private string _nextNode;
         private GameEventNode _node;
         
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             _node = (GameEventNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);

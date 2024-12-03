@@ -2,11 +2,11 @@
 
 namespace NS
 {
-    public class NodeSystemNodeRunner:IPoolObject
+    public class NodeRunner:IPoolObject
     {
-        public static readonly NodeSystemNodeRunner DefaultRunner = new();
+        public static readonly NodeRunner DefaultRunner = new();
         
-        public virtual void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public virtual void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             
         }

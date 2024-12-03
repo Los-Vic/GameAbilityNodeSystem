@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace NSEditor
 {
-    [CustomEditor(typeof(NodeSystemGraphAsset), true)]
+    [CustomEditor(typeof(NodeGraphAsset), true)]
     public class NodeSystemGraphAssetEditor:Editor
     {
         [OnOpenAsset]
@@ -15,9 +15,9 @@ namespace NSEditor
         {
             var asset = EditorUtility.InstanceIDToObject(instanceId);
             var type = asset.GetType();
-            if (!typeof(NodeSystemGraphAsset).IsAssignableFrom(type)) 
+            if (!typeof(NodeGraphAsset).IsAssignableFrom(type)) 
                 return false;
-            NodeSystemEditorWindow.Open((NodeSystemGraphAsset)asset);
+            NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)asset);
             return true;
         }
         
@@ -31,26 +31,33 @@ namespace NSEditor
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("OpenGraph"))
             {
-                NodeSystemEditorWindow.Open((NodeSystemGraphAsset)target);
+                NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;
             if (GUILayout.Button("ValidateGraph"))
             {
-                ValidateGraph();
+                NodeGraphAssetEditorUtility.ValidateGraph(serializedObject);
             }
             GUI.backgroundColor = oldColor;
         }
+        
+    }
 
-        private void ValidateGraph()
+    public static class NodeGraphAssetEditorUtility
+    {
+        public static void ValidateGraph(SerializedObject serializedObject)
         {
-            var graphAsset = serializedObject.targetObject as NodeSystemGraphAsset;
-            var nodeMap = new Dictionary<string, NodeSystemNode>();
-            var portMap = new Dictionary<string, NodeSystemPort>();
-            var portListMap = new Dictionary<string, List<NodeSystemPort>>();
-            var badPorts = new HashSet<NodeSystemPort>();
+            var graphAsset = serializedObject.targetObject as NodeGraphAsset;
+            if(graphAsset == null)
+                return;
+            
+            var nodeMap = new Dictionary<string, Node>();
+            var portMap = new Dictionary<string, NodePort>();
+            var portListMap = new Dictionary<string, List<NodePort>>();
+            var badPorts = new HashSet<NodePort>();
             var badPortIds = new HashSet<string>();
-            var badNodes = new HashSet<NodeSystemNode>();
+            var badNodes = new HashSet<Node>();
             //Construct Node Map
             foreach (var node in graphAsset.nodes)
             {
@@ -77,7 +84,7 @@ namespace NSEditor
                 
                 if (!portListMap.TryGetValue(port.belongNodeId, out var portList))
                 {
-                    portList = new List<NodeSystemPort>();
+                    portList = new List<NodePort>();
                     portListMap.Add(port.belongNodeId, portList);
                 }
                 

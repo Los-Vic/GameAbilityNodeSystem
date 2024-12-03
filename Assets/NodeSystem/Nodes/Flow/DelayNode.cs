@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("Delay", "Default/NonInstantAction/Delay", ENodeCategory.ExecNonInstant, ENodeNumsLimit.None, typeof(DelayNodeRunner))]
-    public class DelayNode:NodeSystemNode
+    [Node("Delay", "Default/NonInstantAction/Delay", (int)ENodeCategory.ExecNonInstant, typeof(DelayFlowNodeRunner))]
+    public class DelayNode:Node
     {
         [Port(Direction.Input, typeof(ExecutePort))]
         public string InPortExec;
@@ -14,14 +14,14 @@ namespace NS
         public string InPortFloat;
     }
     
-    public class DelayNodeRunner:NodeSystemFlowNodeRunner
+    public class DelayFlowNodeRunner:FlowNodeRunner
     {
         private DelayNode _node;
         private float _delay;
         private float _elapsedTime;
         private const string DelayTaskName = "DelayNodeTask";
         
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (DelayNode)nodeAsset;

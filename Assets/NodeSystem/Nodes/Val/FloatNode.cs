@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("Float", "Default/Literal/Float", ENodeCategory.Value, ENodeNumsLimit.None, typeof(FloatNodeRunner))]
-    public class FloatNode:NodeSystemNode
+    [Node("Float", "Default/Literal/Float", (int)ENodeCategory.Value, typeof(FloatNodeRunner))]
+    public class FloatNode:Node
     {
         [ExposedProp]
         public float Val;
@@ -12,11 +12,11 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class FloatNodeRunner:NodeSystemNodeRunner
+    public class FloatNodeRunner:NodeRunner
     {
         private FloatNode _node;
-        private NodeSystemGraphRunner _graphRunner;
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        private NodeGraphRunner _graphRunner;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             _node = ((FloatNode)nodeAsset);
             _graphRunner = graphRunner;

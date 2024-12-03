@@ -7,15 +7,15 @@ namespace GAS.Logic
     public class GameAbilityGraphController
     {
         private GameAbilitySystem _system;
-        private NodeSystemGraphAsset _asset;
+        private NodeGraphAsset _asset;
 
-        private readonly List<NodeSystemGraphRunner> _graphRunners = new();
+        private readonly List<NodeGraphRunner> _graphRunners = new();
         private readonly Dictionary<EGameEvent, string> _gameEventTypeIdMap = new();
         private readonly Dictionary<EDefaultEvent, string> _defaultEventIdMap = new();
 
         internal List<EGameEvent> GetRegisteredGameEvents() => _gameEventTypeIdMap.Keys.ToList();
         
-        internal void Init(GameAbilitySystem system, NodeSystemGraphAsset asset)
+        internal void Init(GameAbilitySystem system, NodeGraphAsset asset)
         {
             _system = system;
             _asset = asset;
@@ -46,7 +46,7 @@ namespace GAS.Logic
         {
             if (!_gameEventTypeIdMap.TryGetValue(eventType, out var nodeId))
             {
-                NodeSystemLogger.LogWarning($"Not found {eventType} node!");
+                NodeSystemLogger.LogError($"Not found {eventType} node in {_asset.name}!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
@@ -59,7 +59,7 @@ namespace GAS.Logic
         {
             if (!_defaultEventIdMap.TryGetValue(eventType, out var nodeId))
             {
-                NodeSystemLogger.LogWarning($"Not found {eventType} node!");
+                NodeSystemLogger.Log($"Not found {eventType} node in {_asset.name}!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
@@ -68,7 +68,7 @@ namespace GAS.Logic
             _graphRunners.Add(graphRunner);
         }
 
-        private void OnRunGraphEnd(NodeSystemGraphRunner runner, EGraphRunnerEnd endType)
+        private void OnRunGraphEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
             _graphRunners.Remove(runner);
         }

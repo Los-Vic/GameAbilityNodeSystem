@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("Branch", "Default/FlowControl/Branch", ENodeCategory.FlowControl, ENodeNumsLimit.None, typeof(BranchNodeRunner))]
-    public class BranchNode:NodeSystemNode
+    [Node("Branch", "Default/FlowControl/Branch", (int)ENodeCategory.FlowControl, typeof(BranchFlowNodeRunner))]
+    public class BranchNode:Node
     {
         [Port(Direction.Input,typeof(ExecutePort))]
         public string InPortExec;
@@ -18,12 +18,12 @@ namespace NS
         public string OutPortFalseExec;
     }
     
-    public class BranchNodeRunner:NodeSystemFlowNodeRunner
+    public class BranchFlowNodeRunner:FlowNodeRunner
     {
         private BranchNode _node;
         private bool _condition;
         
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (BranchNode)nodeAsset;

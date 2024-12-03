@@ -2,8 +2,8 @@
 
 namespace NS
 {
-    [Node("Int", "Default/Literal/Int", ENodeCategory.Value, ENodeNumsLimit.None, typeof(IntNodeRunner))]
-    public class IntNode:NodeSystemNode
+    [Node("Int", "Default/Literal/Int", (int)ENodeCategory.Value, typeof(IntNodeRunner))]
+    public class IntNode:Node
     {
         [ExposedProp]
         public int Val;
@@ -12,11 +12,11 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class IntNodeRunner:NodeSystemNodeRunner
+    public class IntNodeRunner:NodeRunner
     {
         private IntNode _node;
-        private NodeSystemGraphRunner _graphRunner;
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        private NodeGraphRunner _graphRunner;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             _node = ((IntNode)nodeAsset);
             _graphRunner = graphRunner;

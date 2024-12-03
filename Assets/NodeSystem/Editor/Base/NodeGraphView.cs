@@ -8,30 +8,30 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Node = NS.Node;
 using Random = UnityEngine.Random;
 
 namespace NSEditor
 {
-    public class NodeSystemGraphView:GraphView
+    public class NodeGraphView:GraphView
     {
         private readonly SerializedObject _serializedObject;
-        public readonly NodeSystemGraphAsset GraphAsset;
-        public NodeSystemEditorWindow Window { get; private set; }
-
-        private readonly List<NodeSystemEditorNode> _graphEditorNodes = new();
-        private readonly Dictionary<string, NodeSystemEditorNode> _editorNodesMap = new();
-        private readonly Dictionary<Edge, (NodeSystemPort, NodeSystemPort)> _edgeConnectionMap = new();
-
-        private readonly List<NodeSystemEditorNode> _copyEditorNodes = new();
-
-        private NodeSystemSearchProvider _searchProvider;
-        public NodeSystemGraphView(SerializedObject serializedObject, NodeSystemEditorWindow window)
+        public readonly NodeGraphAsset GraphAsset;
+        
+        public NodeEditorWindow Window { get; private set; }
+        private readonly List<EditorNode> _graphEditorNodes = new();
+        private readonly Dictionary<string, EditorNode> _editorNodesMap = new();
+        private readonly Dictionary<Edge, (NodePort, NodePort)> _edgeConnectionMap = new();
+        private NodeSearchProvider _searchProvider;
+        
+        public NodeGraphView(SerializedObject serializedObject, NodeEditorWindow window)
         {
             _serializedObject = serializedObject;
-            GraphAsset = (NodeSystemGraphAsset)serializedObject.targetObject;
+            GraphAsset = (NodeGraphAsset)serializedObject.targetObject;
             Window = window;
-            _searchProvider = ScriptableObject.CreateInstance<NodeSystemSearchProvider>();
+            _searchProvider = window.CreateSearchProvider();
             _searchProvider.GraphView = this;
+            _searchProvider.SetScopeList(window.GetScopeList());
             
             //Add Style Sheet
             var styleSheet =
@@ -71,7 +71,7 @@ namespace NSEditor
         private class CopyContent
         {
             [SerializeReference]
-            public List<NodeSystemNode> Nodes = new();
+            public List<Node> Nodes = new();
         }
         
         private void OnUnserializeAndPaste(string operationname, string data)
@@ -79,15 +79,15 @@ namespace NSEditor
             Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Paste Nodes");
             var content = JsonUtility.FromJson<CopyContent>(data);
             var portIdMap = new Dictionary<string, string>();
-            var newNodeList = new List<NodeSystemNode>();
-            var newPortList = new List<NodeSystemPort>();
+            var newNodeList = new List<Node>();
+            var newPortList = new List<NodePort>();
 
             var randomOffset = 100 * (Random.value * 2 - 1);
             //Create new nodes & ports
             foreach (var node in content.Nodes)
             {
                 var type = node.GetType();
-                var newNode = (NodeSystemNode)Activator.CreateInstance(type);
+                var newNode = (Node)Activator.CreateInstance(type);
                 newNode.Position = new Rect(node.Position.x + 200 + randomOffset, node.Position.y + 200 + randomOffset, node.Position.width,
                     node.Position.height);
                 newNodeList.Add(newNode);
@@ -103,7 +103,7 @@ namespace NSEditor
                     var portId = (string)fieldInfo.GetValue(node);
                     var port = GraphAsset.GetPort(portId);
 
-                    var newPort = new NodeSystemPort(newNode.Id, port.direction, attribute.PortType, port.connectPortId);
+                    var newPort = new NodePort(newNode.Id, port.direction, attribute.PortType, port.connectPortId);
                     portIdMap.Add(port.Id, newPort.Id);
                     newPortList.Add(newPort);
                 }
@@ -157,7 +157,7 @@ namespace NSEditor
                 var type = node.GetType();
 
                 var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
-                if (nodeAttribute is { NodeNumsLimit: ENodeNumsLimit.Singleton })
+                if (nodeAttribute is { IsSingleton: true })
                 {
                     Debug.LogWarning($"Can't copy SingletonNode [{node.nodeName}]");
                     continue;
@@ -220,7 +220,7 @@ namespace NSEditor
             if (graphViewChange.elementsToRemove != null)
             {
                 Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[NodeSystem]Deleted Elements");
-                foreach (var editorNode in graphViewChange.elementsToRemove.OfType<NodeSystemEditorNode>())
+                foreach (var editorNode in graphViewChange.elementsToRemove.OfType<EditorNode>())
                 {
                     RemoveNodeFromGraphAsset(editorNode);
                 }
@@ -264,7 +264,7 @@ namespace NSEditor
         /// Add Node to NodeGraphAsset
         /// </summary>
         /// <param name="node"></param>
-        public void AddNodeToGraphAsset(NodeSystemNode node)
+        public void AddNodeToGraphAsset(Node node)
         {
             Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Add Node");
             GraphAsset.AddNode(node);
@@ -278,9 +278,10 @@ namespace NSEditor
         /// Add Node to GraphView
         /// </summary>
         /// <param name="node"></param>
-        private void AddNodeToGraphView(NodeSystemNode node)
+        private void AddNodeToGraphView(Node node)
         {
-            var editorNode = new NodeSystemEditorNode(node, _serializedObject);
+            var editorNode = Window.CreateEditorNode();
+            editorNode.Draw(node, _serializedObject);
             editorNode.SetPosition(node.Position);
             _graphEditorNodes.Add(editorNode);
             _editorNodesMap.Add(node.Id, editorNode);
@@ -292,7 +293,7 @@ namespace NSEditor
         /// <summary>
         /// Remove Node
         /// </summary>
-        private void RemoveNodeFromGraphAsset(NodeSystemEditorNode editorNode)
+        private void RemoveNodeFromGraphAsset(EditorNode editorNode)
         {
             GraphAsset.RemoveNode(editorNode.Node);
             _editorNodesMap.Remove(editorNode.Node.Id);

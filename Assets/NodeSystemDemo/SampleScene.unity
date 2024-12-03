@@ -256,12 +256,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927528892}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04d13ab0fbb64c34a33d3111a817d295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  asset: {fileID: 11400000, guid: 9c7e0a223ee53634b881cc124fd95998, type: 2}
+  asset: {fileID: 0}
   eventType: 0
   eventParam:
     IntParam1: 3

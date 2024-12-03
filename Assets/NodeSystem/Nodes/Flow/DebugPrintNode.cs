@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace NS
 {
-    [Node("Print","Default/Debug/Print", ENodeCategory.ExecDebugInstant, ENodeNumsLimit.None, typeof(DebugPrintNodeRunner))]
-    public class DebugPrintNode:NodeSystemNode
+    [Node("Print","Default/Debug/Print", (int)ENodeCategory.ExecDebugInstant, typeof(DebugPrintFlowNodeRunner))]
+    public class DebugPrintNode:Node
     {
         [ExposedProp]
         public string Log;
@@ -16,10 +16,10 @@ namespace NS
         
     }
     
-    public class DebugPrintNodeRunner:NodeSystemFlowNodeRunner
+    public class DebugPrintFlowNodeRunner:FlowNodeRunner
     {
         private DebugPrintNode _node;
-        public override void Init(NodeSystemNode nodeAsset, NodeSystemGraphRunner graphRunner)
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (DebugPrintNode)nodeAsset;

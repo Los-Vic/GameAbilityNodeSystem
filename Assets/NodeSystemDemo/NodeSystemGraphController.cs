@@ -5,12 +5,12 @@ namespace NS
     public class NodeSystemGraphController
     {
         private NodeSystem _system;
-        private NodeSystemGraphAsset _asset;
+        private NodeGraphAsset _asset;
 
-        private readonly List<NodeSystemGraphRunner> _graphRunners = new();
+        private readonly List<NodeGraphRunner> _graphRunners = new();
         private readonly Dictionary<ENodeEventType, string> _eventTypeIdMap = new();
         
-        public void Init(NodeSystem system, NodeSystemGraphAsset asset)
+        public void Init(NodeSystem system, NodeGraphAsset asset)
         {
             _system = system;
             _asset = asset;
@@ -46,7 +46,7 @@ namespace NS
             _graphRunners.Add(graphRunner);
         }
 
-        private void OnGraphRunEnd(NodeSystemGraphRunner runner, EGraphRunnerEnd type)
+        private void OnGraphRunEnd(NodeGraphRunner runner, EGraphRunnerEnd type)
         {
             _graphRunners.Remove(runner);
         }
