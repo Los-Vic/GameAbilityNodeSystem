@@ -31,7 +31,6 @@ namespace NSEditor
             Window = window;
             _searchProvider = window.CreateSearchProvider();
             _searchProvider.GraphView = this;
-            _searchProvider.SetScopeList(window.GetScopeList());
             
             //Add Style Sheet
             var styleSheet =

@@ -72,17 +72,15 @@ namespace NSEditor
 
         public virtual NodeSearchProvider CreateSearchProvider()
         {
-            return ScriptableObject.CreateInstance<NodeSearchProvider>();
+            var provider = CreateInstance<NodeSearchProvider>();
+            provider.SetScopeList(new List<int>(0));
+
+            return provider;
         }
 
         public virtual EditorNode CreateEditorNode()
         {
             return new NodeSystemEditorNode();
-        }
-        
-        public virtual List<int> GetScopeList()
-        {
-            return new List<int> { 0 };
         }
         
         #endregion

@@ -17,7 +17,7 @@ namespace NSEditor
             var type = asset.GetType();
             if (!typeof(NodeGraphAsset).IsAssignableFrom(type)) 
                 return false;
-            NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)asset);
+            NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)asset);
             return true;
         }
         
@@ -31,7 +31,7 @@ namespace NSEditor
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("OpenGraph"))
             {
-                NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)target);
+                NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;

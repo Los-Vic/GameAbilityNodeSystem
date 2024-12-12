@@ -17,7 +17,7 @@ namespace GAS.Editor
             var asset = EditorUtility.InstanceIDToObject(instanceId);
             if (asset.GetType() != typeof(AbilityAsset)) 
                 return false;
-            NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)asset);
+            NodeEditorWindow.Open<AbilityAssetEditorWindow>((NodeGraphAsset)asset);
             return true;
         }
         
@@ -31,7 +31,7 @@ namespace GAS.Editor
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("OpenGraph"))
             {
-                NodeEditorWindow.Open<NodeSystemEditorWindow>((NodeGraphAsset)target);
+                NodeEditorWindow.Open<AbilityAssetEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;

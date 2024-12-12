@@ -2,7 +2,7 @@
 
 namespace GAS.Editor
 {
-    public class AbilityAssetEditorWindow:NodeSystemEditorWindow
+    public class AbilityAssetEditorWindow:NodeEditorWindow
     {
         
     }
