@@ -1,8 +1,9 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using NS.Nodes;
+using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Bool", "Default/Literal/Bool", (int)ENodeCategory.Value,  typeof(BoolNodeRunner))]
+    [Node("Bool", "Default/Literal/Bool", (int)ENodeCategory.Value, ENodeFunctionType.Value ,typeof(BoolNodeRunner))]
     public class BoolNode : Node
     {
         [ExposedProp] public bool Val;

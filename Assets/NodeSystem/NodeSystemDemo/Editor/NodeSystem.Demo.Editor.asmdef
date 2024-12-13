@@ -1,0 +1,20 @@
+{
+    "name": "NodeSystem.Demo.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ecc63be1598eaf458594bc4d90dd1bc",
+        "GUID:7984aea29bc87344b8ff597a7d1794fe",
+        "GUID:298dff7fd453955449dc9e26ac2623e6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

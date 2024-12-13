@@ -102,7 +102,7 @@ namespace NSEditor
                     var portId = (string)fieldInfo.GetValue(node);
                     var port = GraphAsset.GetPort(portId);
 
-                    var newPort = new NodePort(newNode.Id, port.direction, attribute.PortType, port.connectPortId);
+                    var newPort = new NodePort(newNode.Id, port.direction, attribute.PortType, attribute.IsFlowPort, port.connectPortId);
                     portIdMap.Add(port.Id, newPort.Id);
                     newPortList.Add(newPort);
                 }
@@ -150,7 +150,7 @@ namespace NSEditor
             var content = new CopyContent();
             foreach (var elem in elements)
             {
-                if (elem is not NodeSystemEditorNode editorNode) 
+                if (elem is not EditorNode editorNode) 
                     continue;
                 var node = editorNode.Node;
                 var type = node.GetType();
@@ -183,7 +183,8 @@ namespace NSEditor
                 if(port == startPort) continue;
                 if(port.node == startPort.node) continue;
                 if(port.direction == startPort.direction) continue;
-                if (port.portType == startPort.portType)
+                if (port.portType.IsAssignableFrom(startPort.portType) 
+                    || startPort.portType.IsAssignableFrom(port.portType))
                 {
                     portList.Add(port);
                 }
@@ -208,7 +209,7 @@ namespace NSEditor
             if (graphViewChange.movedElements != null)
             {
                 Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[NodeSystem]Moved Elements");
-                foreach (var editorNode in graphViewChange.movedElements.OfType<NodeSystemEditorNode>())
+                foreach (var editorNode in graphViewChange.movedElements.OfType<EditorNode>())
                 {
                     editorNode.SavePosition();
                 }
@@ -306,10 +307,10 @@ namespace NSEditor
         /// <param name="edge"></param>
         private void AddConnectionToGraphAsset(Edge edge)
         {
-            var inNode = (NodeSystemEditorNode)edge.input.node;
+            var inNode = (EditorNode)edge.input.node;
             var inPortId = inNode.ViewPortToNodePort[edge.input];
             
-            var outNode = (NodeSystemEditorNode)edge.output.node;
+            var outNode = (EditorNode)edge.output.node;
             var outPortId = outNode.ViewPortToNodePort[edge.output];
 
             var inPort = GraphAsset.GetPort(inPortId);

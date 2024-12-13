@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NS;
+using NS.Nodes;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,7 +17,7 @@ namespace NSEditor
             { typeof(int), new Color(0, 0.8f, 0, 1) },
             { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
             { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
-            { typeof(ExecutePort), new Color(0.8f, 0.8f, 0.8f, 1) },
+            { typeof(BaseFlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
         };
 
         protected override void ConstructTitle(Type type, NodeAttribute attribute)

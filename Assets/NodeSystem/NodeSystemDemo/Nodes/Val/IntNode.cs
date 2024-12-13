@@ -1,24 +1,25 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using NS.Nodes;
+using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Float", "Default/Literal/Float", (int)ENodeCategory.Value, typeof(FloatNodeRunner))]
-    public class FloatNode:Node
+    [Node("Int", "Default/Literal/Int", (int)ENodeCategory.Value, ENodeFunctionType.Value , typeof(IntNodeRunner))]
+    public class IntNode:Node
     {
         [ExposedProp]
-        public float Val;
+        public int Val;
 
-        [Port(Direction.Output, typeof(float))]
+        [Port(Direction.Output, typeof(int))]
         public string OutPortVal;
     }
     
-    public class FloatNodeRunner:NodeRunner
+    public class IntNodeRunner:NodeRunner
     {
-        private FloatNode _node;
+        private IntNode _node;
         private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            _node = ((FloatNode)nodeAsset);
+            _node = ((IntNode)nodeAsset);
             _graphRunner = graphRunner;
         }
 

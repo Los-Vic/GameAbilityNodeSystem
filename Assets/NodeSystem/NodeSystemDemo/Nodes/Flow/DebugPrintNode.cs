@@ -1,17 +1,18 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using NS.Nodes;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NS
 {
-    [Node("Print","Default/Debug/Print", (int)ENodeCategory.ExecDebugInstant, typeof(DebugPrintFlowNodeRunner))]
+    [Node("Print","Default/Debug/Print", (int)ENodeCategory.ExecDebugInstant, ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner))]
     public class DebugPrintNode:Node
     {
         [ExposedProp]
         public string Log;
 
-        [Port(Direction.Input, typeof(ExecutePort))]
+        [Port(Direction.Input, typeof(BaseFlowPort))]
         public string InPortExec;
-        [Port(Direction.Output, typeof(ExecutePort))]
+        [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
         
     }

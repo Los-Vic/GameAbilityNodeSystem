@@ -4,26 +4,11 @@ using UnityEngine;
 
 namespace NS
 {
-    public enum ENodeCategory
+    public enum ENodeFunctionType
     {
-        //------Flow Node Start------
-        Event = 0,
-        FlowControl = 1,
-        //Executable
-        ExecInstant = 100,
-        ExecDebugInstant = 101,
-        ExecNonInstant = 102,
-        //------Flow Node End------
-        
-        //------Value Node Start------
-        Value = 200,
-        //------Value Node End------
-    }
-
-    public enum ENodeNumsLimit
-    {
-        None,
-        Singleton, 
+        Value,
+        Flow,
+        Event,
     }
     
     [Serializable]
@@ -54,7 +39,7 @@ namespace NS
 
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
         
-        public bool IsExecNode()
+        public bool IsFlowNode()
         {
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute == null)
@@ -62,8 +47,7 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is (int)ENodeCategory.ExecInstant or (int)ENodeCategory.ExecDebugInstant
-                or (int)ENodeCategory.ExecNonInstant or (int)ENodeCategory.FlowControl;
+            return nodeAttribute.FunctionType == ENodeFunctionType.Flow;
         }
 
         public bool IsValueNode()
@@ -74,7 +58,7 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is (int)ENodeCategory.Value;
+            return nodeAttribute.FunctionType == ENodeFunctionType.Value;
         }
 
         public bool IsEventNode()
@@ -85,7 +69,7 @@ namespace NS
                 return false;
             }
 
-            return nodeAttribute.NodeCategory is (int)ENodeCategory.Event;
+            return nodeAttribute.FunctionType == ENodeFunctionType.Event;
         }
 
         public virtual string DisplayName() => nodeName;

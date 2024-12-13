@@ -39,7 +39,7 @@ namespace NS
             //Construct NodeValDependencyMap
             foreach (var node in Asset.nodes)
             {
-                if (!node.IsExecNode())
+                if (!node.IsFlowNode())
                     continue;
 
                 var valueNodeList = new List<string>();

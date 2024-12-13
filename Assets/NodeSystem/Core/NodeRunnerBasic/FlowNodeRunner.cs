@@ -18,7 +18,7 @@
         
         public virtual string GetNextNode()
         {
-            return default;
+            return null;
         }
 
         protected void Complete()

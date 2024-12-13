@@ -1,8 +1,9 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using NS.Nodes;
+using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("IntToFloat", "Default/Converter/IntToFloat", (int)ENodeCategory.Value,  typeof(IntToFloatNodeRunner) )]
+    [Node("IntToFloat", "Default/Converter/IntToFloat", (int)ENodeCategory.Value,ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner) )]
     public class IntToFloatNode:Node
     {
         [Port(Direction.Input, typeof(int))]

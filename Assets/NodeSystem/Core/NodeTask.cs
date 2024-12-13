@@ -38,6 +38,7 @@ namespace NS
 
         public virtual void OnReturnToPool()
         {
+            TaskName = string.Empty;
             StartTask = null;
             EndTask = null;
             CancelTask = null;

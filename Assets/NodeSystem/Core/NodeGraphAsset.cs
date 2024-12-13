@@ -49,7 +49,7 @@ namespace NS
                 var attribute = fieldInfo.GetCustomAttribute<PortAttribute>();
                 if(attribute == null)
                     continue;
-                var port = new NodePort(node.Id, attribute.PortDirection, attribute.PortType);
+                var port = new NodePort(node.Id, attribute.PortDirection, attribute.PortType, attribute.IsFlowPort);
                 fieldInfo.SetValue(node, port.Id);
                 AddPort(port);
             }

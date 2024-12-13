@@ -1,11 +1,12 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using NS.Nodes;
+using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("ForLoop", "Default/FlowControl/ForLoop", (int)ENodeCategory.FlowControl, typeof(ForLoopFlowNodeRunner))]
+    [Node("ForLoop", "Default/FlowControl/ForLoop", (int)ENodeCategory.FlowControl, ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner))]
     public class ForLoopNode:Node
     {
-        [Port(Direction.Input, typeof(ExecutePort))]
+        [Port(Direction.Input, typeof(BaseFlowPort))]
         public string InExecPort;
 
         [Port(Direction.Input, typeof(int), "Start")]
@@ -14,10 +15,10 @@ namespace NS
         [Port(Direction.Input, typeof(int), "End")]
         public string InEndIndex;
 
-        [Port(Direction.Output, typeof(ExecutePort), "Completed")]
+        [Port(Direction.Output, typeof(BaseFlowPort), "Completed")]
         public string OutCompleteExecPort;
         
-        [Port(Direction.Output, typeof(ExecutePort),"ForEach")]
+        [Port(Direction.Output, typeof(BaseFlowPort),"ForEach")]
         public string OutForEachExecPort;
     }
     

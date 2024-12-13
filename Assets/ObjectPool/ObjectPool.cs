@@ -99,7 +99,7 @@ namespace CommonObjectPool
     {
         private readonly Dictionary<Type, ObjectPool> _objectPoolMap = new();
         private const int DefaultCapacity = 32;
-        private const int DefaultMaxSize = 128;
+        private const int DefaultMaxSize = 10000;
 
         public T CreateObject<T>() where T : class, IPoolObject, new()
         {
@@ -154,6 +154,14 @@ namespace CommonObjectPool
             _objectPoolMap.Clear();
         }
 
+        public void ClearPool(Type type)
+        {
+            if (_objectPoolMap.TryGetValue(type, out var pool))
+            {
+                pool.Clear();
+            }
+        }
+        
         public void Log()
         {
             foreach (var pool in _objectPoolMap.Values)

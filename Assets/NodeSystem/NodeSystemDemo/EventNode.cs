@@ -1,4 +1,5 @@
 ﻿using System;
+using NS.Nodes;
 using UnityEditor.Experimental.GraphView;
 
 namespace NS
@@ -16,10 +17,10 @@ namespace NS
         public int IntParam2;
     }
     
-    [Node("NodeEvent", "Demo/Event/NodeEvent", (int)ENodeCategory.Event, typeof(EventEventNodeRunner))]
+    [Node("NodeEvent", "Demo/Event/NodeEvent", (int)ENodeCategory.Event, ENodeFunctionType.Event, typeof(EventEventNodeRunner))]
     public class EventNode:Node
     {
-        [Port(Direction.Output, typeof(ExecutePort))]
+        [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
         [EventType]

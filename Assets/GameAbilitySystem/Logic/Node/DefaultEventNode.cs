@@ -4,10 +4,10 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", (int)ENodeCategory.Event, typeof(DefaultEventEventNodeRunner))]
+    [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", (int)0,ENodeFunctionType.Event, typeof(DefaultEventEventNodeRunner))]
     public class DefaultEventNode:Node
     {
-        [Port(Direction.Output, typeof(ExecutePort))]
+        [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
         [EventType]

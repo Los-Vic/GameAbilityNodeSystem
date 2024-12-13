@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    public class ExecutePort
+    public class BaseFlowPort
     {
     }
 }

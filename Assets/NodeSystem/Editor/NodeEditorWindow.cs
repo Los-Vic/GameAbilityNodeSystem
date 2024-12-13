@@ -80,7 +80,7 @@ namespace NSEditor
 
         public virtual EditorNode CreateEditorNode()
         {
-            return new NodeSystemEditorNode();
+            return new EditorNode();
         }
         
         #endregion
