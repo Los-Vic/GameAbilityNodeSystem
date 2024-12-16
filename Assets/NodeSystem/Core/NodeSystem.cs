@@ -5,7 +5,7 @@ namespace NS
 {
     public class NodeSystem
     {
-        public ObjectPoolMgr PoolMgr { get; private set; }
+        private ObjectPoolMgr PoolMgr { get; set; }
         public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
         public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
         

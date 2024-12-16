@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace NS
@@ -26,50 +27,35 @@ namespace NS
             set => position = value;
         }
 
+        private readonly ENodeFunctionType _nodeFunctionType;
+        
         public Node()
         {
-#if UNITY_EDITOR
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
-            if (nodeAttribute != null)
-            {
-                nodeName = nodeAttribute.Title;
-            }
+            if (nodeAttribute == null) 
+                return;
+            
+#if UNITY_EDITOR
+            nodeName = nodeAttribute.Title;
 #endif
+            _nodeFunctionType = ENodeFunctionType.Value;
         }
-
+        
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
         
         public bool IsFlowNode()
         {
-            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
-            if (nodeAttribute == null)
-            {
-                return false;
-            }
-
-            return nodeAttribute.FunctionType == ENodeFunctionType.Flow;
+            return _nodeFunctionType == ENodeFunctionType.Flow;
         }
-
+        
         public bool IsValueNode()
         {
-            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
-            if (nodeAttribute == null)
-            {
-                return false;
-            }
-
-            return nodeAttribute.FunctionType == ENodeFunctionType.Value;
+            return _nodeFunctionType == ENodeFunctionType.Value;
         }
-
+        
         public bool IsEventNode()
         {
-            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
-            if (nodeAttribute == null)
-            {
-                return false;
-            }
-
-            return nodeAttribute.FunctionType == ENodeFunctionType.Event;
+            return _nodeFunctionType == ENodeFunctionType.Event;
         }
 
         public virtual string DisplayName() => nodeName;

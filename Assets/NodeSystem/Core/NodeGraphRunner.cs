@@ -29,6 +29,8 @@ namespace NS
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string EventName => _eventNode?.DisplayName() ?? "";
+        
+        public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
 
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
@@ -60,7 +62,7 @@ namespace NS
 
         private void DeInit()
         {
-            _nodeSystem.TaskScheduler.CancelTasksOfGraphRunner(this);
+            TaskScheduler.CancelTasksOfGraphRunner(this);
             _onRunnerRunEnd = null;
             _asset = null;
             _eventNode = null;
@@ -147,17 +149,6 @@ namespace NS
             }
                 
             _curRunner = GetNodeRunner(nextNode) as FlowNodeRunner;
-        }
-
-        public NodeTask CreateTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
-            Func<float, ENodeSystemTaskRunStatus> updateTask = null)
-        {
-            return _nodeSystem.TaskScheduler.CreateTask(taskName, this, startTask, endTask, cancelTask, updateTask);
-        }
-
-        public void StartTask(NodeTask task)
-        {
-            _nodeSystem.TaskScheduler.StartTask(task);
         }
         
         public NodeRunner GetNodeRunner(string nodeId)

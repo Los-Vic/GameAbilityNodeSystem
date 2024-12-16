@@ -35,7 +35,8 @@ namespace NS
         /// </summary>
         public ENodeFunctionType FunctionType { get; private set; }
 
-        public NodeAttribute(string title, string menuItem, int nodeCategory, ENodeFunctionType functionType, Type runnerType, int scope = 0, bool isSingleton = false)
+        public NodeAttribute(string title, string menuItem, ENodeFunctionType functionType, Type runnerType, 
+            int nodeCategory = 0, int scope = 0, bool isSingleton = false)
         {
             Title = title;
             MenuItem = menuItem;

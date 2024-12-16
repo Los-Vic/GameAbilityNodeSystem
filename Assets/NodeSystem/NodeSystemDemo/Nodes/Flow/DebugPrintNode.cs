@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NS
 {
-    [Node("Print","Default/Debug/Print", (int)ENodeCategory.ExecDebugInstant, ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner))]
+    [Node("Print","Default/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), (int)ENodeCategory.ExecDebugInstant)]
     public class DebugPrintNode:Node
     {
         [ExposedProp]

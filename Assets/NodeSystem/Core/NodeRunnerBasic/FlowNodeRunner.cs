@@ -4,6 +4,7 @@
     {
         private bool _dependentValNodesExecuted;
         protected NodeGraphRunner GraphRunner { get; private set; }
+        protected INodeSystemTaskScheduler TaskScheduler => GraphRunner.TaskScheduler;
 
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {

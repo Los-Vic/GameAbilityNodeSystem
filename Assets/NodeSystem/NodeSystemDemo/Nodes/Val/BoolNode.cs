@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Bool", "Default/Literal/Bool", (int)ENodeCategory.Value, ENodeFunctionType.Value ,typeof(BoolNodeRunner))]
+    [Node("Bool", "Default/Literal/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), (int)ENodeCategory.Value)]
     public class BoolNode : Node
     {
         [ExposedProp] public bool Val;

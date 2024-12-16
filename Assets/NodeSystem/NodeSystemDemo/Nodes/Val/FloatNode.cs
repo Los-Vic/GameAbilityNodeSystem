@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Float", "Default/Literal/Float", (int)ENodeCategory.Value, ENodeFunctionType.Value, typeof(FloatNodeRunner))]
+    [Node("Float", "Default/Literal/Float", ENodeFunctionType.Value, typeof(FloatNodeRunner), (int)ENodeCategory.Value)]
     public class FloatNode:Node
     {
         [ExposedProp]

@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("ForLoop", "Default/FlowControl/ForLoop", (int)ENodeCategory.FlowControl, ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner))]
+    [Node("ForLoop", "Default/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), (int)ENodeCategory.FlowControl)]
     public class ForLoopNode:Node
     {
         [Port(Direction.Input, typeof(BaseFlowPort))]

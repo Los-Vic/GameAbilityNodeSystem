@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Delay", "Default/NonInstantAction/Delay", (int)ENodeCategory.ExecNonInstant,ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner))]
+    [Node("Delay", "Default/NonInstantAction/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), (int)ENodeCategory.ExecNonInstant)]
     public class DelayNode:Node
     {
         [Port(Direction.Input, typeof(BaseFlowPort))]
@@ -34,8 +34,8 @@ namespace NS
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
             NodeSystemLogger.Log($"input delay [{_delay}]");
             
-            var task = GraphRunner.CreateTask(DelayTaskName, StartTask, EndTask, CancelTask, UpdateTask);
-            GraphRunner.StartTask(task);
+            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, EndTask, CancelTask, UpdateTask);
+            TaskScheduler.StartTask(task);
         }
         
         public override string GetNextNode()

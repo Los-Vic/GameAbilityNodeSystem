@@ -12,7 +12,7 @@ namespace GAS.Logic
         public int IntParam2;
     }
     
-    [Node("GameEvent", "GameAbilitySystem/Event/GameEvent", (int)0, ENodeFunctionType.Event, typeof(GameEventEventNodeRunner))]
+    [Node("GameEvent", "GameAbilitySystem/Event/GameEvent", ENodeFunctionType.Event, typeof(GameEventEventNodeRunner))]
     public class GameEventNode:Node
     {
         [Port(Direction.Output, typeof(BaseFlowPort))]

@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("IntToFloat", "Default/Converter/IntToFloat", (int)ENodeCategory.Value,ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner) )]
+    [Node("IntToFloat", "Default/Converter/IntToFloat",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), (int)ENodeCategory.Value )]
     public class IntToFloatNode:Node
     {
         [Port(Direction.Input, typeof(int))]

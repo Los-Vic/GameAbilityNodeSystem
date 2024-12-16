@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Branch", "Default/FlowControl/Branch", (int)ENodeCategory.FlowControl, ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner))]
+    [Node("Branch", "Default/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), (int)ENodeCategory.FlowControl)]
     public class BranchNode:Node
     {
         [Port(Direction.Input,typeof(BaseFlowPort))]
