@@ -12,9 +12,93 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a353063af56749909c5b3c7b449fe642, type: 3}
   m_Name: NewGraph
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 4709999215528640565
+  - rid: 4709999215528640568
+  ports:
+  - rid: 4709999215528640566
+  - rid: 4709999215528640567
+  - rid: 4709999215528640569
+  - rid: 4709999215528640570
+  - rid: 4709999215528640571
   graphName: 
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 4709999215528640565
+      type: {class: DebugPrintNode, ns: NS, asm: NodeSystem.Demo}
+      data:
+        guid: c81e0836-d07c-4f9b-8867-63b1e397186c
+        position:
+          serializedVersion: 2
+          x: 444
+          y: 260.8
+          width: 148
+          height: 95.20001
+        nodeName: Print
+        Log: 
+        InPortExec: 36a31162-34f8-41a9-9fea-e219bcfbd9af
+        OutPortExec: 6d136260-d7f4-4b71-a8ff-2f712f2c8a14
+    - rid: 4709999215528640566
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 36a31162-34f8-41a9-9fea-e219bcfbd9af
+        belongNodeId: c81e0836-d07c-4f9b-8867-63b1e397186c
+        connectPortId: dbfc4906-1716-4fb0-a5c9-832f93831545
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4709999215528640567
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 6d136260-d7f4-4b71-a8ff-2f712f2c8a14
+        belongNodeId: c81e0836-d07c-4f9b-8867-63b1e397186c
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4709999215528640568
+      type: {class: EventNode, ns: NS, asm: NodeSystem.Demo}
+      data:
+        guid: 3d43cfb3-b3a3-4bca-ad9e-7c7426d9bb0c
+        position:
+          serializedVersion: 2
+          x: 99.2
+          y: 247.20001
+          width: 211.2
+          height: 144
+        nodeName: NodeEvent
+        OutPortExec: dbfc4906-1716-4fb0-a5c9-832f93831545
+        NodeEvent: 0
+        OutIntParam1: 337f149f-0752-41f9-a8fb-04035e353311
+        OutIntParam2: 99956027-ce48-4c39-816e-719302e22359
+    - rid: 4709999215528640569
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: dbfc4906-1716-4fb0-a5c9-832f93831545
+        belongNodeId: 3d43cfb3-b3a3-4bca-ad9e-7c7426d9bb0c
+        connectPortId: 36a31162-34f8-41a9-9fea-e219bcfbd9af
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4709999215528640570
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 337f149f-0752-41f9-a8fb-04035e353311
+        belongNodeId: 3d43cfb3-b3a3-4bca-ad9e-7c7426d9bb0c
+        connectPortId: 
+        direction: 1
+        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4709999215528640571
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 99956027-ce48-4c39-816e-719302e22359
+        belongNodeId: 3d43cfb3-b3a3-4bca-ad9e-7c7426d9bb0c
+        connectPortId: 
+        direction: 1
+        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0

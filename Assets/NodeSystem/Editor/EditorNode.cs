@@ -11,6 +11,9 @@ using Node = NS.Node;
 
 namespace NSEditor
 {
+    /// <summary>
+    /// 继承此类绘制新的节点
+    /// </summary>
     public class EditorNode : UnityEditor.Experimental.GraphView.Node
     {
         public Node Node { get; private set; }

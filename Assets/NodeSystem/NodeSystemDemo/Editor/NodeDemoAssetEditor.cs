@@ -1,23 +1,22 @@
-﻿using GAS.Logic;
-using NS;
+﻿using NS;
 using NSEditor;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace GAS.Editor
+namespace NodeSystem.NodeSystemDemo.Editor
 {
-    [CustomEditor(typeof(AbilityAsset), true)]
-    public class AbilityAssetEditor:OdinEditor
+    [CustomEditor(typeof(DemoGraphAsset), true)]
+    public class NodeDemoAssetEditor:UnityEditor.Editor
     {
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceId, int index)
         {
             var asset = EditorUtility.InstanceIDToObject(instanceId);
-            if (asset.GetType() != typeof(AbilityAsset)) 
+            var type = asset.GetType();
+            if (!typeof(NodeGraphAsset).IsAssignableFrom(type)) 
                 return false;
-            NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)asset);
+            NodeEditorWindow.Open<NodeDemoEditorWindow>((NodeGraphAsset)asset);
             return true;
         }
         
@@ -31,7 +30,7 @@ namespace GAS.Editor
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("OpenGraph"))
             {
-                NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)target);
+                NodeEditorWindow.Open<NodeDemoEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;
@@ -41,6 +40,5 @@ namespace GAS.Editor
             }
             GUI.backgroundColor = oldColor;
         }
-        
     }
 }

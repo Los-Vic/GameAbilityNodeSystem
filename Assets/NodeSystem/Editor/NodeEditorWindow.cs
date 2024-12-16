@@ -6,11 +6,15 @@ using UnityEngine.UIElements;
 
 namespace NSEditor
 {
+    /// <summary>
+    /// Graph asset editor window
+    /// 继承此类来实现新的节点编辑窗口
+    /// </summary>
     public class NodeEditorWindow :EditorWindow
     {
         public static void Open<T>(NodeGraphAsset target) where T : NodeEditorWindow
         {
-            var windows = Resources.FindObjectsOfTypeAll<T>();
+            var windows = Resources.FindObjectsOfTypeAll<NodeEditorWindow>();
             foreach (var w in windows)
             {
                 if (w.currentGraphAsset == null)
@@ -73,7 +77,7 @@ namespace NSEditor
         public virtual NodeSearchProvider CreateSearchProvider()
         {
             var provider = CreateInstance<NodeSearchProvider>();
-            provider.SetScopeList(new List<int>(0));
+            provider.SetScopeList(new List<int>(){0});
 
             return provider;
         }

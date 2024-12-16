@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace NSEditor
 {
+    /// <summary>
+    /// Graph asset editor
+    /// 定义了新的node graph asset后，通常需要创建新的asset editor类。在这里Open editor window。无法通过继承复用。
+    /// </summary>
     [CustomEditor(typeof(NodeGraphAsset), true)]
     public class NodeSystemGraphAssetEditor:Editor
     {

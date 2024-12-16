@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace NSEditor
 {
-    public class NodeSystemEditorNode:EditorNode
+    public class NodeSystemDemoEditorNode:EditorNode
     {
         private static readonly Color DefaultPortColor = new Color(0, 0.8f, 0.8f, 1);
         
