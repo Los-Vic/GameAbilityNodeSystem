@@ -10,10 +10,10 @@ namespace GAS.Logic
         private NodeGraphAsset _asset;
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
-        private readonly Dictionary<EGameEvent, string> _gameEventTypeIdMap = new();
-        private readonly Dictionary<EDefaultEvent, string> _defaultEventIdMap = new();
+        private readonly Dictionary<EGamePortal, string> _gameEventTypeIdMap = new();
+        private readonly Dictionary<EDefaultPortal, string> _defaultEventIdMap = new();
 
-        internal List<EGameEvent> GetRegisteredGameEvents() => _gameEventTypeIdMap.Keys.ToList();
+        internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeIdMap.Keys.ToList();
         
         internal void Init(GameAbilitySystem system, NodeGraphAsset asset)
         {
@@ -22,13 +22,13 @@ namespace GAS.Logic
 
             foreach (var node in asset.nodes)
             {
-                if (node is GameEventNode eventNode)
+                if (node is GamePortalNode eventNode)
                 {
-                    _gameEventTypeIdMap.TryAdd(eventNode.NodeEvent, node.Id);
+                    _gameEventTypeIdMap.TryAdd(eventNode.NodePortal, node.Id);
                 }
-                else if (node is DefaultEventNode defaultEventNode)
+                else if (node is DefaultPortalNode defaultEventNode)
                 {
-                    _defaultEventIdMap.TryAdd(defaultEventNode.NodeEvent, node.Id);
+                    _defaultEventIdMap.TryAdd(defaultEventNode.NodePortal, node.Id);
                 }
             }
         }
@@ -42,11 +42,11 @@ namespace GAS.Logic
             _graphRunners.Clear();
         }
         
-        internal void RunGraph(EGameEvent eventType, NodeEventParam param)
+        internal void RunGraph(EGamePortal portalType, NodeActionStartParam param)
         {
-            if (!_gameEventTypeIdMap.TryGetValue(eventType, out var nodeId))
+            if (!_gameEventTypeIdMap.TryGetValue(portalType, out var nodeId))
             {
-                NodeSystemLogger.LogError($"Not found {eventType} node in {_asset.name}!");
+                NodeSystemLogger.LogError($"Not found {portalType} node in {_asset.name}!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
@@ -55,11 +55,11 @@ namespace GAS.Logic
             _graphRunners.Add(graphRunner);
         }
 
-        internal void RunGraph(EDefaultEvent eventType)
+        internal void RunGraph(EDefaultPortal portalType)
         {
-            if (!_defaultEventIdMap.TryGetValue(eventType, out var nodeId))
+            if (!_defaultEventIdMap.TryGetValue(portalType, out var nodeId))
             {
-                NodeSystemLogger.Log($"Not found {eventType} node in {_asset.name}!");
+                NodeSystemLogger.Log($"Not found {portalType} node in {_asset.name}!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();

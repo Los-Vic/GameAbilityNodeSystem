@@ -1,30 +1,25 @@
 ﻿using System;
-using NS.Nodes;
+using NS;
 using UnityEditor.Experimental.GraphView;
+using Node = NS.Node;
 
-namespace NS
+namespace GAS.Logic
 {
-    public enum ENodeEventType
-    {
-        BeginPlay,
-        EndPlay
-    }
-    
     [Serializable]
-    public class NodeEventParam:NodeSystemEventParamBase
+    public class NodeActionStartParam:PortalParamBase
     {
         public int IntParam1;
         public int IntParam2;
     }
     
-    [Node("NodeEvent", "Demo/Event/NodeEvent", ENodeFunctionType.Event, typeof(EventEventNodeRunner), (int)ENodeCategory.Event)]
-    public class EventNode:Node
+    [Node("GamePortal", "GameAbilitySystem/Portal/GamePortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, NodeScopeDefine.Ability)]
+    public class GamePortalNode:Node
     {
         [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [EventType]
-        public ENodeEventType NodeEvent;
+        [PortalType]
+        public EGamePortal NodePortal;
 
         [Port(Direction.Output, typeof(int), "IntParam1")]
         public string OutIntParam1;
@@ -33,20 +28,20 @@ namespace NS
 
         public override string DisplayName()
         {
-            return NodeEvent.ToString();
+            return NodePortal.ToString();
         }
     }
     
-    public class EventEventNodeRunner:EventNodeRunner
+    public class GamePortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private EventNode _node;
+        private NodeGraphRunner _runner;
+        private GamePortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (EventNode)nodeAsset;
-            
+            _node = (GamePortalNode)nodeAsset;
+            _runner = graphRunner;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -55,12 +50,12 @@ namespace NS
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetUpEventParam(NodeSystemEventParamBase paramBase)
+        public override void SetPortalParam(PortalParamBase paramBase)
         {
-            if (paramBase is not NodeEventParam param) 
+            if (paramBase is not NodeActionStartParam param) 
                 return;
-            GraphRunner.SetOutPortVal(_node.OutIntParam1, param.IntParam1);
-            GraphRunner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
+            _runner.SetOutPortVal(_node.OutIntParam1, param.IntParam1);
+            _runner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
         }
 
         public override void Execute()

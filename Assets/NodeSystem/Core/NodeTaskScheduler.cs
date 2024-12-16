@@ -54,7 +54,7 @@ namespace NS
 
         public void StartTask(NodeTask task)
         {
-            NodeSystemLogger.Log($"start task, asset:{_taskGraphRunnerMap[task].AssetName}, event:{_taskGraphRunnerMap[task].EventName}");
+            NodeSystemLogger.Log($"start task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
             var status = task.StartTask?.Invoke() ?? ENodeSystemTaskRunStatus.End;
             if (status == ENodeSystemTaskRunStatus.End || task.UpdateTask == null)
             {
@@ -74,7 +74,7 @@ namespace NS
         {
             _updateList.Remove(task);
             _pendingAddToUpdateList.Remove(task);
-            NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[task].AssetName}, event:{_taskGraphRunnerMap[task].EventName}");
+            NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
             task.CancelTask?.Invoke();
             DestroyTask(task);
         }
@@ -88,7 +88,7 @@ namespace NS
                 {
                     _updateList.Remove(t);
                     _pendingAddToUpdateList.Remove(t);
-                    NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[t].AssetName}, event:{_taskGraphRunnerMap[t].EventName}");
+                    NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[t].AssetName}, portal:{_taskGraphRunnerMap[t].PortalName}");
                     t.CancelTask?.Invoke();
                     cancelTaskSuccess = true;
                 }
@@ -157,7 +157,7 @@ namespace NS
         public void EndTask(NodeTask task)
         {
             _updateList.Remove(task);
-            NodeSystemLogger.Log($"end task, asset:{_taskGraphRunnerMap[task].AssetName}, event:{_taskGraphRunnerMap[task].EventName}");
+            NodeSystemLogger.Log($"end task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
             task.EndTask?.Invoke();
             DestroyTask(task);
         }

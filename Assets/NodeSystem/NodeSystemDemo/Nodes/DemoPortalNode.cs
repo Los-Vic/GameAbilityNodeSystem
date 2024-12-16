@@ -1,25 +1,30 @@
 ﻿using System;
-using NS;
 using UnityEditor.Experimental.GraphView;
-using Node = NS.Node;
+using UnityEngine.Serialization;
 
-namespace GAS.Logic
+namespace NS
 {
+    public enum ENodeDemoPortalType
+    {
+        BeginPlay,
+        EndPlay
+    }
+    
     [Serializable]
-    public class NodeEventParam:NodeSystemEventParamBase
+    public class NodeDemoPortalParam:PortalParamBase
     {
         public int IntParam1;
         public int IntParam2;
     }
     
-    [Node("GameEvent", "GameAbilitySystem/Event/GameEvent", ENodeFunctionType.Event, typeof(GameEventEventNodeRunner))]
-    public class GameEventNode:Node
+    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Portal, typeof(PortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, -1)]
+    public class DemoPortalNode:Node
     {
         [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [EventType]
-        public EGameEvent NodeEvent;
+        [FormerlySerializedAs("NodeEvent")] [PortalType]
+        public ENodeDemoPortalType nodeDemoPortal;
 
         [Port(Direction.Output, typeof(int), "IntParam1")]
         public string OutIntParam1;
@@ -28,20 +33,20 @@ namespace GAS.Logic
 
         public override string DisplayName()
         {
-            return NodeEvent.ToString();
+            return nodeDemoPortal.ToString();
         }
     }
     
-    public class GameEventEventNodeRunner:EventNodeRunner
+    public class PortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private NodeGraphRunner _runner;
-        private GameEventNode _node;
+        private DemoPortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            _node = (GameEventNode)nodeAsset;
-            _runner = graphRunner;
+            base.Init(nodeAsset, graphRunner);
+            _node = (DemoPortalNode)nodeAsset;
+            
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -50,12 +55,12 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetUpEventParam(NodeSystemEventParamBase paramBase)
+        public override void SetPortalParam(PortalParamBase paramBase)
         {
-            if (paramBase is not NodeEventParam param) 
+            if (paramBase is not NodeDemoPortalParam param) 
                 return;
-            _runner.SetOutPortVal(_node.OutIntParam1, param.IntParam1);
-            _runner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
+            GraphRunner.SetOutPortVal(_node.OutIntParam1, param.IntParam1);
+            GraphRunner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
         }
 
         public override void Execute()

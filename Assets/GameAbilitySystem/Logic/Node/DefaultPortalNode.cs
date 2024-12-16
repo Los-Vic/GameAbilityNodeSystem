@@ -1,32 +1,33 @@
 ﻿using NS;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine.Serialization;
 using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("DefaultEvent", "GameAbilitySystem/Event/DefaultEvent", ENodeFunctionType.Event, typeof(DefaultEventEventNodeRunner))]
-    public class DefaultEventNode:Node
+    [Node("DefaultPortal", "GameAbilitySystem/Portal/DefaultPortal", ENodeFunctionType.Portal, typeof(DefaultPortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, NodeScopeDefine.Ability)]
+    public class DefaultPortalNode:Node
     {
         [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [EventType]
-        public EDefaultEvent NodeEvent;
+        [PortalType]
+        public EDefaultPortal NodePortal;
         
         public override string DisplayName()
         {
-            return NodeEvent.ToString();
+            return NodePortal.ToString();
         }
     }
     
-    public class DefaultEventEventNodeRunner:EventNodeRunner
+    public class DefaultPortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private GameEventNode _node;
+        private GamePortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            _node = (GameEventNode)nodeAsset;
+            _node = (GamePortalNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;

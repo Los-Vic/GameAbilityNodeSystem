@@ -54,7 +54,7 @@ namespace NS
     }
     
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class EventTypeAttribute:Attribute
+    public class PortalTypeAttribute:Attribute
     {
     }
 

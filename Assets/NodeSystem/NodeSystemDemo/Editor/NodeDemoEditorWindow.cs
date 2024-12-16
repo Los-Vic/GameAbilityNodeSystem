@@ -1,6 +1,5 @@
-﻿using NSEditor;
-using UnityEditor;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using NSEditor;
 
 namespace NS
 {
@@ -8,7 +7,15 @@ namespace NS
     {
         public override EditorNode CreateEditorNode()
         {
-            return new NodeSystemDemoEditorNode();
+            return base.CreateEditorNode();
+        }
+
+        public override NodeSearchProvider CreateSearchProvider()
+        {
+            var provider = CreateInstance<NodeSearchProvider>();
+            provider.SetScopeList(new List<int>(){0, -1});
+
+            return provider;
         }
     }
 }

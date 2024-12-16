@@ -1,6 +1,7 @@
 ﻿using NS;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class NodeSystemGraphControllerMono:MonoBehaviour
 {
@@ -9,19 +10,19 @@ public class NodeSystemGraphControllerMono:MonoBehaviour
     private NodeSystem _system;
     private NodeSystemGraphController _controller;
     
-    [BoxGroup("Event")]
-    public ENodeEventType eventType;
-    [BoxGroup("Event")]
-    public NodeEventParam eventParam;
+    [BoxGroup("Portal")]
+    public ENodeDemoPortalType demoPortalType;
+    [BoxGroup("Portal")]
+    public NodeDemoPortalParam demoPortalParam;
     
-    [BoxGroup("Event")]
-    [Button("RunGraphWithEvent", ButtonSizes.Large)]
+    [BoxGroup("Portal")]
+    [Button("RunGraphWithPortal", ButtonSizes.Large)]
     [GUIColor(0, 1, 0)]
     private void Run()
     {
         if(!Application.isPlaying)
             return;
-        _controller.RunGraph(eventType, eventParam);
+        _controller.RunGraph(demoPortalType, demoPortalParam);
     }
 
     private void Start()

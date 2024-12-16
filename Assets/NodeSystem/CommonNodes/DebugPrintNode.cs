@@ -1,10 +1,9 @@
-﻿using NS.Nodes;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NS
 {
-    [Node("Print","Default/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), (int)ENodeCategory.ExecDebugInstant)]
+    [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), (int)ECommonNodeCategory.Debug)]
     public class DebugPrintNode:Node
     {
         [ExposedProp]

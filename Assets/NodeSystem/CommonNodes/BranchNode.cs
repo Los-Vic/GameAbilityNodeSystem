@@ -1,9 +1,8 @@
-﻿using NS.Nodes;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Branch", "Default/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), (int)ENodeCategory.FlowControl)]
+    [Node("Branch", "Common/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), (int)ECommonNodeCategory.FlowControl)]
     public class BranchNode:Node
     {
         [Port(Direction.Input,typeof(BaseFlowPort))]

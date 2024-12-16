@@ -21,21 +21,21 @@ namespace NS
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
         //Run node runner
-        private Node _eventNode;
+        private Node _portalNode;
         private FlowNodeRunner _curRunner;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
-        public string EventName => _eventNode?.DisplayName() ?? "";
+        public string PortalName => _portalNode?.DisplayName() ?? "";
         
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
 
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
-        public void Init(NodeSystem system, NodeGraphAsset asset, string eventNodeId, NodeSystemEventParamBase eventParam
+        public void Init(NodeSystem system, NodeGraphAsset asset, string portalNodeId, PortalParamBase actionStartParam
         , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd)
         {
             _nodeSystem = system;
@@ -43,20 +43,20 @@ namespace NS
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
             _isValid = false;
             _onRunnerRunEnd = onRunnerRunEnd;
-            _eventNode = GraphAssetRuntimeData.GetNodeById(eventNodeId);
-            if (!_eventNode.IsEventNode())
+            _portalNode = GraphAssetRuntimeData.GetNodeById(portalNodeId);
+            if (!_portalNode.IsPortalNode())
             {
-                NodeSystemLogger.LogError($"not valid event node {eventNodeId} of {asset.name}");
+                NodeSystemLogger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
                 return;
             }
 
-            var eventNodeRunner = GetNodeRunner(eventNodeId) as EventNodeRunner;
-            if (eventNodeRunner == null)
+            var portalNodeRunner = GetNodeRunner(portalNodeId) as PortalNodeRunner;
+            if (portalNodeRunner == null)
             {
-                NodeSystemLogger.LogError($"not valid event node runner {eventNodeId} of {asset.name}");
+                NodeSystemLogger.LogError($"not valid portal node runner {portalNodeId} of {asset.name}");
                 return;
             }
-            eventNodeRunner.SetUpEventParam(eventParam);
+            portalNodeRunner.SetPortalParam(actionStartParam);
             _isValid = true;
         }
 
@@ -65,7 +65,7 @@ namespace NS
             TaskScheduler.CancelTasksOfGraphRunner(this);
             _onRunnerRunEnd = null;
             _asset = null;
-            _eventNode = null;
+            _portalNode = null;
             _isValid = false;
             GraphAssetRuntimeData = null;
             _nodeSystem = null;
@@ -99,14 +99,14 @@ namespace NS
                 return;
             }
             
-            NodeSystemLogger.Log($"start graph of {_asset.name}, event:{_eventNode.DisplayName()}");
-            _curRunner = GetNodeRunner(_eventNode.Id) as FlowNodeRunner;
+            NodeSystemLogger.Log($"start graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
+            _curRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            NodeSystemLogger.Log($"complete graph of {_asset.name}, event:{_eventNode.DisplayName()}");
+            NodeSystemLogger.Log($"complete graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -114,7 +114,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            NodeSystemLogger.Log($"cancel graph of {_asset.name}, event:{_eventNode.DisplayName()}");
+            NodeSystemLogger.Log($"cancel graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();

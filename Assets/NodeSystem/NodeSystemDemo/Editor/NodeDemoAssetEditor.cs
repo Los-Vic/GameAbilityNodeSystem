@@ -6,20 +6,9 @@ using UnityEngine;
 
 namespace NodeSystem.NodeSystemDemo.Editor
 {
-    [CustomEditor(typeof(DemoGraphAsset), true)]
+    [CustomEditor(typeof(DemoGraphAsset))]
     public class NodeDemoAssetEditor:UnityEditor.Editor
     {
-        [OnOpenAsset]
-        public static bool OnOpenAsset(int instanceId, int index)
-        {
-            var asset = EditorUtility.InstanceIDToObject(instanceId);
-            var type = asset.GetType();
-            if (!typeof(NodeGraphAsset).IsAssignableFrom(type)) 
-                return false;
-            NodeEditorWindow.Open<NodeDemoEditorWindow>((NodeGraphAsset)asset);
-            return true;
-        }
-        
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -28,13 +17,13 @@ namespace NodeSystem.NodeSystemDemo.Editor
             //Open Graph Button
             var oldColor = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
-            if (GUILayout.Button("OpenGraph"))
+            if (GUILayout.Button("OpenGraph", GUILayout.Height(30)))
             {
                 NodeEditorWindow.Open<NodeDemoEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;
-            if (GUILayout.Button("ValidateGraph"))
+            if (GUILayout.Button("ValidateGraph", GUILayout.Height(30)))
             {
                 NodeGraphAssetEditorUtility.ValidateGraph(serializedObject);
             }

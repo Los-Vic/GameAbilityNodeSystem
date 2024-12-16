@@ -9,7 +9,7 @@ namespace NS
     {
         Value,
         Flow,
-        Event,
+        Portal,
     }
     
     [Serializable]
@@ -38,7 +38,7 @@ namespace NS
 #if UNITY_EDITOR
             nodeName = nodeAttribute.Title;
 #endif
-            _nodeFunctionType = ENodeFunctionType.Value;
+            _nodeFunctionType = nodeAttribute.FunctionType;
         }
         
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
@@ -53,9 +53,9 @@ namespace NS
             return _nodeFunctionType == ENodeFunctionType.Value;
         }
         
-        public bool IsEventNode()
+        public bool IsPortalNode()
         {
-            return _nodeFunctionType == ENodeFunctionType.Event;
+            return _nodeFunctionType == ENodeFunctionType.Portal;
         }
 
         public virtual string DisplayName() => nodeName;

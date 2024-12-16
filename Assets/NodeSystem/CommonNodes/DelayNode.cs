@@ -1,9 +1,8 @@
-﻿using NS.Nodes;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("Delay", "Default/NonInstantAction/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), (int)ENodeCategory.ExecNonInstant)]
+    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), (int)ECommonNodeCategory.Task)]
     public class DelayNode:Node
     {
         [Port(Direction.Input, typeof(BaseFlowPort))]

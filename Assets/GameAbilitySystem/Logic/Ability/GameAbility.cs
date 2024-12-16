@@ -74,7 +74,7 @@ namespace GAS.Logic
             if (Cooldown > 0)
                 _tickable = true;
             
-            GraphController.RunGraph(EDefaultEvent.OnAddAbility);
+            GraphController.RunGraph(EDefaultPortal.OnAddAbility);
             //todo: Graph register to game event
         }
 
@@ -82,7 +82,7 @@ namespace GAS.Logic
         {
             //todo: Graph unregister to game event
             
-            GraphController.RunGraph(EDefaultEvent.OnRemoveAbility);
+            GraphController.RunGraph(EDefaultPortal.OnRemoveAbility);
             Owner = null;
         }
         
@@ -122,7 +122,7 @@ namespace GAS.Logic
         //  时间触发
         internal void ActivateAbility()
         {
-            GraphController.RunGraph(EDefaultEvent.OnActivateAbility);
+            GraphController.RunGraph(EDefaultPortal.OnActivateAbility);
         }
 
         private void ResetCooldown()

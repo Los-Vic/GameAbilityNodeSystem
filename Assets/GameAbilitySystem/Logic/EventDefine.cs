@@ -1,13 +1,13 @@
 ﻿namespace GAS.Logic
 {
-    public enum EDefaultEvent
+    public enum EDefaultPortal
     {
         OnAddAbility,
         OnRemoveAbility,
         OnActivateAbility,
     }
     
-    public enum EGameEvent
+    public enum EGamePortal
     {
        
     }

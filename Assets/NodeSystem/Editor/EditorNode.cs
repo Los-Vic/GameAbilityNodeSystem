@@ -23,6 +23,15 @@ namespace NSEditor
         private SerializedObject _graphAssetObject;
         private SerializedProperty _serializedNode;
 
+        private static readonly Color DefaultPortColor = new Color(0, 0.8f, 0.8f, 1);
+        private static readonly Dictionary<Type, Color> PortColorMap = new()
+        {
+            { typeof(int), new Color(0, 0.8f, 0, 1) },
+            { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
+            { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
+            { typeof(BaseFlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
+        };
+        
         public virtual void Draw(Node node, SerializedObject graphAssetObject)
         {
             _graphAssetObject = graphAssetObject;
@@ -51,11 +60,11 @@ namespace NSEditor
                     CreatePort(fieldInfo, portAttribute);
                 }
 
-                //Create EventType
-                var eventTypeAttribute = fieldInfo.GetCustomAttribute<EventTypeAttribute>();
-                if (eventTypeAttribute != null)
+                //Create PortalType
+                var portalTypeAttribute = fieldInfo.GetCustomAttribute<PortalTypeAttribute>();
+                if (portalTypeAttribute != null)
                 {
-                    CreateEventTypeExtension(fieldInfo, Node);
+                    CreatePortalTypeExtension(fieldInfo, Node);
                 }
 
                 //Create Extensions
@@ -70,17 +79,50 @@ namespace NSEditor
 
         protected virtual Color GetNodeColor(int nodeCategory)
         {
+            switch (nodeCategory)
+            {
+                case (int)ECommonNodeCategory.Action:
+                case (int)ECommonNodeCategory.Task:
+                    return new Color(0, 0.3f, 0.7f, 1);
+                case (int)ECommonNodeCategory.Debug:
+                    return new Color(0.7f, 0.3f, 0.7f, 1);
+                case (int)ECommonNodeCategory.Value:
+                    return new Color(0, 0.5f, 0, 1);
+                case (int)ECommonNodeCategory.Portal:
+                    return new Color(0.6f, 0, 0, 1);
+                case (int)ECommonNodeCategory.FlowControl:
+                    return new Color(0.5f,0.5f,0.5f,1);
+            }
             return Color.magenta;
         }
 
         protected virtual Color GetPortColor(Type type)
         {
-            return Color.magenta;
+            return PortColorMap.GetValueOrDefault(type, DefaultPortColor);
         }
         
         protected virtual void ConstructTitle(Type type, NodeAttribute attribute)
         {
             title = attribute.Title;
+            if (attribute.NodeCategory == (int)ECommonNodeCategory.Task)
+            {
+                var img = new Image
+                {
+                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/clock.png"),
+                    style = { width = 28, paddingRight = 6 }
+                };
+                titleButtonContainer.Add(img);
+            }
+            else if (attribute.NodeCategory == (int)ECommonNodeCategory.Debug)
+            {
+                var img = new Image
+                {
+                    image = AssetDatabase.LoadAssetAtPath<Texture>("Assets/NodeSystem/Editor/Icon/debug.png"),
+                    style = { width = 32, paddingRight = 4 }
+                };
+                titleButtonContainer.Add(img);
+            }
+
             var box = new Box
             {
                 style =
@@ -120,15 +162,15 @@ namespace NSEditor
             }
         }
 
-        private void CreateEventTypeExtension(FieldInfo fieldInfo, Node node)
+        private void CreatePortalTypeExtension(FieldInfo fieldInfo, Node node)
         {
             var propertyField = DrawField(fieldInfo.Name);
-            propertyField?.RegisterValueChangeCallback(OnEventTypeFieldChangeCallback);
+            propertyField?.RegisterValueChangeCallback(OnPortalTypeFieldChangeCallback);
             var val = fieldInfo.GetValue(node);
             title = val.ToString();
         }
 
-        private void OnEventTypeFieldChangeCallback(SerializedPropertyChangeEvent evt)
+        private void OnPortalTypeFieldChangeCallback(SerializedPropertyChangeEvent evt)
         {
             title = evt.changedProperty.enumDisplayNames[evt.changedProperty.enumValueIndex];
         }

@@ -8,7 +8,7 @@ namespace NS
         private NodeGraphAsset _asset;
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
-        private readonly Dictionary<ENodeEventType, string> _eventTypeIdMap = new();
+        private readonly Dictionary<ENodeDemoPortalType, string> _portalTypeIdMap = new();
         
         public void Init(NodeSystem system, NodeGraphAsset asset)
         {
@@ -17,10 +17,10 @@ namespace NS
 
             foreach (var node in asset.nodes)
             {
-                if(node is not EventNode eventNode)
+                if(node is not DemoPortalNode portalNode)
                     continue;
 
-                _eventTypeIdMap.TryAdd(eventNode.NodeEvent, node.Id);
+                _portalTypeIdMap.TryAdd(portalNode.nodeDemoPortal, node.Id);
             }
         }
 
@@ -33,11 +33,11 @@ namespace NS
             _graphRunners.Clear();
         }
         
-        public void RunGraph(ENodeEventType eventType, NodeEventParam param)
+        public void RunGraph(ENodeDemoPortalType demoPortalType, NodeDemoPortalParam param)
         {
-            if (!_eventTypeIdMap.TryGetValue(eventType, out var nodeId))
+            if (!_portalTypeIdMap.TryGetValue(demoPortalType, out var nodeId))
             {
-                NodeSystemLogger.LogWarning($"not found {eventType} node!");
+                NodeSystemLogger.LogWarning($"not found {demoPortalType} node!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();

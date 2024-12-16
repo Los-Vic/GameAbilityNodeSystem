@@ -1,9 +1,8 @@
-﻿using NS.Nodes;
-using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
-    [Node("ForLoop", "Default/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), (int)ENodeCategory.FlowControl)]
+    [Node("ForLoop", "Common/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), (int)ECommonNodeCategory.FlowControl)]
     public class ForLoopNode:Node
     {
         [Port(Direction.Input, typeof(BaseFlowPort))]

@@ -2,7 +2,6 @@
 using System.Reflection;
 using NS;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace NSEditor
@@ -11,20 +10,9 @@ namespace NSEditor
     /// Graph asset editor
     /// 定义了新的node graph asset后，通常需要创建新的asset editor类。在这里Open editor window。无法通过继承复用。
     /// </summary>
-    [CustomEditor(typeof(NodeGraphAsset), true)]
+    [CustomEditor(typeof(NodeGraphAsset))]
     public class NodeSystemGraphAssetEditor:Editor
     {
-        [OnOpenAsset]
-        public static bool OnOpenAsset(int instanceId, int index)
-        {
-            var asset = EditorUtility.InstanceIDToObject(instanceId);
-            var type = asset.GetType();
-            if (!typeof(NodeGraphAsset).IsAssignableFrom(type)) 
-                return false;
-            NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)asset);
-            return true;
-        }
-        
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -33,13 +21,13 @@ namespace NSEditor
             //Open Graph Button
             var oldColor = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
-            if (GUILayout.Button("OpenGraph"))
+            if (GUILayout.Button("OpenGraph", GUILayout.Height(30)))
             {
                 NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;
-            if (GUILayout.Button("ValidateGraph"))
+            if (GUILayout.Button("ValidateGraph", GUILayout.Height(30)))
             {
                 NodeGraphAssetEditorUtility.ValidateGraph(serializedObject);
             }
