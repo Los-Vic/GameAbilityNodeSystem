@@ -1,6 +1,6 @@
 ﻿namespace GAS.Logic
 {
-    public enum EDefaultPortal
+    public enum EAbilityPortal
     {
         OnAddAbility,
         OnRemoveAbility,
@@ -9,6 +9,6 @@
     
     public enum EGamePortal
     {
-       
+       None,
     }
 }

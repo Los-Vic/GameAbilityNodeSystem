@@ -11,7 +11,7 @@ namespace GAS.Logic
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
         private readonly Dictionary<EGamePortal, string> _gameEventTypeIdMap = new();
-        private readonly Dictionary<EDefaultPortal, string> _defaultEventIdMap = new();
+        private readonly Dictionary<EAbilityPortal, string> _defaultEventIdMap = new();
 
         internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeIdMap.Keys.ToList();
         
@@ -26,9 +26,9 @@ namespace GAS.Logic
                 {
                     _gameEventTypeIdMap.TryAdd(eventNode.NodePortal, node.Id);
                 }
-                else if (node is DefaultPortalNode defaultEventNode)
+                else if (node is AbilityPortalNode abilityPortalNode)
                 {
-                    _defaultEventIdMap.TryAdd(defaultEventNode.NodePortal, node.Id);
+                    _defaultEventIdMap.TryAdd(abilityPortalNode.Portal, node.Id);
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace GAS.Logic
             _graphRunners.Add(graphRunner);
         }
 
-        internal void RunGraph(EDefaultPortal portalType)
+        internal void RunGraph(EAbilityPortal portalType)
         {
             if (!_defaultEventIdMap.TryGetValue(portalType, out var nodeId))
             {

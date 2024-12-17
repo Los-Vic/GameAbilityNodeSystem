@@ -5,22 +5,22 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("DefaultPortal", "GameAbilitySystem/Portal/DefaultPortal", ENodeFunctionType.Portal, typeof(DefaultPortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, NodeScopeDefine.Ability)]
-    public class DefaultPortalNode:Node
+    [Node("AbilityPortal", "GameAbilitySystem/Portal/AbilityPortal", ENodeFunctionType.Portal, typeof(AbilityPortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, NodeScopeDefine.Ability)]
+    public class AbilityPortalNode:Node
     {
         [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
         [PortalType]
-        public EDefaultPortal NodePortal;
+        public EAbilityPortal Portal;
         
         public override string DisplayName()
         {
-            return NodePortal.ToString();
+            return Portal.ToString();
         }
     }
     
-    public class DefaultPortalPortalNodeRunner:PortalNodeRunner
+    public class AbilityPortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
         private GamePortalNode _node;

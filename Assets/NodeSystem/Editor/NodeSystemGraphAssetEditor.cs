@@ -21,15 +21,19 @@ namespace NSEditor
             //Open Graph Button
             var oldColor = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
-            if (GUILayout.Button("OpenGraph", GUILayout.Height(30)))
+            if (GUILayout.Button("OpenGraph", GUILayout.Height(48)))
             {
                 NodeEditorWindow.Open<NodeEditorWindow>((NodeGraphAsset)target);
             }
 
             GUI.backgroundColor = Color.red;
-            if (GUILayout.Button("ValidateGraph", GUILayout.Height(30)))
+            if (GUILayout.Button("ValidateGraph", GUILayout.Height(24)))
             {
                 NodeGraphAssetEditorUtility.ValidateGraph(serializedObject);
+            }
+            if (GUILayout.Button("ClearGraph", GUILayout.Height(24)))
+            {
+                NodeGraphAssetEditorUtility.ClearGraph(serializedObject);
             }
             GUI.backgroundColor = oldColor;
         }
@@ -40,6 +44,7 @@ namespace NSEditor
     {
         public static void ValidateGraph(SerializedObject serializedObject)
         {
+            Debug.Log($"ValidateGraph:{serializedObject.targetObject.name}");
             var graphAsset = serializedObject.targetObject as NodeGraphAsset;
             if(graphAsset == null)
                 return;
@@ -50,6 +55,14 @@ namespace NSEditor
             var badPorts = new HashSet<NodePort>();
             var badPortIds = new HashSet<string>();
             var badNodes = new HashSet<Node>();
+            
+            //Remove Null
+            for (var i = graphAsset.nodes.Count - 1; i >= 0; i--)
+            {
+                if(graphAsset.nodes[i] == null)
+                    graphAsset.nodes.RemoveAt(i);
+            }
+            
             //Construct Node Map
             foreach (var node in graphAsset.nodes)
             {
@@ -154,6 +167,16 @@ namespace NSEditor
             {
                 graphAsset.ports.Remove(port);
             }
+        }
+
+        public static void ClearGraph(SerializedObject serializedObject)
+        {
+            Debug.Log($"ClearGraph:{serializedObject.targetObject.name}");
+            var graphAsset = serializedObject.targetObject as NodeGraphAsset;
+            if(graphAsset == null)
+                return;
+            graphAsset.nodes.Clear();
+            graphAsset.ports.Clear();
         }
     }
 }

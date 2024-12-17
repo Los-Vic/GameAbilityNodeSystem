@@ -37,5 +37,9 @@ namespace GAS.Logic
         [LabelText("每帧更新")]
         [InfoBox("不需要冷却等基于时间的行为，则不需要勾选")]
         public bool isTickable = true;
+        
+        
+        //Runtime
+        public uint Id { get; set; }
     }
 }

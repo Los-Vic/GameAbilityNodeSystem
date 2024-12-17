@@ -27,6 +27,10 @@ namespace NodeSystem.NodeSystemDemo.Editor
             {
                 NodeGraphAssetEditorUtility.ValidateGraph(serializedObject);
             }
+            if (GUILayout.Button("ClearGraph", GUILayout.Height(30)))
+            {
+                NodeGraphAssetEditorUtility.ClearGraph(serializedObject);
+            }
             GUI.backgroundColor = oldColor;
         }
     }

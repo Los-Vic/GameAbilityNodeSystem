@@ -1,16 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace NS
 {
     public class NodeGraphAsset:ScriptableObject
     {
+        [FoldoutGroup("Graph")]
         [SerializeReference]
-        //[HideInInspector]
+        [ReadOnly]
+        [ListDrawerSettings(ShowIndexLabels = true, DraggableItems = false, ShowFoldout = false)]
         public List<Node> nodes = new();
+        [FoldoutGroup("Graph")]
         [SerializeReference] 
+        [ReadOnly]
+        [ListDrawerSettings(ShowIndexLabels = true, DraggableItems = false, ShowFoldout = false)]
         public List<NodePort> ports = new();
         
 #if UNITY_EDITOR

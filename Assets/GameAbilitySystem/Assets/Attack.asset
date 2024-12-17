@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
-  m_Name: NewAbility
+  m_Name: Attack
   m_EditorClassIdentifier: 
   nodes: []
   ports: []
-  abilityName: "\u6D4B\u8BD5"
+  abilityName: "\u653B\u51FB"
   cooldown:
     rid: -2
   costs: []
