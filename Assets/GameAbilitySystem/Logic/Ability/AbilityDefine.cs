@@ -12,6 +12,7 @@ namespace GAS.Logic
         MinionMana = 1
     }
 
+    [DrawWithUnity]
     public enum ECompositeAttributeType
     {
         //这里添加新的属性

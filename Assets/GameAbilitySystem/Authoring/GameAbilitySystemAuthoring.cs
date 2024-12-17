@@ -50,7 +50,7 @@ namespace GAS.Authoring
             if (!_abilityConfigMap.TryGetValue(abilityId, out var abilityConfig))
                 return default;
 
-            var asset = AssetDatabase.LoadAssetAtPath<AbilityAsset>(abilityConfig.logicAssetPath);
+            var asset = AssetDatabase.LoadAssetAtPath<AbilityAsset>(abilityConfig.abilityAssetPath);
             if (asset == null)
                 return default;
 
