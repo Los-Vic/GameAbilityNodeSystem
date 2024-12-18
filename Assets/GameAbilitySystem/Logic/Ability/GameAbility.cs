@@ -93,7 +93,7 @@ namespace GAS.Logic
             if (IsInCooldown)
                 return false;
 
-            //Cost
+            //Cost 
             foreach (var costElement in Asset.costs)
             {
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);

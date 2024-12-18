@@ -23,8 +23,8 @@ namespace NS
         [Port(Direction.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [FormerlySerializedAs("NodeEvent")] [PortalType]
-        public ENodeDemoPortalType nodeDemoPortal;
+        [PortalType]
+        public ENodeDemoPortalType NodeDemoPortal;
 
         [Port(Direction.Output, typeof(int), "IntParam1")]
         public string OutIntParam1;
@@ -33,7 +33,7 @@ namespace NS
 
         public override string DisplayName()
         {
-            return nodeDemoPortal.ToString();
+            return NodeDemoPortal.ToString();
         }
     }
     

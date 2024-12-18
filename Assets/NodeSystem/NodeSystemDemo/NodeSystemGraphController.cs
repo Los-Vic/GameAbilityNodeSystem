@@ -8,20 +8,11 @@ namespace NS
         private NodeGraphAsset _asset;
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
-        private readonly Dictionary<ENodeDemoPortalType, string> _portalTypeIdMap = new();
         
         public void Init(NodeSystem system, NodeGraphAsset asset)
         {
             _system = system;
             _asset = asset;
-
-            foreach (var node in asset.nodes)
-            {
-                if(node is not DemoPortalNode portalNode)
-                    continue;
-
-                _portalTypeIdMap.TryAdd(portalNode.nodeDemoPortal, node.Id);
-            }
         }
 
         public void DeInit()
@@ -35,11 +26,10 @@ namespace NS
         
         public void RunGraph(ENodeDemoPortalType demoPortalType, NodeDemoPortalParam param)
         {
-            if (!_portalTypeIdMap.TryGetValue(demoPortalType, out var nodeId))
-            {
-                NodeSystemLogger.LogWarning($"not found {demoPortalType} node!");
+            var runtimeData = _system.GetGraphRuntimeData(_asset);
+            var nodeId = runtimeData.GetPortalNodeId(typeof(DemoPortalNode), (int)demoPortalType);
+            if(nodeId == null)
                 return;
-            }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
             graphRunner.Init(_system, _asset, nodeId, param, OnGraphRunEnd);
             graphRunner.StartRunner();
