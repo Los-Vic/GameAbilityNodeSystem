@@ -3,18 +3,16 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [DrawWithUnity]
-    public enum ESimpleAttributeType
-    {
-        [InspectorName("无")]
-        None = 0,
-        [InspectorName("随从/魔力")]
-        MinionMana = 1
-    }
+   public enum EAbilityTag
+   {
+      
+   }
 
-    [DrawWithUnity]
-    public enum ECompositeAttributeType
-    {
-        //这里添加新的属性
-    }
+   public enum EAbilityLifeType
+   {
+      [InspectorName("短暂")]
+      Instant, // 激活一次后自动销毁
+      [InspectorName("持续")]
+      Persistent //主动调用销毁
+   }
 }

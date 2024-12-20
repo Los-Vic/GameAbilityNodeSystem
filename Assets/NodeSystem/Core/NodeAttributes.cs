@@ -67,15 +67,16 @@ namespace NS
         public Orientation Orientation;
         public Port.Capacity PortCapacity;
         public bool IsFlowPort;
+        public int DrawOrder;
 
-        public PortAttribute(Direction portDirection, Type portType, string portName = "", Orientation orientation = Orientation.Horizontal, 
-            Port.Capacity portCapacity = Port.Capacity.Single)
+        public PortAttribute(Direction portDirection, Type portType, string portName = "", int drawOrder = 0, Orientation orientation = Orientation.Horizontal)
         {
             PortName = portName;
             PortType = portType;
             Orientation = orientation;
             PortDirection = portDirection;
             IsFlowPort = typeof(BaseFlowPort).IsAssignableFrom(portType);
+            DrawOrder = drawOrder;
             //暂不支持多端口
             PortCapacity = Port.Capacity.Single;
         }

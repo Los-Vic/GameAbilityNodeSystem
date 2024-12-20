@@ -30,6 +30,7 @@ namespace NSEditor
             { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
             { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
             { typeof(BaseFlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
+            { typeof(string), new Color(0.8f,0,0.8f)}
         };
         
         public virtual void Draw(Node node, SerializedObject graphAssetObject)
@@ -103,6 +104,12 @@ namespace NSEditor
         
         protected virtual void ConstructTitle(Type type, NodeAttribute attribute)
         {
+            if (attribute.Title == "")
+            {
+                titleContainer.RemoveFromHierarchy();
+                return;
+            }
+            
             title = attribute.Title;
             if (attribute.NodeCategory == (int)ECommonNodeCategory.Task)
             {

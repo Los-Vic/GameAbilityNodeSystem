@@ -6,4 +6,9 @@
         public const int Ability = 2;
         public const int Effect = 3;
     }
+
+    public static class NodeCategoryDefine
+    {
+        public const int AbilityEffectPortal = 6;
+    }
 }

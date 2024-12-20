@@ -1,4 +1,5 @@
-﻿using CommonObjectPool;
+﻿using System;
+using CommonObjectPool;
 using GAS.Logic.Value;
 using MissQ;
 
@@ -10,21 +11,47 @@ namespace GAS.Logic
         public AbilityAsset Asset;
         public uint Lv;
     }
+
+    public enum EAbilityState
+    {
+        Initialized,
+        Idle,
+        Casting,
+        MarkDestroy,
+        UnInitialized,
+    }
+
+    public enum EAbilityCastingState
+    {
+        None,
+        PreCasting,
+        Casting,
+        PostCasting,
+    }
     
-    public class GameAbility :IPoolObject, ITickable
+    public class GameAbility :IPoolObject, ITickable, IOwnedByGameUnit
     {
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
-        internal GameUnit Owner;
         internal uint Lv;
+        private GameUnit _owner;
+        internal uint ID { get; private set; }
+        internal EAbilityState State { get; private set; }
         
         //Cooldown
         internal bool IsInCooldown;
-        internal FP Cooldown;
+        internal FP CooldownDuration;
         internal FP CooldownCounter;
         
-        internal uint ID { get; private set; }
-        private bool _tickable;
+        //Casting
+        internal EAbilityCastingState CastingState;
+        internal Action OnStartPreCast;
+        internal Action OnStartCast;
+        internal Action OnStartPostCast;
+        internal Action OnEndPostCast;
+        
+        
+        private bool IsAvailable => State == EAbilityState.Idle;
         
         internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
         {
@@ -32,49 +59,54 @@ namespace GAS.Logic
             Asset = param.Asset;
             GraphController.Init(sys, Asset);
             Lv = param.Lv;
-
-            _tickable = Asset.isTickable;
+            
+            State = EAbilityState.Initialized;
         }
 
         private void UnInit()
         {
             ResetCooldown();
-            _tickable = false;
             GraphController.UnInit();
+            CastingState = EAbilityCastingState.None;
+            State = EAbilityState.UnInitialized;
+        }
+
+        #region Tick
+
+        public void TickCooldown(float deltaTime)
+        {
+            if (!IsInCooldown) 
+                return;
+            CooldownCounter += deltaTime;
+            if (CooldownCounter >= CooldownDuration)
+            {
+                ResetCooldown();
+            }
         }
 
         public void OnTick(float deltaTime)
         {
-            if(!_tickable)
-                return;
             
-            if (IsInCooldown)
-            {
-                CooldownCounter += deltaTime;
-                if (CooldownCounter >= Cooldown)
-                {
-                    ResetCooldown();
-                }
-            }
         }
+        
+        #endregion
+      
 
         //变更等级
         internal void ChangeAbilityLevel(uint newLv)
         {
+            if(!IsAvailable)
+                return;
             Lv = newLv;
-            Cooldown = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
         }
         
         //获得和移除Ability
         internal void OnAddAbility(GameUnit owner)
         {
-            Owner = owner;
-            Cooldown = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
-            //如果有冷却时间，则必须开启Tickable
-            if (Cooldown > 0)
-                _tickable = true;
+            _owner = owner;
+            State = EAbilityState.Idle;
             
-            GraphController.RunGraph(EAbilityPortal.OnAddAbility);
+            GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
             //todo: Graph register to game event
         }
 
@@ -82,13 +114,17 @@ namespace GAS.Logic
         {
             //todo: Graph unregister to game event
             
-            GraphController.RunGraph(EAbilityPortal.OnRemoveAbility);
-            Owner = null;
+            GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
+            _owner = null;
+            State = EAbilityState.MarkDestroy;
         }
         
         //检测技能执行条件是否满足
         internal bool CheckAbility()
         {
+            if(!IsAvailable)
+                return false;
+            
             //Cooldown
             if (IsInCooldown)
                 return false;
@@ -96,8 +132,8 @@ namespace GAS.Logic
             //Cost 
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
-                if (Owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, _owner, Lv);
+                if (_owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
                     return false;
             }
 
@@ -107,23 +143,29 @@ namespace GAS.Logic
         //提交执行技能的消耗，并开始冷却计时
         internal void CommitAbility()
         {
+            if(!IsAvailable)
+                return;
+            
             StartCooldown();
             
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
-                var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, _owner, Lv);
+                var attribute = _owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Owner.Sys.AttributeInstanceMgr.SetAttributeVal(Owner, attribute, newVal);
+                _owner.Sys.AttributeInstanceMgr.SetAttributeVal(_owner, attribute, newVal);
             }
         }
-
-        //非事件触发
-        //  时间触发
+        
         internal void ActivateAbility()
         {
-            GraphController.RunGraph(EAbilityPortal.OnActivateAbility);
+            if(!IsAvailable)
+                return;
+            
+            GraphController.RunGraph(typeof(OnActivateAbilityPortalNode));
         }
+
+        #region Cooldown
 
         private void ResetCooldown()
         {
@@ -133,9 +175,41 @@ namespace GAS.Logic
 
         private void StartCooldown()
         {
-            if(Cooldown > 0)
+            CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, _owner, Lv);
+            if(CooldownDuration > 0)
                 IsInCooldown = true;
         }
+
+        #endregion
+
+        #region Casting
+
+        private void StartPreCast()
+        {
+            CastingState = EAbilityCastingState.PreCasting;
+            OnStartPreCast?.Invoke();
+        }
+
+        private void StartCast()
+        {
+            CastingState = EAbilityCastingState.Casting;
+            OnStartCast?.Invoke();
+        }
+
+        private void StartPostCast()
+        {
+            CastingState = EAbilityCastingState.PostCasting;
+            OnStartPostCast?.Invoke();
+        }
+
+        private void EndPostCast()
+        {
+            CastingState = EAbilityCastingState.None;
+            OnEndPostCast?.Invoke();
+        }
+
+        #endregion
+       
         
         #region Object Pool
 
@@ -157,5 +231,10 @@ namespace GAS.Logic
         }
 
         #endregion
+
+        public GameUnit GetOwner()
+        {
+            return _owner;
+        }
     }
 }

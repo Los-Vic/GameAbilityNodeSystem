@@ -5,6 +5,11 @@ using MissQ;
 
 namespace GAS.Logic
 {
+    public interface IOwnedByGameUnit
+    {
+        public GameUnit GetOwner();
+    }
+    
     public class GameUnit: IPoolObject
     {
         internal GameAbilitySystem Sys { get;private set; }

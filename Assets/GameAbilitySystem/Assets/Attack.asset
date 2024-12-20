@@ -15,10 +15,12 @@ MonoBehaviour:
   nodes: []
   ports: []
   abilityName: "\u653B\u51FB"
+  cueProxy: 
+  lifeType: 0
   cooldown:
     rid: -2
   costs: []
-  isTickable: 1
+  tags: 
   references:
     version: 2
     RefIds:

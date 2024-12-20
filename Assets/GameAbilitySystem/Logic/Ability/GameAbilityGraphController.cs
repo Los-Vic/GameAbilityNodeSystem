@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NS;
 
@@ -10,10 +11,10 @@ namespace GAS.Logic
         private NodeGraphAsset _asset;
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
-        private readonly Dictionary<EGamePortal, string> _gameEventTypeIdMap = new();
-        private readonly Dictionary<EAbilityPortal, string> _defaultEventIdMap = new();
+        private readonly Dictionary<EGamePortal, string> _gameEventTypeNodeIdMap = new();
+        private readonly Dictionary<Type, string> _portTypeNodeIdMap = new();
 
-        internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeIdMap.Keys.ToList();
+        internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
         
         internal void Init(GameAbilitySystem system, NodeGraphAsset asset)
         {
@@ -22,13 +23,16 @@ namespace GAS.Logic
 
             foreach (var node in asset.nodes)
             {
-                if (node is GamePortalNode eventNode)
+                if(!node.IsPortalNode())
+                    continue;
+                
+                if (node is GameEventPortalNode eventNode)
                 {
-                    _gameEventTypeIdMap.TryAdd(eventNode.NodePortal, node.Id);
+                    _gameEventTypeNodeIdMap.TryAdd(eventNode.NodePortal, node.Id);
                 }
-                else if (node is AbilityPortalNode abilityPortalNode)
+                else
                 {
-                    _defaultEventIdMap.TryAdd(abilityPortalNode.Portal, node.Id);
+                    _portTypeNodeIdMap.TryAdd(node.GetType(), node.Id);
                 }
             }
         }
@@ -42,9 +46,9 @@ namespace GAS.Logic
             _graphRunners.Clear();
         }
         
-        internal void RunGraph(EGamePortal portalType, NodeActionStartParam param)
+        internal void RunGraphGameEvent(EGamePortal portalType, GameEventNodeParam param)
         {
-            if (!_gameEventTypeIdMap.TryGetValue(portalType, out var nodeId))
+            if (!_gameEventTypeNodeIdMap.TryGetValue(portalType, out var nodeId))
             {
                 NodeSystemLogger.LogError($"Not found {portalType} node in {_asset.name}!");
                 return;
@@ -54,16 +58,16 @@ namespace GAS.Logic
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }
-
-        internal void RunGraph(EAbilityPortal portalType)
+        
+        internal void RunGraph(Type portalNodeType, GameEventNodeParam param = null)
         {
-            if (!_defaultEventIdMap.TryGetValue(portalType, out var nodeId))
+            if (!_portTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
             {
-                NodeSystemLogger.Log($"Not found {portalType} node in {_asset.name}!");
+                NodeSystemLogger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, null, OnRunGraphEnd);
+            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }

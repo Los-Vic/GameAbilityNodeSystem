@@ -10,6 +10,7 @@ namespace NS
         Value,
         Flow,
         Portal,
+        Reroute,
     }
     
     [Serializable]
@@ -58,6 +59,11 @@ namespace NS
             return _nodeFunctionType == ENodeFunctionType.Portal;
         }
 
+        public bool IsRerouteNode()
+        {
+            return _nodeFunctionType == ENodeFunctionType.Reroute;
+        }
+        
         public virtual string DisplayName() => nodeName;
     }
 }

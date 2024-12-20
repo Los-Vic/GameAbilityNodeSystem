@@ -16,5 +16,10 @@ namespace GAS.Editor
 
             return provider;
         }
+
+        public override EditorNode CreateEditorNode()
+        {
+            return new SystemEditorNode();
+        }
     }
 }
