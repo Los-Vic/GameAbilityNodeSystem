@@ -78,6 +78,13 @@ namespace NSEditor
             RefreshExpandedState();
         }
 
+        public void RefreshRerouteNode()
+        {
+            if(!Node.IsRerouteNode())
+                return;
+            //todo:修改port type 和 port color
+        }
+
         protected virtual Color GetNodeColor(int nodeCategory)
         {
             switch (nodeCategory)
@@ -151,7 +158,7 @@ namespace NSEditor
             var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection,
                 portAttribute.PortCapacity,
                 portAttribute.PortType);
-
+            
             port.portName = portAttribute.PortName;
             port.portColor = GetPortColor(portAttribute.PortType);
             port.tooltip = portAttribute.PortType.Name;
