@@ -228,6 +228,7 @@ namespace NSEditor
                 foreach (var edge in graphViewChange.elementsToRemove.OfType<Edge>())
                 {
                     RemoveConnectionFromGraphAsset(edge);
+                    RefreshRerouteNode(edge, false);
                 }
                 SaveAsset();
             }
@@ -239,6 +240,7 @@ namespace NSEditor
                 foreach (var e in graphViewChange.edgesToCreate)
                 {
                     AddConnectionToGraphAsset(e);
+                    RefreshRerouteNode(e, true);
                 }
                 SaveAsset();
             }
@@ -366,6 +368,7 @@ namespace NSEditor
                     var outViewPort = outEditorNode.NodePortToViewPort[outNodePort.Id];
                     
                     var edge = viewPort.ConnectTo(outViewPort);
+                    RefreshRerouteNode(edge, true);
                     AddElement(edge);
                     _edgeConnectionMap.Add(edge, (nodePort, outNodePort));
                 }
@@ -382,6 +385,14 @@ namespace NSEditor
         {
             _serializedObject.Update();
             this.Bind(_serializedObject);
+        }
+
+        private void RefreshRerouteNode(Edge edge, bool isAdd)
+        {
+            var inNode = edge.input.node as EditorNode;
+            var outNode = edge.output.node as EditorNode;
+            inNode?.RefreshRerouteNode(edge, isAdd);
+            outNode?.RefreshRerouteNode(edge, isAdd);
         }
     }
 }

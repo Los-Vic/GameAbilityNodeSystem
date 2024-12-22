@@ -31,6 +31,10 @@ namespace NS
                 }
 
                 runnerType = nodeAttribute.NodeRunnerType;
+                if (runnerType == null)
+                {
+                    return NodeRunner.DefaultRunner;
+                }
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 

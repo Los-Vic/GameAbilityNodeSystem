@@ -30,7 +30,8 @@ namespace NSEditor
             { typeof(float), new Color(0f, 0.6f, 0.5f, 1)},
             { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
             { typeof(BaseFlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
-            { typeof(string), new Color(0.8f,0,0.8f)}
+            { typeof(string), new Color(0.8f,0,0.8f)},
+            { typeof(object), new Color(0.3f, 0.3f, 0.3f, 1)}
         };
         
         public virtual void Draw(Node node, SerializedObject graphAssetObject)
@@ -78,11 +79,37 @@ namespace NSEditor
             RefreshExpandedState();
         }
 
-        public void RefreshRerouteNode()
+        public void RefreshRerouteNode(Edge changeEdge, bool isAdd)
         {
             if(!Node.IsRerouteNode())
                 return;
-            //todo:修改port type 和 port color
+            var connections = new List<Edge>();
+            foreach (var port in NodePortToViewPort.Values)
+            {
+                connections.AddRange(port.connections);
+            }
+
+            if (isAdd)
+            {
+                connections.Add(changeEdge);
+            }
+            else
+            {
+                connections.Remove(changeEdge);
+            }
+            
+            Type portType = null;
+            foreach (var edge in connections)
+            {
+                portType = edge.input.node != this ? edge.input.portType : edge.output.portType;
+            }
+            foreach (var port in NodePortToViewPort.Values)
+            {
+                port.portType = portType ?? typeof(object);
+                port.portColor = GetPortColor(port.portType);
+                port.portName = "";
+                port.tooltip = port.portType.Name;
+            }
         }
 
         protected virtual Color GetNodeColor(int nodeCategory)

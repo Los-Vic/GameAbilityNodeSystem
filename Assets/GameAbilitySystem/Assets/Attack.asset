@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
   m_Name: Attack
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 4980032813482901563
+  - rid: 4980032813482901571
+  ports:
+  - rid: 4980032813482901564
+  - rid: 4980032813482901572
+  - rid: 4980032813482901573
+  - rid: 4980032813482901574
   abilityName: "\u653B\u51FB"
   cueProxy: 
   lifeType: 0
@@ -26,3 +32,68 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 4980032813482901563
+      type: {class: IntNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: 74ee6a0f-c611-4c8b-826f-4a899ea8eca3
+        position:
+          serializedVersion: 2
+          x: 195
+          y: 283
+          width: 153
+          height: 97
+        nodeName: Int
+        Val: 0
+        OutPortVal: 5f8d7738-2919-4b45-b217-a0cf4c161425
+    - rid: 4980032813482901564
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 5f8d7738-2919-4b45-b217-a0cf4c161425
+        belongNodeId: 74ee6a0f-c611-4c8b-826f-4a899ea8eca3
+        connectPortId: 
+        direction: 1
+        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4980032813482901571
+      type: {class: DelayNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: 0d7bb2b8-d4b5-49f5-a17c-71d77d8d6083
+        position:
+          serializedVersion: 2
+          x: 868
+          y: 283
+          width: 118
+          height: 101
+        nodeName: Delay
+        InPortExec: bd12e257-49ef-482c-a3d9-8b2950094871
+        OutPortExec: 600ed03b-9504-4b31-8e91-a48ede9b9020
+        InPortFloat: 072f51ab-a5de-427d-95db-4538b608883b
+    - rid: 4980032813482901572
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: bd12e257-49ef-482c-a3d9-8b2950094871
+        belongNodeId: 0d7bb2b8-d4b5-49f5-a17c-71d77d8d6083
+        connectPortId: 
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4980032813482901573
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 600ed03b-9504-4b31-8e91-a48ede9b9020
+        belongNodeId: 0d7bb2b8-d4b5-49f5-a17c-71d77d8d6083
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4980032813482901574
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 072f51ab-a5de-427d-95db-4538b608883b
+        belongNodeId: 0d7bb2b8-d4b5-49f5-a17c-71d77d8d6083
+        connectPortId: 
+        direction: 0
+        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
