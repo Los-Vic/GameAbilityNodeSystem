@@ -10,7 +10,6 @@ namespace NS
         Value,
         Flow,
         Portal,
-        Reroute,
     }
     
     [Serializable]
@@ -29,6 +28,7 @@ namespace NS
         }
 
         private readonly ENodeFunctionType _nodeFunctionType;
+        private const string Reroute = "Reroute";
         
         public Node()
         {
@@ -61,7 +61,7 @@ namespace NS
 
         public bool IsRerouteNode()
         {
-            return _nodeFunctionType == ENodeFunctionType.Reroute;
+            return nodeName == Reroute;
         }
         
         public virtual string DisplayName() => nodeName;

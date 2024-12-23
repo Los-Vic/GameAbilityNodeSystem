@@ -15,11 +15,17 @@ MonoBehaviour:
   nodes:
   - rid: 4980032813482901563
   - rid: 4980032813482901571
+  - rid: 4709999374630912056
+  - rid: 4709999374630912059
   ports:
   - rid: 4980032813482901564
   - rid: 4980032813482901572
   - rid: 4980032813482901573
   - rid: 4980032813482901574
+  - rid: 4709999374630912057
+  - rid: 4709999374630912058
+  - rid: 4709999374630912060
+  - rid: 4709999374630912061
   abilityName: "\u653B\u51FB"
   cueProxy: 
   lifeType: 0
@@ -32,6 +38,68 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 4709999374630912056
+      type: {class: RerouteNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: b3e50550-5a97-454c-b6a0-7e3baacc2265
+        position:
+          serializedVersion: 2
+          x: 498.4
+          y: 567.2
+          width: 72.80002
+          height: 40.799988
+        nodeName: Reroute
+        InPortVal: 50948274-f390-4b3e-af94-375f124ac904
+        OutPortVal: 54f94af3-450b-4607-86dd-7c2e97502b57
+    - rid: 4709999374630912057
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 50948274-f390-4b3e-af94-375f124ac904
+        belongNodeId: b3e50550-5a97-454c-b6a0-7e3baacc2265
+        connectPortId: 5f8d7738-2919-4b45-b217-a0cf4c161425
+        direction: 0
+        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4709999374630912058
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 54f94af3-450b-4607-86dd-7c2e97502b57
+        belongNodeId: b3e50550-5a97-454c-b6a0-7e3baacc2265
+        connectPortId: 253e14a2-0dbb-4dfa-b556-5d68fa3c3479
+        direction: 1
+        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4709999374630912059
+      type: {class: RerouteNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: 9db18bfe-8266-487b-8a38-3f6f8d9c4592
+        position:
+          serializedVersion: 2
+          x: 760.8
+          y: 567.2
+          width: 72.79999
+          height: 40.799988
+        nodeName: Reroute
+        InPortVal: 253e14a2-0dbb-4dfa-b556-5d68fa3c3479
+        OutPortVal: 1292a85e-0b5b-4849-ac48-c2caae9c4c32
+    - rid: 4709999374630912060
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 253e14a2-0dbb-4dfa-b556-5d68fa3c3479
+        belongNodeId: 9db18bfe-8266-487b-8a38-3f6f8d9c4592
+        connectPortId: 54f94af3-450b-4607-86dd-7c2e97502b57
+        direction: 0
+        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4709999374630912061
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 1292a85e-0b5b-4849-ac48-c2caae9c4c32
+        belongNodeId: 9db18bfe-8266-487b-8a38-3f6f8d9c4592
+        connectPortId: 
+        direction: 1
+        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
     - rid: 4980032813482901563
       type: {class: IntNode, ns: NS, asm: NodeSystem}
       data:
@@ -50,7 +118,7 @@ MonoBehaviour:
       data:
         guid: 5f8d7738-2919-4b45-b217-a0cf4c161425
         belongNodeId: 74ee6a0f-c611-4c8b-826f-4a899ea8eca3
-        connectPortId: 
+        connectPortId: 50948274-f390-4b3e-af94-375f124ac904
         direction: 1
         portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         isFlowPort: 0

@@ -138,7 +138,7 @@ namespace NSEditor
         
         protected virtual void ConstructTitle(Type type, NodeAttribute attribute)
         {
-            if (attribute.Title == "")
+            if (Node.IsRerouteNode())
             {
                 titleContainer.RemoveFromHierarchy();
                 return;
