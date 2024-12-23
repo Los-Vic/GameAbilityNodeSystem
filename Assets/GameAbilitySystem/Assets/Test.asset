@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  nodes:
+  - rid: 4709999379509149749
+  - rid: 4709999379509149751
+  ports:
+  - rid: 4709999379509149750
+  - rid: 4709999379509149752
+  - rid: 4709999379509149753
+  abilityName: "\u6D4B\u8BD5\u6280\u80FD"
+  cueProxy: 
+  lifeType: 0
+  cooldown:
+    rid: -2
+  costs: []
+  tags: 
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 4709999379509149749
+      type: {class: OnAddAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+      data:
+        guid: b3b4225b-2c5e-483d-86ad-51fca68fd1ee
+        position:
+          serializedVersion: 2
+          x: 165.6
+          y: 285.6
+          width: 151.19998
+          height: 76.79999
+        nodeName: OnAddAbility
+        OutPortExec: 0d2c03fb-d739-4a00-bff1-08c69045b96d
+    - rid: 4709999379509149750
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 0d2c03fb-d739-4a00-bff1-08c69045b96d
+        belongNodeId: b3b4225b-2c5e-483d-86ad-51fca68fd1ee
+        connectPortId: 6b19516d-e3b8-412d-b533-4240eee1abe3
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4709999379509149751
+      type: {class: DebugPrintNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: 281a49fb-a351-4154-ba70-787e74b04e19
+        position:
+          serializedVersion: 2
+          x: 563.2
+          y: 285.6
+          width: 148
+          height: 95.19998
+        nodeName: Print
+        Log: On Add Ability!
+        InPortExec: 6b19516d-e3b8-412d-b533-4240eee1abe3
+        OutPortExec: 4acc5b59-e0e9-4dd2-8d75-9dd2a3a4df3b
+    - rid: 4709999379509149752
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 6b19516d-e3b8-412d-b533-4240eee1abe3
+        belongNodeId: 281a49fb-a351-4154-ba70-787e74b04e19
+        connectPortId: 0d2c03fb-d739-4a00-bff1-08c69045b96d
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4709999379509149753
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 4acc5b59-e0e9-4dd2-8d75-9dd2a3a4df3b
+        belongNodeId: 281a49fb-a351-4154-ba70-787e74b04e19
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1

@@ -57,7 +57,7 @@ namespace GAS.Logic
         {
             ID = param.Id;
             Asset = param.Asset;
-            GraphController.Init(sys, Asset);
+            GraphController.Init(sys, Asset, this);
             Lv = param.Lv;
             
             State = EAbilityState.Initialized;

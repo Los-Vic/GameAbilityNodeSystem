@@ -15,18 +15,17 @@ namespace NS
     public class IntToFloatNodeRunner:NodeRunner
     {
         private IntToFloatNode _node;
-        private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (IntToFloatNode)nodeAsset;
-            _graphRunner = graphRunner;
         }
 
         public override void Execute()
         {
-            var inVal = _graphRunner.GetInPortVal<int>(_node.InPortVal);
+            var inVal = GraphRunner.GetInPortVal<int>(_node.InPortVal);
             var floatVal = (float)inVal;
-            _graphRunner.SetOutPortVal(_node.OutPortVal, floatVal);
+            GraphRunner.SetOutPortVal(_node.OutPortVal, floatVal);
         }
     }
 }

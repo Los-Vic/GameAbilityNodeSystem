@@ -1,4 +1,5 @@
 ﻿using System;
+using NS;
 using UnityEngine;
 
 namespace GAS.Logic
@@ -16,7 +17,7 @@ namespace GAS.Logic
             var abilityAsset = _system.AssetConfigProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
             {
-                Debug.LogError($"Fail to get ActiveAbilityAsset of {id}");
+                NodeSystemLogger.LogError($"Fail to get ActiveAbilityAsset of {id}");
                 return default;
             }
             
@@ -27,11 +28,13 @@ namespace GAS.Logic
             };
             
             ability.Init(_system, ref param);
+            NodeSystemLogger.Log($"Created Ability: {param.Asset.abilityName}");
             return ability;
         }
 
         internal void DestroyAbility(GameAbility ability)
         {
+            NodeSystemLogger.Log($"Destroy Ability: {ability.Asset.abilityName}");
             _system.ObjectPoolMgr.DestroyObject(ability);
         }
     }

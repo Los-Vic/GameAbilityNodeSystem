@@ -15,17 +15,16 @@ namespace NS
     public class RerouteNodeRunner:NodeRunner
     {
         private RerouteNode _node;
-        private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (RerouteNode)nodeAsset;
-            _graphRunner = graphRunner;
         }
 
         public override void Execute()
         {
-            var inVal = _graphRunner.GetInPortVal<object>(_node.InPortVal);
-            _graphRunner.SetOutPortVal(_node.OutPortVal, inVal);
+            var inVal = GraphRunner.GetInPortVal<object>(_node.InPortVal);
+            GraphRunner.SetOutPortVal(_node.OutPortVal, inVal);
         }
     }
 }

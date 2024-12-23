@@ -20,7 +20,7 @@ namespace NS
             _objectPoolMgr.Clear();
         }
         
-        public virtual NodeRunner CreateNodeRunner(Type type)
+        public NodeRunner CreateNodeRunner(Type type)
         {
             if (!_cachedNodeToNodeRunnerTypeMap.TryGetValue(type, out var runnerType))
             {
@@ -49,9 +49,9 @@ namespace NS
             _objectPoolMgr.DestroyObject(runner);
         }
 
-        public virtual NodeGraphRunner CreateGraphRunner()
+        public NodeGraphRunner CreateGraphRunner()
         {
-            return _objectPoolMgr.CreateObject<NodeGraphRunner>();
+            return _objectPoolMgr.CreateObject<NodeGraphRunner>() ;
         }
 
         public virtual void DestroyGraphRunner(NodeGraphRunner runner)

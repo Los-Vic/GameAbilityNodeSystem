@@ -44,27 +44,26 @@ namespace GAS.Logic
     public class SplitGameEventParamNodeRunner : NodeRunner
     {
         private SplitGameEventParamNode _node;
-        private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (SplitGameEventParamNode)nodeAsset;
-            _graphRunner = graphRunner;
         }
 
         public override void Execute()
         {
-            var inVal = _graphRunner.GetInPortVal<GameEventNodeParam>(_node.InPortVal);
+            var inVal = GraphRunner.GetInPortVal<GameEventNodeParam>(_node.InPortVal);
             if(inVal == null)
                 return;
             
-            _graphRunner.SetOutPortVal(_node.OutPortSrcUnit, inVal.EventSrcUnit);
-            _graphRunner.SetOutPortVal(_node.OutPortSrcAbility, inVal.EventSrcAbility);
-            _graphRunner.SetOutPortVal(_node.OutPortSrcEffect, inVal.EventSrcEffect);
-            _graphRunner.SetOutPortVal(_node.OutPortTargetUnit, inVal.EventTargetUnit);
-            _graphRunner.SetOutPortVal(_node.OutPortVal1, inVal.EventValue1);
-            _graphRunner.SetOutPortVal(_node.OutPortVal2, inVal.EventValue2);
-            _graphRunner.SetOutPortVal(_node.OutPortVal3, inVal.EventValue3);
-            _graphRunner.SetOutPortVal(_node.OutPortString, inVal.EventString);
+            GraphRunner.SetOutPortVal(_node.OutPortSrcUnit, inVal.EventSrcUnit);
+            GraphRunner.SetOutPortVal(_node.OutPortSrcAbility, inVal.EventSrcAbility);
+            GraphRunner.SetOutPortVal(_node.OutPortSrcEffect, inVal.EventSrcEffect);
+            GraphRunner.SetOutPortVal(_node.OutPortTargetUnit, inVal.EventTargetUnit);
+            GraphRunner.SetOutPortVal(_node.OutPortVal1, inVal.EventValue1);
+            GraphRunner.SetOutPortVal(_node.OutPortVal2, inVal.EventValue2);
+            GraphRunner.SetOutPortVal(_node.OutPortVal3, inVal.EventValue3);
+            GraphRunner.SetOutPortVal(_node.OutPortString, inVal.EventString);
         }
     }
     
@@ -90,13 +89,12 @@ namespace GAS.Logic
     public class GamePortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private NodeGraphRunner _runner;
         private GameEventPortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = (GameEventPortalNode)nodeAsset;
-            _runner = graphRunner;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -109,7 +107,7 @@ namespace GAS.Logic
         {
             if (paramBase is not GameEventNodeParam param) 
                 return;
-            _runner.SetOutPortVal(_node.OutParam1, param);
+            GraphRunner.SetOutPortVal(_node.OutParam1, param);
         }
 
         public override void Execute()

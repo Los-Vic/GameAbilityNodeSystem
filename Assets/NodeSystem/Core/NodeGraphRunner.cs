@@ -11,6 +11,10 @@ namespace NS
         Canceled,
     }
     
+    public abstract class NodeGraphRunnerContext
+    {
+    }
+    
     public class NodeGraphRunner:IPoolObject
     {
         private NodeGraphAsset _asset;
@@ -32,11 +36,12 @@ namespace NS
         
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
 
+        public NodeGraphRunnerContext Context { get; private set; }
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
         public void Init(NodeSystem system, NodeGraphAsset asset, string portalNodeId, PortalParamBase actionStartParam
-        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd)
+        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd, NodeGraphRunnerContext context = null)
         {
             _nodeSystem = system;
             _asset = asset;
@@ -44,6 +49,8 @@ namespace NS
             _isValid = false;
             _onRunnerRunEnd = onRunnerRunEnd;
             _portalNode = GraphAssetRuntimeData.GetNodeById(portalNodeId);
+            Context = context;
+            
             if (!_portalNode.IsPortalNode())
             {
                 NodeSystemLogger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
@@ -63,15 +70,19 @@ namespace NS
         private void DeInit()
         {
             TaskScheduler.CancelTasksOfGraphRunner(this);
+            Clear();
             _onRunnerRunEnd = null;
             _asset = null;
             _portalNode = null;
             _isValid = false;
             GraphAssetRuntimeData = null;
             _nodeSystem = null;
-            Clear();
+            Context = null;
         }
 
+        /// <summary>
+        /// 每次重跑前的清理
+        /// </summary>
         private void Clear()
         {
             _curRunner = null;

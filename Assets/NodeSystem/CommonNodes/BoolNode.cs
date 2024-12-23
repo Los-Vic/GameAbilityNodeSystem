@@ -14,16 +14,15 @@ namespace NS
     public class BoolNodeRunner:NodeRunner
     {
         private BoolNode _node;
-        private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = ((BoolNode)nodeAsset);
-            _graphRunner = graphRunner;
         }
 
         public override void Execute()
         {
-            _graphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
+            GraphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
         }
     }
 }

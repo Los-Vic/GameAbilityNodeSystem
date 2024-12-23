@@ -5,7 +5,7 @@ namespace NS
 {
     public class NodeSystem
     {
-        private ObjectPoolMgr PoolMgr { get; set; }
+        private ObjectPoolMgr NodePoolMgr { get; set; }
         public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
         public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
         
@@ -13,9 +13,9 @@ namespace NS
         
         public virtual void InitSystem()
         {
-            PoolMgr = new ObjectPoolMgr();
-            NodeObjectFactory = new NodeSystemObjectFactory(PoolMgr);
-            TaskScheduler = new NodeTaskScheduler(PoolMgr);
+            NodePoolMgr = new ObjectPoolMgr();
+            NodeObjectFactory = new NodeSystemObjectFactory(NodePoolMgr);
+            TaskScheduler = new NodeTaskScheduler(NodePoolMgr);
         }
 
         public virtual void UnInitSystem()
@@ -38,6 +38,11 @@ namespace NS
             data.Init(asset);
             _graphAssetRuntimeDataMap.Add(asset, data);
             return data;
+        }
+
+        public virtual void DumpObjectPool()
+        {
+            NodePoolMgr.Log();
         }
     }
 }

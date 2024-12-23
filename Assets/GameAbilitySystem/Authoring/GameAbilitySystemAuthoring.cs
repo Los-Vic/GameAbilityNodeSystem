@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using GAS.Logic;
 using MissQ;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,6 +23,9 @@ namespace GAS.Authoring
         //Configs
         private readonly Dictionary<uint, AbilityConfigElement> _abilityConfigMap = new();
         private readonly Dictionary<string, List<float>> _paramMap = new();
+        
+        //Test
+        private GameUnit _testUnit;
         
         private void Start()
         {
@@ -69,6 +73,38 @@ namespace GAS.Authoring
             var id = (int)Math.Clamp(lv, 0, paramVals.Count - 1);
             return paramVals[id];
         }
+
+        #region Test
+
+        [Button("CreateTestUnit")]
+        private void CreateTestUnit()
+        {
+            if(!Application.isPlaying)
+                return;
+            
+            if(_testUnit != null)
+                _system.DestroyGameUnit(_testUnit);
+            
+            //Creat a test unit
+            var param = new GameUnitCreateParam()
+            {
+                AbilitySystem = _system
+            };
+            _testUnit = _system.CreateGameUnit(ref param);
+            _testUnit.GrantAbility(0);
+        }
+
+        [Button("DumpObjectPool")]
+        private void DumpObjectPool()
+        {
+            if(!Application.isPlaying)
+                return;
+            
+            _system.DumpObjectPool();
+        }
+        
+        #endregion
+        
     }
 }
 #endif

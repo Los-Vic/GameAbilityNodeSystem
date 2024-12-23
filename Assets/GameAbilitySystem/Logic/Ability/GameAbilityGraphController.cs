@@ -5,10 +5,16 @@ using NS;
 
 namespace GAS.Logic
 {
+    public class GameAbilityGraphRunnerContext : NodeGraphRunnerContext
+    {
+        public GameAbility Ability { get; set; }
+    }
+    
     public class GameAbilityGraphController
     {
         private GameAbilitySystem _system;
         private NodeGraphAsset _asset;
+        private readonly GameAbilityGraphRunnerContext _context = new();
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
         private readonly Dictionary<EGamePortal, string> _gameEventTypeNodeIdMap = new();
@@ -16,10 +22,11 @@ namespace GAS.Logic
 
         internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
         
-        internal void Init(GameAbilitySystem system, NodeGraphAsset asset)
+        internal void Init(GameAbilitySystem system, NodeGraphAsset asset, GameAbility ability)
         {
             _system = system;
             _asset = asset;
+            _context.Ability = ability;
 
             foreach (var node in asset.nodes)
             {
@@ -44,6 +51,9 @@ namespace GAS.Logic
                 _system.NodeObjectFactory.DestroyGraphRunner(graphRunner);
             }
             _graphRunners.Clear();
+            _system = null;
+            _asset = null;
+            _context.Ability = null;
         }
         
         internal void RunGraphGameEvent(EGamePortal portalType, GameEventNodeParam param)
@@ -54,9 +64,9 @@ namespace GAS.Logic
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd);
-            graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
+            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd, _context);
+            graphRunner.StartRunner();
         }
         
         internal void RunGraph(Type portalNodeType, GameEventNodeParam param = null)
@@ -67,13 +77,15 @@ namespace GAS.Logic
                 return;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd);
-            graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
+            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd, _context);
+            graphRunner.StartRunner();
+           
         }
 
         private void OnRunGraphEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
+            _system.NodeObjectFactory.DestroyGraphRunner(runner);
             _graphRunners.Remove(runner);
         }
     }

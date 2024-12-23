@@ -15,16 +15,15 @@ namespace NS
     public class IntNodeRunner:NodeRunner
     {
         private IntNode _node;
-        private NodeGraphRunner _graphRunner;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
+            base.Init(nodeAsset, graphRunner);
             _node = ((IntNode)nodeAsset);
-            _graphRunner = graphRunner;
         }
 
         public override void Execute()
         {
-            _graphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
+            GraphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
         }
     }
 }

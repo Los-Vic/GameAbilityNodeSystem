@@ -3,15 +3,8 @@
     public class FlowNodeRunner:NodeRunner
     {
         private bool _dependentValNodesExecuted;
-        protected NodeGraphRunner GraphRunner { get; private set; }
         protected INodeSystemTaskScheduler TaskScheduler => GraphRunner.TaskScheduler;
-
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
-        {
-            base.Init(nodeAsset, graphRunner);
-            GraphRunner = graphRunner;
-        }
-
+        
         public virtual void Reset()
         {
             _dependentValNodesExecuted = false;

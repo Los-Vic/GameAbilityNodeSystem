@@ -85,7 +85,7 @@ namespace CommonObjectPool
         public (int, int) LogState()
         {
             Debug.Log(
-                $"[ObjectPool][{_poolObjectType.Name}]: total/pool active:[{_pool.CountAll}/{_pool.CountActive}]");
+                $"[ObjectPool][{_poolObjectType.Name}]: active/total:[{_pool.CountActive}/{_pool.CountAll}]");
             return (_pool.CountActive, _pool.CountAll);
         }
 
@@ -131,9 +131,9 @@ namespace CommonObjectPool
             return pool.CreateObject();
         }
 
-        public void DestroyObject<T>(T obj) where T : class, IPoolObject, new()
+        public void DestroyObject(IPoolObject obj)
         {
-            var type = typeof(T);
+            var type = obj.GetType();
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return;
 

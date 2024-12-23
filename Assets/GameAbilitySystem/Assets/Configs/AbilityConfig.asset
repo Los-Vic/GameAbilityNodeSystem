@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70657e91e0d241aabbc21552170ff9b5, type: 3}
   m_Name: AbilityConfig
   m_EditorClassIdentifier: 
-  elements: []
+  elements:
+  - id: 0
+    abilityAssetPath: Assets/GameAbilitySystem/Assets/Test.asset

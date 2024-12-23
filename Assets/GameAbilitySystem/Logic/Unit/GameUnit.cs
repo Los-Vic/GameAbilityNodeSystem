@@ -9,6 +9,11 @@ namespace GAS.Logic
     {
         public GameUnit GetOwner();
     }
+
+    public struct GameUnitCreateParam
+    {
+        public GameAbilitySystem AbilitySystem;
+    }
     
     public class GameUnit: IPoolObject
     {
@@ -24,9 +29,9 @@ namespace GAS.Logic
         //Effects
         internal readonly List<GameEffect> GameEffects = new();
         
-        internal void Init(GameAbilitySystem sys)
+        internal void Init(ref GameUnitCreateParam param)
         {
-            Sys = sys;
+            Sys = param.AbilitySystem;
         }
 
         private void UnInit()
@@ -45,7 +50,11 @@ namespace GAS.Logic
             CompositeAttributes.Clear();
             
             //Clear Abilities
-            
+            foreach (var ability in GameAbilities)
+            {
+                Sys.AbilityInstanceMgr.DestroyAbility(ability);
+            }
+            GameAbilities.Clear();
             //Clear Effects
         }
         
@@ -105,14 +114,16 @@ namespace GAS.Logic
 
         #region Abilities
 
-        internal void GrantAbility(uint abilityId)
+        public void GrantAbility(uint abilityId)
         {
             var ability = Sys.AbilityInstanceMgr.CreateAbility(abilityId);
+            if (ability == null)
+                return;
             GameAbilities.Add(ability);
             ability.OnAddAbility(this);
         }
 
-        internal void RemoveAbility(uint abilityId)
+        public void RemoveAbility(uint abilityId)
         {
             foreach (var ability in GameAbilities)
             {
@@ -124,7 +135,7 @@ namespace GAS.Logic
             }
         }
 
-        internal void RemoveAbility(GameAbility ability)
+        public void RemoveAbility(GameAbility ability)
         {
             ability.OnRemoveAbility();
             GameAbilities.Remove(ability);

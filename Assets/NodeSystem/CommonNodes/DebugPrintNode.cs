@@ -27,7 +27,7 @@ namespace NS
 
         public override void Execute()
         {
-            Debug.Log(_node.Log);
+            NodeSystemLogger.Log(_node.Log);
             Complete();
         }
 
