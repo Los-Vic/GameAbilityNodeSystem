@@ -33,9 +33,9 @@ namespace GAS.Logic
             base.UnInitSystem();
         }
 
-        public void Update(float deltaTime)
+        public override void UpdateSystem(float dt)
         {
-            
+            base.UpdateSystem(dt);
         }
 
         #region GameUnit

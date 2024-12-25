@@ -33,7 +33,7 @@ namespace NS
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
             NodeSystemLogger.Log($"input delay [{_delay}]");
             
-            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, EndTask, CancelTask, UpdateTask);
+            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
             TaskScheduler.StartTask(task);
         }
         
@@ -46,28 +46,28 @@ namespace NS
             return connectPort.belongNodeId;
         }
         
-        private ENodeSystemTaskRunStatus UpdateTask(float dt)
+        private ETaskStatus UpdateTask(float dt)
         {
             _elapsedTime += dt;
             if (_elapsedTime >= _delay)
-                return ENodeSystemTaskRunStatus.End;
+                return ETaskStatus.Completed;
 
-            return ENodeSystemTaskRunStatus.Running;
+            return ETaskStatus.Running;
         }
 
         private void CancelTask()
         {
         }
 
-        private void EndTask()
+        private void CompleteTask()
         {
            Complete();
         }
 
-        private ENodeSystemTaskRunStatus StartTask()
+        private ETaskStatus StartTask()
         {
             _elapsedTime = 0;
-            return ENodeSystemTaskRunStatus.Running;
+            return ETaskStatus.Running;
         }
     }
 }

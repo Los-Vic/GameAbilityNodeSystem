@@ -3,28 +3,99 @@ using CommonObjectPool;
 
 namespace NS
 {
-    public enum ENodeSystemTaskRunStatus
+    public enum ETaskStatus
     {
+        Dead,
+        Waiting,
         Running,
-        End,
+        Completed,
+        Cancelled
     }
     
     public class NodeTask: IPoolObject
     {
-        public string TaskName { get; private set; }
-        public Func<ENodeSystemTaskRunStatus> StartTask { get; private set; }
-        public Action EndTask { get; private set; }
-        public Action CancelTask { get; private set; }
-        public Func<float, ENodeSystemTaskRunStatus> UpdateTask { get; private set; }
+        private string TaskName { get; set; }
+        private Func<ETaskStatus> OnStartTask { get; set; }
+        private Action OnCompleteTask { get; set; }
+        private Action OnCancelTask { get; set; }
+        private Func<float, ETaskStatus> OnUpdateTask { get; set; }
 
-        public void InitTask(string taskName, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
-            Func<float, ENodeSystemTaskRunStatus> updateTask = null)
+        private ETaskStatus Status { get; set; }
+        public bool IsEnded => Status is ETaskStatus.Completed or ETaskStatus.Cancelled;
+        
+        public void InitTask(string taskName, Func<ETaskStatus> startTask, Action completeTask, Action cancelTask, 
+            Func<float, ETaskStatus> updateTask = null)
         {
+            Status = ETaskStatus.Waiting;
             TaskName = taskName;
-            StartTask = startTask;
-            EndTask = endTask;
-            CancelTask = cancelTask;
-            UpdateTask = updateTask;
+            OnStartTask = startTask;
+            OnCompleteTask = completeTask;
+            OnCancelTask = cancelTask;
+            OnUpdateTask = updateTask;
+        }
+        
+        public ETaskStatus StartTask()
+        {
+            if (OnStartTask == null || Status != ETaskStatus.Waiting)
+            {
+                NodeSystemLogger.LogWarning($"start task:{TaskName} failed! status:{Status}");
+                return Status;
+            }
+            NodeSystemLogger.Log($"start task:{TaskName} succeeded!");
+            var status = OnStartTask.Invoke();
+            UpdateStatusFromDelegateResult(status);
+            return Status;
+        }
+
+        public void UpdateTask(float deltaTime)
+        {
+            if (OnUpdateTask == null || Status != ETaskStatus.Running)
+            {
+                NodeSystemLogger.LogWarning($"update task:{TaskName} failed! status:{Status}");
+                return;
+            }
+            var status = OnUpdateTask.Invoke(deltaTime);
+            UpdateStatusFromDelegateResult(status);
+        }
+        
+        public void CancelTask()
+        {
+            if (IsEnded)
+            {
+                NodeSystemLogger.LogWarning($"cancel task:{TaskName} failed! already ended, status:{Status}!");
+                return;
+            }
+            NodeSystemLogger.Log($"cancel task:{TaskName} succeeded!");
+            Status = ETaskStatus.Cancelled;
+            OnCancelTask?.Invoke();
+        }
+
+        private void UpdateStatusFromDelegateResult(ETaskStatus newStatus)
+        {
+            switch (newStatus)
+            {
+                case ETaskStatus.Completed:
+                    CompleteTask();
+                    break;
+                case ETaskStatus.Cancelled:
+                    CancelTask();
+                    break;
+                default:  
+                    Status = newStatus;
+                    break;
+            }
+        }
+        
+        private void CompleteTask()
+        {
+            if (IsEnded)
+            {
+                NodeSystemLogger.LogWarning($"complete task:{TaskName} failed! already ended, status:{Status}!");
+                return;
+            }
+            NodeSystemLogger.Log($"complete task:{TaskName} succeeded!");
+            Status = ETaskStatus.Completed;
+            OnCompleteTask?.Invoke();
         }
         
         #region PoolObject
@@ -38,11 +109,12 @@ namespace NS
 
         public virtual void OnReturnToPool()
         {
+            Status = ETaskStatus.Dead;
             TaskName = string.Empty;
-            StartTask = null;
-            EndTask = null;
-            CancelTask = null;
-            UpdateTask = null;
+            OnStartTask = null;
+            OnCompleteTask = null;
+            OnCancelTask = null;
+            OnUpdateTask = null;
         }
 
         public virtual void OnDestroy()

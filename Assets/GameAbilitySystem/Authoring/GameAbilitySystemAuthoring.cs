@@ -49,6 +49,11 @@ namespace GAS.Authoring
             }
         }
 
+        private void Update()
+        {
+            _system.UpdateSystem(Time.deltaTime);
+        }
+
         public AbilityAsset GetAbilityAsset(uint abilityId)
         {
             if (!_abilityConfigMap.TryGetValue(abilityId, out var abilityConfig))

@@ -7,19 +7,16 @@ namespace NS
     public interface INodeSystemTaskScheduler
     {
         NodeTask CreateTask(string taskName, NodeGraphRunner runner,
-            Func<ENodeSystemTaskRunStatus> startTask, Action endTask,
+            Func<ETaskStatus> startTask, Action endTask,
             Action cancelTask,
-            Func<float, ENodeSystemTaskRunStatus> updateTask = null);
+            Func<float, ETaskStatus> updateTask = null);
         
         void StartTask(NodeTask task);
         void ArrangeTaskUpdatePolicy(NodeTask task);
-        void CancelTask(NodeTask task);
+        void ForceCancelTask(NodeTask task);
         void CancelTasksOfGraphRunner(NodeGraphRunner runner);
         bool HasTaskRunning(NodeGraphRunner runner);
         void UpdateScheduler(float dt);
-        void DestroyTasks(NodeGraphRunner runner);
-        void DestroyTask(NodeTask task);
-        void EndTask(NodeTask task);
     }
     
     
@@ -27,10 +24,12 @@ namespace NS
     {
         protected readonly ObjectPoolMgr PoolMgr;
 
+        private readonly List<NodeTask> _allTasks = new List<NodeTask>();
         private readonly List<NodeTask> _updateList = new();
-        private readonly List<NodeTask> _traversalUpdateList = new();
         private readonly List<NodeTask> _pendingAddToUpdateList = new();
+        private readonly List<NodeTask> _pendingDestroyList = new();
 
+        //销毁NodeGraphRunner时，能找到所拥有的NodeTask进行清理
         private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
         private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
@@ -39,10 +38,13 @@ namespace NS
             PoolMgr = poolMgr;
         }
 
-        public NodeTask CreateTask(string taskName, NodeGraphRunner runner, Func<ENodeSystemTaskRunStatus> startTask, Action endTask, Action cancelTask, 
-            Func<float, ENodeSystemTaskRunStatus> updateTask = null)
+        public NodeTask CreateTask(string taskName, NodeGraphRunner runner, Func<ETaskStatus> startTask, Action endTask, Action cancelTask, 
+            Func<float, ETaskStatus> updateTask = null)
         {
             var task = PoolMgr.CreateObject<NodeTask>();
+            _allTasks.Add(task);
+            
+            taskName = $"{taskName}_{runner.AssetName}_{runner.PortalName}";
             task.InitTask(taskName, startTask, endTask, cancelTask, updateTask);
             
             _graphRunnerTasksMap.TryAdd(runner, new List<NodeTask>());
@@ -54,15 +56,9 @@ namespace NS
 
         public void StartTask(NodeTask task)
         {
-            NodeSystemLogger.Log($"start task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
-            var status = task.StartTask?.Invoke() ?? ENodeSystemTaskRunStatus.End;
-            if (status == ENodeSystemTaskRunStatus.End || task.UpdateTask == null)
-            {
-                EndTask(task);
-                return;
-            }
-
-            ArrangeTaskUpdatePolicy(task);
+            var status = task.StartTask();
+            if(status == ETaskStatus.Running)
+                ArrangeTaskUpdatePolicy(task);
         }
 
         public void ArrangeTaskUpdatePolicy(NodeTask task)
@@ -70,35 +66,22 @@ namespace NS
             _pendingAddToUpdateList.Add(task);
         }
         
-        public void CancelTask(NodeTask task)
+        public void ForceCancelTask(NodeTask task)
         {
-            _updateList.Remove(task);
-            _pendingAddToUpdateList.Remove(task);
-            NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
-            task.CancelTask?.Invoke();
-            DestroyTask(task);
+            task.CancelTask();
         }
 
         public void CancelTasksOfGraphRunner(NodeGraphRunner runner)
         {
-            var cancelTaskSuccess = false;
-            if (_graphRunnerTasksMap.TryGetValue(runner, out var tasks))
+            if (!_graphRunnerTasksMap.TryGetValue(runner, out var tasks)) 
+                return;
+            
+            foreach (var t in tasks)
             {
-                foreach (var t in tasks)
-                {
-                    _updateList.Remove(t);
-                    _pendingAddToUpdateList.Remove(t);
-                    NodeSystemLogger.Log($"cancel task, asset:{_taskGraphRunnerMap[t].AssetName}, portal:{_taskGraphRunnerMap[t].PortalName}");
-                    t.CancelTask?.Invoke();
-                    cancelTaskSuccess = true;
-                }
+                if(t.IsEnded)
+                    continue;
+                t.CancelTask();
             }
-
-            if (cancelTaskSuccess)
-            {
-                runner.CancelRunner();
-            }
-            DestroyTasks(runner);
         }
 
         public bool HasTaskRunning(NodeGraphRunner runner)
@@ -108,58 +91,40 @@ namespace NS
         
         public void UpdateScheduler(float dt)
         {
-            if(_pendingAddToUpdateList.Count == 0 && _updateList.Count == 0)
-                return;
-            
-            _traversalUpdateList.AddRange(_updateList);
-            foreach (var t in _traversalUpdateList)
+            //Add pending tasks to update list
+            if (_pendingAddToUpdateList.Count != 0)
             {
-                var status = t.UpdateTask.Invoke(dt);
-                if (status != ENodeSystemTaskRunStatus.End)
-                    continue;
-                EndTask(t);
+                _updateList.AddRange(_pendingAddToUpdateList);
+                _pendingAddToUpdateList.Clear();
             }
-            _traversalUpdateList.Clear();
-            
-            if (_pendingAddToUpdateList.Count == 0) 
-                return;
-            _updateList.AddRange(_pendingAddToUpdateList);
-            _pendingAddToUpdateList.Clear();
-        }
-
-        public void DestroyTasks(NodeGraphRunner runner)
-        {
-            if (!_graphRunnerTasksMap.Remove(runner, out var runnerTasks)) 
-                return;
-            
-            foreach (var t in runnerTasks)
+            // Update tasks
+            foreach (var t in _updateList)
             {
-                _taskGraphRunnerMap.Remove(t);
+                t.UpdateTask(dt);
+            }
+
+            //Check task is ended?
+            foreach (var t in _allTasks)
+            {
+               if(t.IsEnded)
+                   _pendingDestroyList.Add(t);
+            }
+
+            //Clear ended tasks
+            foreach (var t in _pendingDestroyList)
+            {
+                _allTasks.Remove(t);
+                _pendingAddToUpdateList.Remove(t);
+                _updateList.Remove(t);
+
+                _taskGraphRunnerMap.Remove(t, out var runner);
+                _graphRunnerTasksMap[runner].Remove(t);
+                if(_graphRunnerTasksMap[runner].Count == 0)
+                    _graphRunnerTasksMap.Remove(runner);
+                
                 PoolMgr.DestroyObject(t);
             }
-        }
-        
-        public void DestroyTask(NodeTask task)
-        {
-            if (_taskGraphRunnerMap.Remove(task, out var runner))
-            {
-                if (_graphRunnerTasksMap.TryGetValue(runner, out var runnerTasks))
-                {
-                    runnerTasks.Remove(task);
-                    if (runnerTasks.Count == 0)
-                    {
-                        _graphRunnerTasksMap.Remove(runner);
-                    }
-                }
-            }
-            PoolMgr.DestroyObject(task);
-        }
-        public void EndTask(NodeTask task)
-        {
-            _updateList.Remove(task);
-            NodeSystemLogger.Log($"end task, asset:{_taskGraphRunnerMap[task].AssetName}, portal:{_taskGraphRunnerMap[task].PortalName}");
-            task.EndTask?.Invoke();
-            DestroyTask(task);
+            _pendingDestroyList.Clear();
         }
 
     }
