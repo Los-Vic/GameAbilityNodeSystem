@@ -182,8 +182,8 @@ namespace NSEditor
 
         private void CreatePort(FieldInfo fieldInfo, PortAttribute portAttribute)
         {
-            var port = InstantiatePort(portAttribute.Orientation, portAttribute.PortDirection,
-                portAttribute.PortCapacity,
+            var port = InstantiatePort(Orientation.Horizontal, GetPortDirection(portAttribute.PortDirection),
+                Port.Capacity.Single,
                 portAttribute.PortType);
             
             port.portName = portAttribute.PortName;
@@ -193,7 +193,7 @@ namespace NSEditor
             ViewPortToNodePort.Add(port, nodePort);
             NodePortToViewPort.Add(nodePort, port);
 
-            if (portAttribute.PortDirection == Direction.Input)
+            if (portAttribute.PortDirection == EPortDirection.Input)
             {
                 inputContainer.Add(port);
             }
@@ -251,6 +251,18 @@ namespace NSEditor
             field.bindingPath = prop.propertyPath;
             extensionContainer.Add(field);
             return field;
+        }
+
+        private Direction GetPortDirection(EPortDirection dir)
+        {
+            switch (dir)
+            {
+                case EPortDirection.Input:
+                    return Direction.Input;
+                case EPortDirection.Output:
+                    return Direction.Output;
+            }
+            return Direction.Input;
         }
     }
 }

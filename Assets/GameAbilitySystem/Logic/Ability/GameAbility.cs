@@ -141,10 +141,10 @@ namespace GAS.Logic
         }
 
         //提交执行技能的消耗，并开始冷却计时
-        internal void CommitAbility()
+        internal bool CommitAbility()
         {
-            if(!IsAvailable)
-                return;
+            if (!CheckAbility())
+                return false;
             
             StartCooldown();
             
@@ -155,6 +155,8 @@ namespace GAS.Logic
                 var newVal = attribute.Val - costNums;
                 _owner.Sys.AttributeInstanceMgr.SetAttributeVal(_owner, attribute, newVal);
             }
+
+            return true;
         }
         
         internal void ActivateAbility()

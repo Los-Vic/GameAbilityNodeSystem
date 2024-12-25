@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
@@ -61,24 +60,17 @@ namespace NS
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class PortAttribute : Attribute
     {
-        public Direction PortDirection;
+        public EPortDirection PortDirection;
         public Type PortType;
         public string PortName;
-        public Orientation Orientation;
-        public Port.Capacity PortCapacity;
         public bool IsFlowPort;
-        public int DrawOrder;
 
-        public PortAttribute(Direction portDirection, Type portType, string portName = "", int drawOrder = 0, Orientation orientation = Orientation.Horizontal)
+        public PortAttribute(EPortDirection portDirection, Type portType, string portName = "")
         {
             PortName = portName;
             PortType = portType;
-            Orientation = orientation;
             PortDirection = portDirection;
             IsFlowPort = typeof(BaseFlowPort).IsAssignableFrom(portType);
-            DrawOrder = drawOrder;
-            //暂不支持多端口
-            PortCapacity = Port.Capacity.Single;
         }
     }
     

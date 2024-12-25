@@ -1,14 +1,12 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Reroute", "Common/Reroute", ENodeFunctionType.Value ,typeof(RerouteNodeRunner), (int)ECommonNodeCategory.Value)]
     public class RerouteNode:Node
     {
-        [Port(Direction.Input, typeof(object))]
+        [Port(EPortDirection.Input, typeof(object))]
         public string InPortVal;
 
-        [Port(Direction.Output, typeof(object))]
+        [Port(EPortDirection.Output, typeof(object))]
         public string OutPortVal;
     }
     

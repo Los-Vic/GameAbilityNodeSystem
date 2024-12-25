@@ -1,20 +1,18 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Branch", "Common/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), (int)ECommonNodeCategory.FlowControl)]
     public class BranchNode:Node
     {
-        [Port(Direction.Input,typeof(BaseFlowPort))]
+        [Port(EPortDirection.Input,typeof(BaseFlowPort))]
         public string InPortExec;
 
-        [Port(Direction.Input,typeof(bool), "Condition")]
+        [Port(EPortDirection.Input,typeof(bool), "Condition")]
         public string InPortBool;
 
-        [Port(Direction.Output, typeof(BaseFlowPort), "True")]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "True")]
         public string OutPortTrueExec;
         
-        [Port(Direction.Output, typeof(BaseFlowPort), "False")]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "False")]
         public string OutPortFalseExec;
     }
     

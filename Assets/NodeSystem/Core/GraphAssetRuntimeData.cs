@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using UnityEditor.Experimental.GraphView;
 using System;
 
 namespace NS
@@ -84,7 +83,7 @@ namespace NS
                     foreach (var portId in _nodePortsMap[_toRunNodeList[0]])
                     {
                         var port = _portIdMap[portId];
-                        if(port.IsFlowPort() || port.direction == Direction.Output)
+                        if(port.IsFlowPort() || port.direction == EPortDirection.Output)
                             continue;
                     
                         if(!NodePort.IsValidPortId(port.connectPortId))

@@ -1,6 +1,4 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Float", "Common/LiteralValue/Float", ENodeFunctionType.Value, typeof(FloatNodeRunner), (int)ECommonNodeCategory.Value)]
     public class FloatNode:Node
@@ -8,7 +6,7 @@ namespace NS
         [ExposedProp]
         public float Val;
 
-        [Port(Direction.Output, typeof(float))]
+        [Port(EPortDirection.Output, typeof(float))]
         public string OutPortVal;
     }
     

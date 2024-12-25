@@ -1,7 +1,4 @@
 ﻿using System;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.Serialization;
-
 namespace NS
 {
     public enum ENodeDemoPortalType
@@ -20,15 +17,15 @@ namespace NS
     [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Portal, typeof(PortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, -1)]
     public class DemoPortalNode:Node
     {
-        [Port(Direction.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
         [PortalType]
         public ENodeDemoPortalType NodeDemoPortal;
 
-        [Port(Direction.Output, typeof(int), "IntParam1")]
+        [Port(EPortDirection.Output, typeof(int), "IntParam1")]
         public string OutIntParam1;
-        [Port(Direction.Output, typeof(int), "IntParam2")]
+        [Port(EPortDirection.Output, typeof(int), "IntParam2")]
         public string OutIntParam2;
 
         public override string DisplayName()

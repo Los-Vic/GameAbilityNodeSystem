@@ -1,7 +1,4 @@
-﻿using UnityEditor.Experimental.GraphView;
-using UnityEngine;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), (int)ECommonNodeCategory.Debug)]
     public class DebugPrintNode:Node
@@ -9,9 +6,9 @@ namespace NS
         [ExposedProp]
         public string Log;
 
-        [Port(Direction.Input, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
-        [Port(Direction.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
         
     }

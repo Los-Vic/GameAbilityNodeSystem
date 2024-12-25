@@ -357,7 +357,7 @@ namespace NSEditor
                 foreach (var (nodePortId, viewPort) in editorNode.NodePortToViewPort)
                 {
                     var nodePort = GraphAsset.GetPort(nodePortId);
-                    if(nodePort.direction == Direction.Output)
+                    if(nodePort.direction == EPortDirection.Output)
                         continue;
                     
                     if(string.IsNullOrEmpty(nodePort.connectPortId))

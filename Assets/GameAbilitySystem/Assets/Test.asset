@@ -13,24 +13,14 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   nodes:
-  - rid: 4709999379509149749
-  - rid: 4709999379509149751
-  - rid: 4709999422970527744
-  - rid: 4709999422970527748
-  - rid: 4709999422970527750
-  - rid: 4709999422970527753
+  - rid: 4709999426244182100
+  - rid: 4709999426244182102
   ports:
-  - rid: 4709999379509149750
-  - rid: 4709999379509149752
-  - rid: 4709999379509149753
-  - rid: 4709999422970527745
-  - rid: 4709999422970527746
-  - rid: 4709999422970527747
-  - rid: 4709999422970527749
-  - rid: 4709999422970527751
-  - rid: 4709999422970527752
-  - rid: 4709999422970527754
-  - rid: 4709999422970527755
+  - rid: 4709999426244182101
+  - rid: 4709999426244182103
+  - rid: 4709999426244182104
+  - rid: 4709999426244182105
+  - rid: 4709999426244182106
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
   cueProxy: 
   lifeType: 0
@@ -43,186 +33,79 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 4709999379509149749
-      type: {class: OnAddAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+    - rid: 4709999426244182100
+      type: {class: OnActivateAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
       data:
-        guid: b3b4225b-2c5e-483d-86ad-51fca68fd1ee
+        guid: 2c15ab6f-24e4-453a-9481-ee19f7235706
         position:
           serializedVersion: 2
-          x: 127.2
-          y: 285.6
-          width: 151.2
-          height: 76.79999
-        nodeName: OnAddAbility
-        OutPortExec: 0d2c03fb-d739-4a00-bff1-08c69045b96d
-    - rid: 4709999379509149750
+          x: 248.8
+          y: 314.4
+          width: 183.99998
+          height: 76.80002
+        nodeName: OnActivateAbility
+        OutPortExec: 867a6c13-5a72-4c72-9cac-3cdc3bf32fe6
+    - rid: 4709999426244182101
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 0d2c03fb-d739-4a00-bff1-08c69045b96d
-        belongNodeId: b3b4225b-2c5e-483d-86ad-51fca68fd1ee
-        connectPortId: 08f4cfb1-6d07-4336-b947-e5d394871725
+        guid: 867a6c13-5a72-4c72-9cac-3cdc3bf32fe6
+        belongNodeId: 2c15ab6f-24e4-453a-9481-ee19f7235706
+        connectPortId: 14288e53-8b66-45d5-ae9c-5c4de48a0efa
         direction: 1
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4709999379509149751
-      type: {class: DebugPrintNode, ns: NS, asm: NodeSystem}
+    - rid: 4709999426244182102
+      type: {class: BranchNode, ns: NS, asm: NodeSystem}
       data:
-        guid: 281a49fb-a351-4154-ba70-787e74b04e19
+        guid: 4f34a74e-0d1e-470e-ad13-6c8953dd8758
         position:
           serializedVersion: 2
-          x: 696.8
-          y: 285.6
-          width: 225.60004
-          height: 95.19998
-        nodeName: Print
-        Log: On Add Ability!
-        InPortExec: 6b19516d-e3b8-412d-b533-4240eee1abe3
-        OutPortExec: 4acc5b59-e0e9-4dd2-8d75-9dd2a3a4df3b
-    - rid: 4709999379509149752
+          x: 574.4
+          y: 353.6
+          width: 151.19995
+          height: 100.79999
+        nodeName: Branch
+        InPortExec: 14288e53-8b66-45d5-ae9c-5c4de48a0efa
+        InPortBool: 08fd53d6-4ec8-4f02-9e97-db5e35e85176
+        OutPortTrueExec: d96ea067-a0bc-4a9d-a440-7a5435ce5c08
+        OutPortFalseExec: 50299073-296d-4644-9b73-2e70a9bcf67f
+    - rid: 4709999426244182103
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 6b19516d-e3b8-412d-b533-4240eee1abe3
-        belongNodeId: 281a49fb-a351-4154-ba70-787e74b04e19
-        connectPortId: 01fc1231-a134-4fc7-91bc-d6794b2ced8f
+        guid: 14288e53-8b66-45d5-ae9c-5c4de48a0efa
+        belongNodeId: 4f34a74e-0d1e-470e-ad13-6c8953dd8758
+        connectPortId: 867a6c13-5a72-4c72-9cac-3cdc3bf32fe6
         direction: 0
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4709999379509149753
+    - rid: 4709999426244182104
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 4acc5b59-e0e9-4dd2-8d75-9dd2a3a4df3b
-        belongNodeId: 281a49fb-a351-4154-ba70-787e74b04e19
+        guid: 08fd53d6-4ec8-4f02-9e97-db5e35e85176
+        belongNodeId: 4f34a74e-0d1e-470e-ad13-6c8953dd8758
+        connectPortId: 
+        direction: 0
+        portType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4709999426244182105
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: d96ea067-a0bc-4a9d-a440-7a5435ce5c08
+        belongNodeId: 4f34a74e-0d1e-470e-ad13-6c8953dd8758
         connectPortId: 
         direction: 1
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4709999422970527744
-      type: {class: DelayNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: 97bae8e9-f6ff-423f-af79-f12e73a73f39
-        position:
-          serializedVersion: 2
-          x: 434.4
-          y: 285.6
-          width: 119.19998
-          height: 100.79999
-        nodeName: Delay
-        InPortExec: 08f4cfb1-6d07-4336-b947-e5d394871725
-        OutPortExec: 01fc1231-a134-4fc7-91bc-d6794b2ced8f
-        InPortFloat: eaf3487a-18b3-4057-8c9c-6b936cdb8637
-    - rid: 4709999422970527745
+    - rid: 4709999426244182106
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 08f4cfb1-6d07-4336-b947-e5d394871725
-        belongNodeId: 97bae8e9-f6ff-423f-af79-f12e73a73f39
-        connectPortId: 0d2c03fb-d739-4a00-bff1-08c69045b96d
-        direction: 0
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4709999422970527746
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 01fc1231-a134-4fc7-91bc-d6794b2ced8f
-        belongNodeId: 97bae8e9-f6ff-423f-af79-f12e73a73f39
-        connectPortId: 6b19516d-e3b8-412d-b533-4240eee1abe3
+        guid: 50299073-296d-4644-9b73-2e70a9bcf67f
+        belongNodeId: 4f34a74e-0d1e-470e-ad13-6c8953dd8758
+        connectPortId: 
         direction: 1
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4709999422970527747
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: eaf3487a-18b3-4057-8c9c-6b936cdb8637
-        belongNodeId: 97bae8e9-f6ff-423f-af79-f12e73a73f39
-        connectPortId: 75016a44-9513-4248-877a-2d2cdec1398d
-        direction: 0
-        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4709999422970527748
-      type: {class: IntNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: 2e37a554-4df7-4efb-87c6-2aa2c0406dad
-        position:
-          serializedVersion: 2
-          x: 82.4
-          y: 478.4
-          width: 155.20001
-          height: 95.19998
-        nodeName: Int
-        Val: 2
-        OutPortVal: b7fafbec-8b0b-4795-8ed6-a9e198812525
-    - rid: 4709999422970527749
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: b7fafbec-8b0b-4795-8ed6-a9e198812525
-        belongNodeId: 2e37a554-4df7-4efb-87c6-2aa2c0406dad
-        connectPortId: 102e2c6c-2261-40e9-b29d-f28a497eac2c
-        direction: 1
-        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4709999422970527750
-      type: {class: RerouteNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: bbf5011a-37e7-44fe-b24e-a484c66e5695
-        position:
-          serializedVersion: 2
-          x: 308.8
-          y: 515.2
-          width: 72.80002
-          height: 40.799988
-        nodeName: Reroute
-        InPortVal: 102e2c6c-2261-40e9-b29d-f28a497eac2c
-        OutPortVal: 27821dd7-c602-4bd7-ae42-27b71f1ddf00
-    - rid: 4709999422970527751
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 102e2c6c-2261-40e9-b29d-f28a497eac2c
-        belongNodeId: bbf5011a-37e7-44fe-b24e-a484c66e5695
-        connectPortId: b7fafbec-8b0b-4795-8ed6-a9e198812525
-        direction: 0
-        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4709999422970527752
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 27821dd7-c602-4bd7-ae42-27b71f1ddf00
-        belongNodeId: bbf5011a-37e7-44fe-b24e-a484c66e5695
-        connectPortId: ef62a4ef-a7cd-47ec-85a8-36846f177c90
-        direction: 1
-        portType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4709999422970527753
-      type: {class: IntToFloatNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: 009f391e-5370-49d4-a7ad-d2796590064f
-        position:
-          serializedVersion: 2
-          x: 434.4
-          y: 479.2
-          width: 126.399994
-          height: 76.79999
-        nodeName: IntToFloat
-        InPortVal: ef62a4ef-a7cd-47ec-85a8-36846f177c90
-        OutPortVal: 75016a44-9513-4248-877a-2d2cdec1398d
-    - rid: 4709999422970527754
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: ef62a4ef-a7cd-47ec-85a8-36846f177c90
-        belongNodeId: 009f391e-5370-49d4-a7ad-d2796590064f
-        connectPortId: 27821dd7-c602-4bd7-ae42-27b71f1ddf00
-        direction: 0
-        portType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4709999422970527755
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 75016a44-9513-4248-877a-2d2cdec1398d
-        belongNodeId: 009f391e-5370-49d4-a7ad-d2796590064f
-        connectPortId: eaf3487a-18b3-4057-8c9c-6b936cdb8637
-        direction: 1
-        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0

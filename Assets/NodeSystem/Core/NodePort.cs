@@ -1,9 +1,14 @@
 ﻿using System;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NS
 {
+    public enum EPortDirection
+    {
+        Input,
+        Output,
+    }
+    
     /// <summary>
     /// 暂不支持多线端口
     /// </summary>
@@ -14,11 +19,11 @@ namespace NS
         public string Id => guid;
         public string belongNodeId;
         public string connectPortId;
-        public Direction direction;
+        public EPortDirection direction;
         public string portType;
         public bool isFlowPort;
         
-        public NodePort(string belongNodeId, Direction direction, Type portType, bool isFlowPort, string connectPortId = null)
+        public NodePort(string belongNodeId, EPortDirection direction, Type portType, bool isFlowPort, string connectPortId = null)
         {
             this.belongNodeId = belongNodeId;
             this.direction = direction;

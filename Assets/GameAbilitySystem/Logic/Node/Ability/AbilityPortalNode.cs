@@ -1,12 +1,11 @@
 ﻿using NS;
-using UnityEditor.Experimental.GraphView;
 using Node = NS.Node;
 
 namespace GAS.Logic
 {
     public class AbilityPortalNode : Node
     {
-        [Port(Direction.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
     }
     
@@ -26,9 +25,9 @@ namespace GAS.Logic
     [Node("OnActivateAbilityEvent", "Ability/Portal/OnActivateAbilityEvent", ENodeFunctionType.Portal, typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public class OnActivateAbilityEventPortalNode:Node
     {
-        [Port(Direction.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
-        [Port(Direction.Output, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Output, typeof(GameEventNodeParam), "EventParam")]
         public string OutPortParam;
     }
     

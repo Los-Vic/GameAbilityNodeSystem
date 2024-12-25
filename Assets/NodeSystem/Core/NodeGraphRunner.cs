@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonObjectPool;
-using UnityEditor.Experimental.GraphView;
 
 namespace NS
 {
@@ -180,7 +179,7 @@ namespace NS
         public T GetInPortVal<T>(string inPortId)
         {
             var port = GraphAssetRuntimeData.GetPortById(inPortId);
-            if (port.direction != Direction.Input)
+            if (port.direction != EPortDirection.Input)
             {
                 NodeSystemLogger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
                 return default;
@@ -196,7 +195,7 @@ namespace NS
         public void SetOutPortVal(string outPortId, object val)
         {
             var port = GraphAssetRuntimeData.GetPortById(outPortId);
-            if (port.direction != Direction.Output)
+            if (port.direction != EPortDirection.Output)
             {
                 NodeSystemLogger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
                 return;

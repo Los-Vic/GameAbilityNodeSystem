@@ -1,13 +1,11 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Bool", "Common/LiteralValue/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), (int)ECommonNodeCategory.Value)]
     public class BoolNode : Node
     {
         [ExposedProp] public bool Val;
 
-        [Port(Direction.Output, typeof(bool))] 
+        [Port(EPortDirection.Output, typeof(bool))] 
         public string OutPortVal;
     }
     

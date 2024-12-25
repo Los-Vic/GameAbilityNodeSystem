@@ -1,16 +1,14 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), (int)ECommonNodeCategory.Task)]
     public class DelayNode:Node
     {
-        [Port(Direction.Input, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
-        [Port(Direction.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [Port(Direction.Input, typeof(float), "Duration")]
+        [Port(EPortDirection.Input, typeof(float), "Duration")]
         public string InPortFloat;
     }
     

@@ -1,6 +1,4 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("Int", "Common/LiteralValue/Int", ENodeFunctionType.Value , typeof(IntNodeRunner), (int)ECommonNodeCategory.Value)]
     public class IntNode:Node
@@ -8,7 +6,7 @@ namespace NS
         [ExposedProp]
         public int Val;
 
-        [Port(Direction.Output, typeof(int))]
+        [Port(EPortDirection.Output, typeof(int))]
         public string OutPortVal;
     }
     

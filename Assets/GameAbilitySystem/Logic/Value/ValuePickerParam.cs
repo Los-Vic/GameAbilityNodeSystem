@@ -15,10 +15,10 @@ namespace GAS.Logic.Value
         [LabelText("参数名")]
         public string paramName;
         
-#if UNITY_EDITOR
         public static List<string> GetAllParams()
         {
             var result = new List<string>();
+#if UNITY_EDITOR
             var cfg = AssetDatabase.LoadAssetAtPath<AbilityEffectParamConfig>(
                 "Assets/GameAbilitySystem/Assets/Configs/AbilityEffectParamConfig.asset");
             if (cfg == null)
@@ -28,9 +28,10 @@ namespace GAS.Logic.Value
             {
                 result.Add(element.paramName);
             }
+#endif
             return result;
         }
-#endif
+
         
     }
     

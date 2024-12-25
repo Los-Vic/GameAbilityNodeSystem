@@ -1,14 +1,12 @@
-﻿using UnityEditor.Experimental.GraphView;
-
-namespace NS
+﻿namespace NS
 {
     [Node("IntToFloat", "Common/LiteralValue/IntToFloat",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), (int)ECommonNodeCategory.Value )]
     public class IntToFloatNode:Node
     {
-        [Port(Direction.Input, typeof(int))]
+        [Port(EPortDirection.Input, typeof(int))]
         public string InPortVal;
 
-        [Port(Direction.Output, typeof(float))]
+        [Port(EPortDirection.Output, typeof(float))]
         public string OutPortVal;
     }
     
