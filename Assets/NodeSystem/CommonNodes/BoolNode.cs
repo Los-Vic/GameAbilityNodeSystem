@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Bool", "Common/LiteralValue/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), (int)ECommonNodeCategory.Value)]
+    [Node("Bool", "Common/LiteralValue/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), CommonNodeCategory.Value)]
     public class BoolNode : Node
     {
         [ExposedProp] public bool Val;

@@ -3,5 +3,6 @@
     public enum EGamePortal
     {
        None,
+       OnPostPrepareStart,
     }
 }

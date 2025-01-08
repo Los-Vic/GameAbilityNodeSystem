@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Branch", "Common/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), (int)ECommonNodeCategory.FlowControl)]
+    [Node("Branch", "Common/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), CommonNodeCategory.FlowControl)]
     public class BranchNode:Node
     {
         [Port(EPortDirection.Input,typeof(BaseFlowPort))]

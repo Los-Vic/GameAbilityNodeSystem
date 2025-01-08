@@ -1,30 +1,31 @@
-﻿namespace NS
-{
-    [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
-    public class DebugPrintNode:Node
-    {
-        [ExposedProp]
-        public string Log;
+﻿using NS;
 
+namespace GAS.Logic
+{
+    [Node("ActivateAbility", "Ability/Exec/ActivateAbility", ENodeFunctionType.Flow, typeof(ActivateAbilityNodeRunner), CommonNodeCategory.Action, NodeScopeDefine.Ability)]
+    public class ActivateAbilityNode:Node
+    {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
-        
     }
-    
-    public class DebugPrintFlowNodeRunner:FlowNodeRunner
+
+    public class ActivateAbilityNodeRunner : FlowNodeRunner
     {
-        private DebugPrintNode _node;
+        private ActivateAbilityNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (DebugPrintNode)nodeAsset;
+            _node = (ActivateAbilityNode)nodeAsset;
         }
 
         public override void Execute()
         {
-            NodeSystemLogger.Log(_node.Log);
+            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
+            {
+                context.Ability.GF_ActivateAbility();
+            }
             Complete();
         }
 

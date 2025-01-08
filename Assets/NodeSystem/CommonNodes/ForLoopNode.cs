@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("ForLoop", "Common/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), (int)ECommonNodeCategory.FlowControl)]
+    [Node("ForLoop", "Common/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), CommonNodeCategory.FlowControl)]
     public class ForLoopNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

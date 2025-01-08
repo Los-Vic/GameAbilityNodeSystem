@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Int", "Common/LiteralValue/Int", ENodeFunctionType.Value , typeof(IntNodeRunner), (int)ECommonNodeCategory.Value)]
+    [Node("Int", "Common/LiteralValue/Int", ENodeFunctionType.Value , typeof(IntNodeRunner), CommonNodeCategory.Value)]
     public class IntNode:Node
     {
         [ExposedProp]

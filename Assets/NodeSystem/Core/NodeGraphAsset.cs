@@ -98,12 +98,24 @@ namespace NS
         {
             foreach (var n in nodes)
             {
-                if (n.nodeName != nodeName) 
+                if (n.NodeName != nodeName) 
                     continue;
                 return true;
             }
 
             return false;
+        }
+
+        public int GetNodeNameCount(string nodeName)
+        {
+            var count = 0;
+            foreach (var n in nodes)
+            {
+                if(n.NodeName == nodeName)
+                    count++;
+            }
+
+            return count;
         }
 #endif
     }

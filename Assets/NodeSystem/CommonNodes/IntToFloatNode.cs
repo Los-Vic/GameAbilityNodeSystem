@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("IntToFloat", "Common/LiteralValue/IntToFloat",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), (int)ECommonNodeCategory.Value )]
+    [Node("IntToFloat", "Common/LiteralValue/IntToFloat",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), CommonNodeCategory.Value )]
     public class IntToFloatNode:Node
     {
         [Port(EPortDirection.Input, typeof(int))]

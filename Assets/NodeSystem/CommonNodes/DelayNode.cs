@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), (int)ECommonNodeCategory.Task)]
+    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
     public class DelayNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

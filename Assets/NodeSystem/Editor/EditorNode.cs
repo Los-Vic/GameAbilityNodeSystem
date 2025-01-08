@@ -22,6 +22,7 @@ namespace NSEditor
 
         private SerializedObject _graphAssetObject;
         private SerializedProperty _serializedNode;
+        private NodeGraphAsset _graphAsset;
 
         private static readonly Color DefaultPortColor = new Color(0, 0.8f, 0.8f, 1);
         private static readonly Dictionary<Type, Color> PortColorMap = new()
@@ -37,6 +38,8 @@ namespace NSEditor
         public virtual void Draw(Node node, SerializedObject graphAssetObject)
         {
             _graphAssetObject = graphAssetObject;
+            _graphAsset = _graphAssetObject.targetObject as NodeGraphAsset;
+            
             AddToClassList("node-graph-node");
             Node = node;
 
@@ -66,7 +69,7 @@ namespace NSEditor
                 var portalTypeAttribute = fieldInfo.GetCustomAttribute<PortalTypeAttribute>();
                 if (portalTypeAttribute != null)
                 {
-                    CreatePortalTypeExtension(fieldInfo, Node);
+                    CreatePortalTypeExtension(fieldInfo);
                 }
 
                 //Create Extensions
@@ -77,6 +80,7 @@ namespace NSEditor
                 }
             }
             RefreshExpandedState();
+            CheckPortalNodeIsSingle();
         }
 
         public void RefreshRerouteNode(Edge changeEdge, bool isAdd)
@@ -116,16 +120,16 @@ namespace NSEditor
         {
             switch (nodeCategory)
             {
-                case (int)ECommonNodeCategory.Action:
-                case (int)ECommonNodeCategory.Task:
+                case CommonNodeCategory.Action:
+                case CommonNodeCategory.Task:
                     return new Color(0, 0.3f, 0.7f, 1);
-                case (int)ECommonNodeCategory.Debug:
+                case CommonNodeCategory.Debug:
                     return new Color(0.7f, 0.3f, 0.7f, 1);
-                case (int)ECommonNodeCategory.Value:
+                case CommonNodeCategory.Value:
                     return new Color(0, 0.5f, 0, 1);
-                case (int)ECommonNodeCategory.Portal:
+                case CommonNodeCategory.Portal:
                     return new Color(0.6f, 0, 0, 1);
-                case (int)ECommonNodeCategory.FlowControl:
+                case CommonNodeCategory.FlowControl:
                     return new Color(0.5f,0.5f,0.5f,1);
             }
             return Color.magenta;
@@ -145,7 +149,7 @@ namespace NSEditor
             }
             
             title = attribute.Title;
-            if (attribute.NodeCategory == (int)ECommonNodeCategory.Task)
+            if (attribute.NodeCategory == CommonNodeCategory.Task)
             {
                 var img = new Image
                 {
@@ -154,7 +158,7 @@ namespace NSEditor
                 };
                 titleButtonContainer.Add(img);
             }
-            else if (attribute.NodeCategory == (int)ECommonNodeCategory.Debug)
+            else if (attribute.NodeCategory == CommonNodeCategory.Debug)
             {
                 var img = new Image
                 {
@@ -203,17 +207,22 @@ namespace NSEditor
             }
         }
 
-        private void CreatePortalTypeExtension(FieldInfo fieldInfo, Node node)
+        private void CreatePortalTypeExtension(FieldInfo fieldInfo)
         {
             var propertyField = DrawField(fieldInfo.Name);
             propertyField?.RegisterValueChangeCallback(OnPortalTypeFieldChangeCallback);
-            var val = fieldInfo.GetValue(node);
-            title = val.ToString();
+            var val = fieldInfo.GetValue(Node);
+            var newTitle = val.ToString();
+            title = newTitle;
+            Node.SetNodeName(newTitle);
         }
 
         private void OnPortalTypeFieldChangeCallback(SerializedPropertyChangeEvent evt)
         {
-            title = evt.changedProperty.enumDisplayNames[evt.changedProperty.enumValueIndex];
+            var newTitle = evt.changedProperty.enumDisplayNames[evt.changedProperty.enumValueIndex];
+            title = newTitle;
+            Node.SetNodeName(newTitle);
+            CheckPortalNodeIsSingle();
         }
 
         public void SavePosition()
@@ -263,6 +272,17 @@ namespace NSEditor
                     return Direction.Output;
             }
             return Direction.Input;
+        }
+
+        private void CheckPortalNodeIsSingle()
+        {
+            if(!Node.IsPortalNode())
+                return;
+
+            if (_graphAsset.GetNodeNameCount(Node.NodeName) > 1)
+            {
+                NodeSystemLogger.LogError($"Portal node is repeated! {Node.NodeName}");
+            }
         }
     }
 }

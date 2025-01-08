@@ -20,7 +20,7 @@ namespace GAS.Editor
         protected override Color GetNodeColor(int nodeCategory)
         {
             if (nodeCategory == NodeCategoryDefine.AbilityEffectPortal)
-                return new Color(0.6f, 0.6f, 0.3f);
+                return new Color(0.9f, 0.3f, 0.1f);
             return base.GetNodeColor(nodeCategory);
         }
 

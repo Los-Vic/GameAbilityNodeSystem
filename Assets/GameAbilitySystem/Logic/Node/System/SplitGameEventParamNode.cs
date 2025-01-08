@@ -5,7 +5,7 @@ using Node = NS.Node;
 namespace GAS.Logic
 {
     
-    [Node("SplitGameEventParam", "System/GameEvent/SplitGameEventParam", ENodeFunctionType.Value, typeof(SplitGameEventParamNodeRunner), (int)ECommonNodeCategory.Value, NodeScopeDefine.System)]
+    [Node("SplitGameEventParam", "System/GameEvent/SplitGameEventParam", ENodeFunctionType.Value, typeof(SplitGameEventParamNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.System)]
     public class SplitGameEventParamNode : Node
     {
         [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]

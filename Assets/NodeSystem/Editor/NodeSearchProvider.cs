@@ -127,9 +127,9 @@ namespace NSEditor
             if (nodeAttribute != null)
             {
                 if (nodeAttribute.IsSingleton &&
-                    GraphView.GraphAsset.HasNodeName(node.nodeName))
+                    GraphView.GraphAsset.HasNodeName(node.NodeName))
                 {
-                    Debug.LogWarning($"Can't add SingletonNode [{node.nodeName}]");
+                    Debug.LogWarning($"Can't add SingletonNode [{node.NodeName}]");
                     return true;
                 }
             }

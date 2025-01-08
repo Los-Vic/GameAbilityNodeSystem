@@ -14,7 +14,7 @@ namespace NS
         public int IntParam2;
     }
     
-    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Portal, typeof(PortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, -1)]
+    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Portal, typeof(PortalPortalNodeRunner), CommonNodeCategory.Portal, -1)]
     public class DemoPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]

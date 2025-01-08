@@ -22,8 +22,8 @@ namespace GAS.Logic
     {
     }
     
-    [Node("OnActivateAbilityEvent", "Ability/Portal/OnActivateAbilityEvent", ENodeFunctionType.Portal, typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public class OnActivateAbilityEventPortalNode:Node
+    [Node("OnActivateAbilityByEvent", "Ability/Portal/OnActivateAbilityByEvent", ENodeFunctionType.Portal, typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public class OnActivateAbilityByEventPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
@@ -63,11 +63,11 @@ namespace GAS.Logic
     public class AbilityGameEventPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private OnActivateAbilityEventPortalNode _node;
+        private OnActivateAbilityByEventPortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            _node = (OnActivateAbilityEventPortalNode)nodeAsset;
+            _node = (OnActivateAbilityByEventPortalNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;

@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Float", "Common/LiteralValue/Float", ENodeFunctionType.Value, typeof(FloatNodeRunner), (int)ECommonNodeCategory.Value)]
+    [Node("Float", "Common/LiteralValue/Float", ENodeFunctionType.Value, typeof(FloatNodeRunner), CommonNodeCategory.Value)]
     public class FloatNode:Node
     {
         [ExposedProp]

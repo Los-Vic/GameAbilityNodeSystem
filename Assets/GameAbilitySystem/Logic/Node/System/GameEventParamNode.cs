@@ -4,7 +4,7 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("GameEventParam", "System/GameEvent/GameEventParam", ENodeFunctionType.Value , typeof(GameEventParamNodeRunner), (int)ECommonNodeCategory.Value)]
+    [Node("GameEventParam", "System/GameEvent/GameEventParam", ENodeFunctionType.Value , typeof(GameEventParamNodeRunner), CommonNodeCategory.Value)]
     public class GameEventParamNode:Node
     {
         [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]

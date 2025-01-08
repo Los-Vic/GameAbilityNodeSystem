@@ -99,24 +99,24 @@ namespace NS
         {
             if (!_isValid)
             {
-                NodeSystemLogger.LogError($"start graph of {_asset.name} failed. not valid.");
+                NodeSystemLogger.LogError($"start run graph {_asset.name} failed. not valid.");
                 return;
             }
 
             if (IsRunning())
             {
-                NodeSystemLogger.LogError($"start graph of {_asset.name} failed. already running.");
+                NodeSystemLogger.LogError($"start run graph {_asset.name} failed. already running.");
                 return;
             }
             
-            NodeSystemLogger.Log($"start graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
+            NodeSystemLogger.Log($"start run graph {_asset.name}, portal:{_portalNode.DisplayName()}");
             _curRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            NodeSystemLogger.Log($"complete graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
+            NodeSystemLogger.Log($"complete graph {_asset.name}, portal:{_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -124,7 +124,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            NodeSystemLogger.Log($"cancel graph of {_asset.name}, portal:{_portalNode.DisplayName()}");
+            NodeSystemLogger.Log($"cancel graph {_asset.name}, portal:{_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();

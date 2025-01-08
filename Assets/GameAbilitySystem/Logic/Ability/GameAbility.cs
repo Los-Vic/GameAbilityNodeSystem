@@ -2,6 +2,7 @@
 using CommonObjectPool;
 using GAS.Logic.Value;
 using MissQ;
+using NS;
 
 namespace GAS.Logic
 {
@@ -12,6 +13,14 @@ namespace GAS.Logic
         public uint Lv;
     }
 
+    public enum ECheckAbilityResult
+    {
+        Success,
+        NotAvailable,
+        InCooling,
+        CostFailed,
+    }
+    
     public enum EAbilityState
     {
         Initialized,
@@ -103,6 +112,7 @@ namespace GAS.Logic
         //获得和移除Ability
         internal void OnAddAbility(GameUnit owner)
         {
+            NodeSystemLogger.Log($"On add ability: {Asset.abilityName}");
             _owner = owner;
             State = EAbilityState.Idle;
             
@@ -112,6 +122,7 @@ namespace GAS.Logic
 
         internal void OnRemoveAbility()
         {
+            NodeSystemLogger.Log($"On remove ability: {Asset.abilityName}");
             //todo: Graph unregister to game event
             
             GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
@@ -120,32 +131,30 @@ namespace GAS.Logic
         }
         
         //检测技能执行条件是否满足
-        internal bool CheckAbility()
+        private ECheckAbilityResult CheckAbility()
         {
+            //Available
             if(!IsAvailable)
-                return false;
+                return ECheckAbilityResult.NotAvailable;
             
             //Cooldown
             if (IsInCooldown)
-                return false;
+                return ECheckAbilityResult.InCooling;
 
             //Cost 
             foreach (var costElement in Asset.costs)
             {
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, _owner, Lv);
                 if (_owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
-                    return false;
+                    return ECheckAbilityResult.CostFailed;
             }
 
-            return true;
+            return ECheckAbilityResult.Success;
         }
 
         //提交执行技能的消耗，并开始冷却计时
-        internal bool CommitAbility()
+        private void CommitAbility()
         {
-            if (!CheckAbility())
-                return false;
-            
             StartCooldown();
             
             foreach (var costElement in Asset.costs)
@@ -155,18 +164,8 @@ namespace GAS.Logic
                 var newVal = attribute.Val - costNums;
                 _owner.Sys.AttributeInstanceMgr.SetAttributeVal(_owner, attribute, newVal);
             }
-
-            return true;
         }
         
-        internal void ActivateAbility()
-        {
-            if(!IsAvailable)
-                return;
-            
-            GraphController.RunGraph(typeof(OnActivateAbilityPortalNode));
-        }
-
         #region Cooldown
 
         private void ResetCooldown()
@@ -211,7 +210,44 @@ namespace GAS.Logic
         }
 
         #endregion
-       
+
+        #region Graph Funciton
+
+        internal void GF_ActivateAbility()
+        {
+            var checkResult = CheckAbility();
+            if (checkResult != ECheckAbilityResult.Success)
+            {
+                NodeSystemLogger.Log($"Activate ability failed, check result : {checkResult}. {Asset.abilityName}");
+                return;
+            }
+            
+            CommitAbility();
+            NodeSystemLogger.Log($"Activate ability succeeded. {Asset.abilityName}");
+            GraphController.RunGraph(typeof(OnActivateAbilityPortalNode));
+        }
+
+        internal void GF_ActivateAbilityWithGameEventParam(GameEventNodeParam param)
+        {
+            if (param == null)
+            {
+                NodeSystemLogger.Log($"Activate ability with param failed, param is null. {Asset.abilityName}");
+                return;
+            }
+            
+            var checkResult = CheckAbility();
+            if (checkResult != ECheckAbilityResult.Success)
+            {
+                NodeSystemLogger.Log($"Activate ability with param failed, check result : {checkResult}. {Asset.abilityName}");
+                return;
+            }
+            
+            CommitAbility();
+            NodeSystemLogger.Log($"Activate ability with param succeeded. {Asset.abilityName}");
+            GraphController.RunGraph(typeof(OnActivateAbilityByEventPortalNode), param);
+        }
+
+        #endregion
         
         #region Object Pool
 

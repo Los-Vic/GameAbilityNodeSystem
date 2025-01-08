@@ -16,7 +16,7 @@ namespace GAS.Logic
         public string EventString;
     }
     
-    [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), (int)ECommonNodeCategory.Portal, NodeScopeDefine.System)]
+    [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Portal, NodeScopeDefine.System)]
     public class GameEventPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]

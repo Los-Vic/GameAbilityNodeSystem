@@ -18,7 +18,10 @@ namespace NS
         [SerializeField] private string guid = Guid.NewGuid().ToString();
         [SerializeField] private Rect position;
 
-        public string nodeName;
+        [SerializeField]
+        private string nodeName;
+
+        public string NodeName => nodeName;
 
         public string Id => guid;
         public Rect Position
@@ -41,6 +44,17 @@ namespace NS
 #endif
             _nodeFunctionType = nodeAttribute.FunctionType;
         }
+        
+        #if UNITY_EDITOR
+        public void SetNodeName(string postfix)
+        {
+            var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
+            if (nodeAttribute == null) 
+                return;
+            
+            nodeName = $"{nodeAttribute.Title}_{postfix}";
+        }
+        #endif
         
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
         

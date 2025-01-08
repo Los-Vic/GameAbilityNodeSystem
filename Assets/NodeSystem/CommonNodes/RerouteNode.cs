@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Reroute", "Common/Reroute", ENodeFunctionType.Value ,typeof(RerouteNodeRunner), (int)ECommonNodeCategory.Value)]
+    [Node("Reroute", "Common/Reroute", ENodeFunctionType.Value ,typeof(RerouteNodeRunner), CommonNodeCategory.Value)]
     public class RerouteNode:Node
     {
         [Port(EPortDirection.Input, typeof(object))]
