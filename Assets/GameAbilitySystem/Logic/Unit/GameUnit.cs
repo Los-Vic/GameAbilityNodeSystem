@@ -5,11 +5,6 @@ using MissQ;
 
 namespace GAS.Logic
 {
-    public interface IOwnedByGameUnit
-    {
-        public GameUnit GetOwner();
-    }
-
     public struct GameUnitCreateParam
     {
         public GameAbilitySystem AbilitySystem;

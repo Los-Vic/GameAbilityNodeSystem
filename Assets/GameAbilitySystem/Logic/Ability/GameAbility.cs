@@ -38,12 +38,12 @@ namespace GAS.Logic
         PostCasting,
     }
     
-    public class GameAbility :IPoolObject, ITickable, IOwnedByGameUnit
+    public class GameAbility :IPoolObject, ITickable
     {
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
         internal uint Lv;
-        private GameUnit _owner;
+        public GameUnit Owner { get; private set; }
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }
         
@@ -113,7 +113,7 @@ namespace GAS.Logic
         internal void OnAddAbility(GameUnit owner)
         {
             NodeSystemLogger.Log($"On add ability: {Asset.abilityName}");
-            _owner = owner;
+            Owner = owner;
             State = EAbilityState.Idle;
             
             GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
@@ -126,7 +126,7 @@ namespace GAS.Logic
             //todo: Graph unregister to game event
             
             GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
-            _owner = null;
+            Owner = null;
             State = EAbilityState.MarkDestroy;
         }
         
@@ -144,8 +144,8 @@ namespace GAS.Logic
             //Cost 
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, _owner, Lv);
-                if (_owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
+                if (Owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
                     return ECheckAbilityResult.CostFailed;
             }
 
@@ -159,10 +159,10 @@ namespace GAS.Logic
             
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, _owner, Lv);
-                var attribute = _owner.GetSimpleAttribute(costElement.attributeType);
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
+                var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                _owner.Sys.AttributeInstanceMgr.SetAttributeVal(_owner, attribute, newVal);
+                Owner.Sys.AttributeInstanceMgr.SetAttributeVal(Owner, attribute, newVal);
             }
         }
         
@@ -176,7 +176,7 @@ namespace GAS.Logic
 
         private void StartCooldown()
         {
-            CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, _owner, Lv);
+            CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
             if(CooldownDuration > 0)
                 IsInCooldown = true;
         }
@@ -269,10 +269,5 @@ namespace GAS.Logic
         }
 
         #endregion
-
-        public GameUnit GetOwner()
-        {
-            return _owner;
-        }
     }
 }

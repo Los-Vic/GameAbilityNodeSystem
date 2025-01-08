@@ -183,8 +183,8 @@ namespace NSEditor
                 if(port == startPort) continue;
                 if(port.node == startPort.node) continue;
                 if(port.direction == startPort.direction) continue;
-                if (port.portType.IsAssignableFrom(startPort.portType) 
-                    || startPort.portType.IsAssignableFrom(port.portType))
+                if (startPort.direction == Direction.Output && port.portType.IsAssignableFrom(startPort.portType) 
+                    || (startPort.direction == Direction.Input && startPort.portType.IsAssignableFrom(port.portType)))
                 {
                     portList.Add(port);
                 }

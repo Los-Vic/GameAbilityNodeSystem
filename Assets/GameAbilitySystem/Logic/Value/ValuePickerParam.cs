@@ -12,7 +12,6 @@ namespace GAS.Logic.Value
     public class ValuePickerParam:ValuePickerBase
     {
         [ValueDropdown(nameof(GetAllParams))]
-        [LabelText("参数名")]
         public string paramName;
         
         public static List<string> GetAllParams()

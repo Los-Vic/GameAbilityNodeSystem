@@ -6,7 +6,9 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
+using Image = UnityEngine.UIElements.Image;
 using Node = NS.Node;
 
 namespace NSEditor
@@ -76,7 +78,7 @@ namespace NSEditor
                 var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
                 if (exposedPropAttribute != null)
                 {
-                    DrawField(fieldInfo.Name);
+                    DrawField(fieldInfo);
                 }
             }
             RefreshExpandedState();
@@ -209,7 +211,7 @@ namespace NSEditor
 
         private void CreatePortalTypeExtension(FieldInfo fieldInfo)
         {
-            var propertyField = DrawField(fieldInfo.Name);
+            var propertyField = DrawField(fieldInfo);
             propertyField?.RegisterValueChangeCallback(OnPortalTypeFieldChangeCallback);
             var val = fieldInfo.GetValue(Node);
             var newTitle = val.ToString();
@@ -246,7 +248,7 @@ namespace NSEditor
             }
         }
 
-        private PropertyField DrawField(string fieldInfoName)
+        private PropertyField DrawField(FieldInfo fieldInfo)
         {
             if (_serializedNode == null)
             {
@@ -255,14 +257,97 @@ namespace NSEditor
                     return default;
             }
             
-            var prop = _serializedNode.FindPropertyRelative(fieldInfoName);
+            var prop = _serializedNode.FindPropertyRelative(fieldInfo.Name);
             var field = new PropertyField(prop);
+            
+            //create dropdown field to select instance
+            if (fieldInfo.GetCustomAttribute<SerializeReference>() != null)
+            {
+                var baseType = fieldInfo.FieldType;
+                var typeList = GetSerializeReferenceChildClasses(baseType);
+                
+                var dropdownField = new DropdownField("Class");
+                dropdownField.choices.Add("Null");
+                foreach (var t in typeList)
+                {
+                    dropdownField.choices.Add(t.Name);
+                }
+
+                if (prop.managedReferenceValue == null)
+                {
+                    dropdownField.index = 0;
+                }
+                else
+                {
+                    var t = prop.managedReferenceValue.GetType();
+                    for (var i = 0; i < dropdownField.choices.Count; i++)
+                    {
+                        if (dropdownField.choices[i] == t.Name)
+                        {
+                            dropdownField.index = i;
+                            break;
+                        }
+                    }
+                }
+
+                dropdownField.RegisterValueChangedCallback((evt) => 
+                    OnSerializeReferenceDropdownFieldValueChanged(evt, prop, typeList, field));
+                extensionContainer.Add(dropdownField);
+            }
+            
+           
             field.BindProperty(prop);
            // field.bindingPath = prop.propertyPath;
             extensionContainer.Add(field);
             
             return field;
         }
+
+        private void OnSerializeReferenceDropdownFieldValueChanged(ChangeEvent<string> evt, SerializedProperty property, 
+            List<Type> typeList, PropertyField propertyField)
+        {
+            if (evt.newValue == "Null")
+            {
+                property.managedReferenceValue = null;
+                property.serializedObject.ApplyModifiedProperties();
+                return;
+            }
+            
+            foreach (var t in typeList)
+            {
+                if (t.Name == evt.newValue)
+                {
+                    property.managedReferenceValue = Activator.CreateInstance(t);
+                    property.serializedObject.ApplyModifiedProperties();
+
+                    if (!propertyField.IsBound())
+                    {
+                        propertyField.BindProperty(property);
+                    }
+                    break;
+                }
+            }
+        }
+
+        private List<Type> GetSerializeReferenceChildClasses(Type baseType)
+        {
+            var list = new List<Type>();
+            
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.IsSubclassOf(baseType))
+                    {
+                        list.Add(type);
+                    }
+                }
+            }
+            return list;
+        }
+        
+        
 
         private Direction GetPortDirection(EPortDirection dir)
         {

@@ -20,7 +20,7 @@ MonoBehaviour:
   cooldown:
     rid: -2
   costs: []
-  tags: 
+  abilityTags: 
   references:
     version: 2
     RefIds:
