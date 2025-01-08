@@ -254,11 +254,13 @@ namespace NSEditor
                 if (_serializedNode == null)
                     return default;
             }
-
+            
             var prop = _serializedNode.FindPropertyRelative(fieldInfoName);
-            var field = new PropertyField();
-            field.bindingPath = prop.propertyPath;
+            var field = new PropertyField(prop);
+            field.BindProperty(prop);
+           // field.bindingPath = prop.propertyPath;
             extensionContainer.Add(field);
+            
             return field;
         }
 
