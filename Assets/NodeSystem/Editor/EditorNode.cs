@@ -49,6 +49,7 @@ namespace NSEditor
             var att = type.GetCustomAttribute<NodeAttribute>();
             ConstructTitle(type, att);
 
+            tooltip = att.ToolTip;
 
             //Add Class To Uss
             var depths = att.MenuItem.Split('/');

@@ -33,17 +33,22 @@ namespace NS
         /// 节点的作用类型
         /// </summary>
         public ENodeFunctionType FunctionType { get; private set; }
+        
+        public string ToolTip { get; private set; }
 
         public NodeAttribute(string title, string menuItem, ENodeFunctionType functionType, Type runnerType, 
-            int nodeCategory = 0, int scope = 0, bool isSingleton = false)
+            int nodeCategory = 0, int scope = 0, string tooltip = "")
         {
             Title = title;
             MenuItem = menuItem;
             NodeCategory = nodeCategory;
-            IsSingleton = isSingleton;
             NodeRunnerType = runnerType;
             Scope = scope;
             FunctionType = functionType;
+            ToolTip = tooltip;
+            
+            //暂时不考虑这个
+            IsSingleton = false;
         }
     }
     

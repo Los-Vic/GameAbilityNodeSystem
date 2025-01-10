@@ -25,14 +25,14 @@ namespace NS
         
         //Run node runner
         private Node _portalNode;
-        private FlowNodeRunner _curRunner;
+        private FlowNodeRunner _curNodeRunner;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string PortalName => _portalNode?.DisplayName() ?? "";
-        
+        public string PortalNodeId => _portalNode?.Id ?? "";
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
 
         public NodeGraphRunnerContext Context { get; private set; }
@@ -84,7 +84,7 @@ namespace NS
         /// </summary>
         private void Clear()
         {
-            _curRunner = null;
+            _curNodeRunner = null;
             _runningLoopNodeIds.Clear();
             _outPortResultCached.Clear();
             DestroyRunnerInstances();
@@ -110,7 +110,7 @@ namespace NS
             }
             
             NodeSystemLogger.Log($"start run graph {_asset.name}, portal:{_portalNode.DisplayName()}");
-            _curRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
+            _curNodeRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
@@ -132,33 +132,34 @@ namespace NS
         
         internal void ExecuteRunner()
         {
-            if (_curRunner == null)
+            if (_curNodeRunner == null)
             {
                 CompleteRunner();
                 return;
             }
-            _curRunner.Execute();
+            NodeSystemLogger.Log($"execute node {_curNodeRunner.GetType()}");
+            _curNodeRunner.Execute();
         }
 
         internal void MoveToNextNode()
         {
-            if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curRunner)
+            if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curNodeRunner)
             {
-                _curRunner.Reset();
+                _curNodeRunner.Reset();
             }
                 
-            var nextNode = _curRunner.GetNextNode();
+            var nextNode = _curNodeRunner.GetNextNode();
             if (!Node.IsValidNodeId(nextNode))
             {
                 if (!Node.IsValidNodeId(loopNode))
                 {
-                    _curRunner = null;
+                    _curNodeRunner = null;
                     return;
                 }
                 nextNode = loopNode;
             }
                 
-            _curRunner = GetNodeRunner(nextNode) as FlowNodeRunner;
+            _curNodeRunner = GetNodeRunner(nextNode) as FlowNodeRunner;
         }
         
         public NodeRunner GetNodeRunner(string nodeId)

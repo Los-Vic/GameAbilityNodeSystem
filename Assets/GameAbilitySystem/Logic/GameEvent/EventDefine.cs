@@ -1,6 +1,6 @@
 ﻿namespace GAS.Logic
 {
-    public enum EGamePortal
+    public enum EGameEventPortal
     {
        None,
        OnPostPrepareStart,

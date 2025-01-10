@@ -2,7 +2,8 @@
 
 namespace GAS.Logic
 {
-    [Node("ActivateAbilityByEvent", "Ability/Exec/ActivateAbilityByEvent", ENodeFunctionType.Flow, typeof(ActivateAbilityByEventNodeRunner), CommonNodeCategory.Action, NodeScopeDefine.Ability)]
+    [Node("ActivateAbilityByEvent", "Ability/Exec/ActivateAbilityByEvent", ENodeFunctionType.Flow, typeof(ActivateAbilityByEventNodeRunner), 
+        CommonNodeCategory.Action, NodeScopeDefine.Ability, "Trigger OnActivateAbilityByEvent portal, means activity is activated")]
     public class ActivateAbilityByEventNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

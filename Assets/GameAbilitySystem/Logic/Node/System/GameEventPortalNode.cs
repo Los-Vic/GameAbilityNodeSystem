@@ -1,5 +1,6 @@
 ﻿using MissQ;
 using NS;
+using UnityEngine.Serialization;
 using Node = NS.Node;
 
 namespace GAS.Logic
@@ -22,15 +23,15 @@ namespace GAS.Logic
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [PortalType]
-        public EGamePortal NodePortal;
+        [FormerlySerializedAs("NodePortal")] [PortalType]
+        public EGameEventPortal nodeEventPortal;
         
         [Port(EPortDirection.Output, typeof(GameEventNodeParam), "EventParam")]
         public string OutParam1;
         
         public override string DisplayName()
         {
-            return NodePortal.ToString();
+            return nodeEventPortal.ToString();
         }
     }
     

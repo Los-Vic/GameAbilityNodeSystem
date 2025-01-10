@@ -2,30 +2,31 @@
 
 namespace GAS.Logic
 {
-    [Node("ActivateAbility", "Ability/Exec/ActivateAbility", ENodeFunctionType.Flow, typeof(ActivateAbilityNodeRunner), 
-        CommonNodeCategory.Action, NodeScopeDefine.Ability, "Trigger OnActivateAbility portal, means activity is activated")]
-    public class ActivateAbilityNode:Node
+    [Node("CancelAbility", "Ability/Exec/CancelAbility", ENodeFunctionType.Flow, typeof(CancelAbilityNodeNodeRunner), 
+        CommonNodeCategory.Action, NodeScopeDefine.Ability, 
+        "Cancel ability if ability is in activated, that is either OnActivateAbility or OnActivateAbilityByEvent is running with tasks")]
+    public class CancelAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
     }
-
-    public class ActivateAbilityNodeRunner : FlowNodeRunner
+    
+    public class CancelAbilityNodeNodeRunner : FlowNodeRunner
     {
-        private ActivateAbilityNode _node;
+        private CancelAbilityNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (ActivateAbilityNode)nodeAsset;
+            _node = (CancelAbilityNode)nodeAsset;
         }
 
         public override void Execute()
         {
             if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
             {
-                context.Ability.GF_ActivateAbility();
+                context.Ability.GF_CancelAbility();
             }
             Complete();
         }

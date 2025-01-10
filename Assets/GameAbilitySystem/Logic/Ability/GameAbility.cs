@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CommonObjectPool;
 using GAS.Logic.Value;
 using MissQ;
@@ -24,8 +25,7 @@ namespace GAS.Logic
     public enum EAbilityState
     {
         Initialized,
-        Idle,
-        Casting,
+        Available,
         MarkDestroy,
         UnInitialized,
     }
@@ -58,9 +58,8 @@ namespace GAS.Logic
         internal Action OnStartCast;
         internal Action OnStartPostCast;
         internal Action OnEndPostCast;
-        
-        
-        private bool IsAvailable => State == EAbilityState.Idle;
+        private bool IsAvailable => State == EAbilityState.Available;
+        private readonly List<NodeGraphRunner> _activateAbilityRunners = new();
         
         internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
         {
@@ -74,11 +73,33 @@ namespace GAS.Logic
 
         private void UnInit()
         {
+            _activateAbilityRunners.Clear();
             ResetCooldown();
             GraphController.UnInit();
             CastingState = EAbilityCastingState.None;
             State = EAbilityState.UnInitialized;
         }
+        
+        #region Object Pool
+
+        public void OnCreateFromPool()
+        {
+        }
+
+        public void OnTakeFromPool()
+        {
+        }
+
+        public void OnReturnToPool()
+        {
+            UnInit();
+        }
+
+        public void OnDestroy()
+        {
+        }
+
+        #endregion
 
         #region Tick
 
@@ -99,8 +120,7 @@ namespace GAS.Logic
         }
         
         #endregion
-      
-
+        
         //变更等级
         internal void ChangeAbilityLevel(uint newLv)
         {
@@ -114,7 +134,7 @@ namespace GAS.Logic
         {
             NodeSystemLogger.Log($"On add ability: {Asset.abilityName}");
             Owner = owner;
-            State = EAbilityState.Idle;
+            State = EAbilityState.Available;
             
             GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
             //todo: Graph register to game event
@@ -224,7 +244,8 @@ namespace GAS.Logic
             
             CommitAbility();
             NodeSystemLogger.Log($"Activate ability succeeded. {Asset.abilityName}");
-            GraphController.RunGraph(typeof(OnActivateAbilityPortalNode));
+            var runner = GraphController.RunGraph(typeof(OnActivateAbilityPortalNode), null, OnActivateAbilityRunnerEnd);
+            _activateAbilityRunners.Add(runner);
         }
 
         internal void GF_ActivateAbilityWithGameEventParam(GameEventNodeParam param)
@@ -244,30 +265,30 @@ namespace GAS.Logic
             
             CommitAbility();
             NodeSystemLogger.Log($"Activate ability with param succeeded. {Asset.abilityName}");
-            GraphController.RunGraph(typeof(OnActivateAbilityByEventPortalNode), param);
+            var runner = GraphController.RunGraph(typeof(OnActivateAbilityByEventPortalNode), param, OnActivateAbilityRunnerEnd);
+            _activateAbilityRunners.Add(runner);
         }
 
-        #endregion
+        internal void GF_CancelAbility()
+        {
+            if (_activateAbilityRunners.Count == 0)
+            {
+                NodeSystemLogger.Log($"Cancel ability failed, not activated. {Asset.abilityName}");
+                return;
+            }
+
+            foreach (var runner in _activateAbilityRunners)
+            {
+                NodeSystemLogger.Log($"Cancel ability runner, portal name:{runner.PortalName}. {Asset.abilityName}");
+                runner.CancelRunner();
+            }
+        }
         
-        #region Object Pool
-
-        public void OnCreateFromPool()
-        {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
-        {
-            UnInit();
-        }
-
-        public void OnDestroy()
-        {
-        }
-
         #endregion
+
+        private void OnActivateAbilityRunnerEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
+        {
+            _activateAbilityRunners.Remove(runner);
+        }
     }
 }

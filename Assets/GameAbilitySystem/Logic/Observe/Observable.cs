@@ -39,6 +39,7 @@ namespace GAS.Logic
         {
             foreach (var observer in _observers)
             {
+                //maybe exception needed here?
                 _callbackMap[observer]?.Invoke(msg);
             }
         }

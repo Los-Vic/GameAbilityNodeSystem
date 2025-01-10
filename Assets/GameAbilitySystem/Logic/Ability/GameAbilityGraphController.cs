@@ -17,10 +17,11 @@ namespace GAS.Logic
         private readonly GameAbilityGraphRunnerContext _context = new();
 
         private readonly List<NodeGraphRunner> _graphRunners = new();
-        private readonly Dictionary<EGamePortal, string> _gameEventTypeNodeIdMap = new();
+        
+        private readonly Dictionary<EGameEventPortal, string> _gameEventTypeNodeIdMap = new();
         private readonly Dictionary<Type, string> _portTypeNodeIdMap = new();
 
-        internal List<EGamePortal> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
+        internal List<EGameEventPortal> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
         
         internal void Init(GameAbilitySystem system, NodeGraphAsset asset, GameAbility ability)
         {
@@ -35,7 +36,7 @@ namespace GAS.Logic
                 
                 if (node is GameEventPortalNode eventNode)
                 {
-                    _gameEventTypeNodeIdMap.TryAdd(eventNode.NodePortal, node.Id);
+                    _gameEventTypeNodeIdMap.TryAdd(eventNode.nodeEventPortal, node.Id);
                 }
                 else
                 {
@@ -56,33 +57,42 @@ namespace GAS.Logic
             _context.Ability = null;
         }
         
-        internal void RunGraphGameEvent(EGamePortal portalType, GameEventNodeParam param)
+        internal NodeGraphRunner RunGraphGameEvent(EGameEventPortal eventPortalType, GameEventNodeParam param, Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null)
         {
-            if (!_gameEventTypeNodeIdMap.TryGetValue(portalType, out var nodeId))
+            if (!_gameEventTypeNodeIdMap.TryGetValue(eventPortalType, out var nodeId))
             {
-                NodeSystemLogger.LogError($"Not found {portalType} node in {_asset.name}!");
-                return;
+                NodeSystemLogger.LogError($"Not found {eventPortalType} node in {_asset.name}!");
+                return null;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
-            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd, _context);
+            graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
+            {
+                customOnRunGraphEnd?.Invoke(runner, endType);
+                OnRunGraphEnd(runner, endType);
+            }, _context);
             graphRunner.StartRunner();
+            return graphRunner;
         }
         
-        internal void RunGraph(Type portalNodeType, GameEventNodeParam param = null)
+        internal NodeGraphRunner RunGraph(Type portalNodeType, GameEventNodeParam param = null, Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null)
         {
             if (!_portTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
             {
                 NodeSystemLogger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
-                return;
+                return null;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
-            graphRunner.Init(_system, _asset, nodeId, param, OnRunGraphEnd, _context);
+            graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
+            {
+                customOnRunGraphEnd?.Invoke(runner, endType);
+                OnRunGraphEnd(runner, endType);
+            }, _context);
             graphRunner.StartRunner();
-           
+            return graphRunner;
         }
-
+        
         private void OnRunGraphEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
             _system.NodeObjectFactory.DestroyGraphRunner(runner);
