@@ -31,6 +31,7 @@ namespace GAS.Logic
         public override void UnInitSystem()
         {
             base.UnInitSystem();
+            ObjectPoolMgr.Clear();
         }
 
         public override void UpdateSystem(float dt)

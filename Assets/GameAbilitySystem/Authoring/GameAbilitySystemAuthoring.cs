@@ -54,6 +54,11 @@ namespace GAS.Authoring
             _system.UpdateSystem(Time.deltaTime);
         }
 
+        private void OnDestroy()
+        {
+            _system.UnInitSystem();
+        }
+
         public AbilityAsset GetAbilityAsset(uint abilityId)
         {
             if (!_abilityConfigMap.TryGetValue(abilityId, out var abilityConfig))
@@ -93,7 +98,8 @@ namespace GAS.Authoring
             //Creat a test unit
             var param = new GameUnitCreateParam()
             {
-                AbilitySystem = _system
+                AbilitySystem = _system,
+                UnitName = "TestUnit",
             };
             _testUnit = _system.CreateGameUnit(ref param);
             _testUnit.GrantAbility(0);

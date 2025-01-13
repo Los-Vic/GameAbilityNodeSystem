@@ -17,13 +17,13 @@ namespace GAS.Logic
         {
             var unit = _system.ObjectPoolMgr.CreateObject<GameUnit>();
             unit.Init(ref param);
-            NodeSystemLogger.Log("Create Unit!");
+            NodeSystemLogger.Log($"Create unit:{param.UnitName}!");
             return unit;
         }
 
         internal void DestroyGameUnit(GameUnit unit)
         {
-            NodeSystemLogger.Log("Destroy Unit!");
+            NodeSystemLogger.Log($"Destroy unit:{unit.UnitName}!");
             _system.ObjectPoolMgr.DestroyObject(unit);
         }
 

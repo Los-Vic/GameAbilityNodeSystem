@@ -17,6 +17,7 @@ namespace CommonObjectPool
     {
         private readonly UnityEngine.Pool.ObjectPool<IPoolObject> _pool;
         private readonly Type _poolObjectType;
+        private readonly List<IPoolObject> _poolObjects = new();
 
         //Constructor
         public ObjectPool(Type type, int capacity, int maxSize)
@@ -39,18 +40,23 @@ namespace CommonObjectPool
         public IPoolObject CreateObject()
         {
             var obj = _pool.Get();
+            _poolObjects.Add(obj);
             obj.OnTakeFromPool();
             return obj;
         }
 
         public void DestroyObject(IPoolObject obj)
         {
+            _poolObjects.Remove(obj);
             obj.OnReturnToPool();
             _pool.Release(obj);
         }
+        
+        public List<IPoolObject> GetObjects() => _poolObjects;
 
         public void Clear()
         {
+            Debug.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], count [{_poolObjects.Count}]");
             _pool.Clear();
         }
         
@@ -73,7 +79,6 @@ namespace CommonObjectPool
 
         private static void OnDestroyItem(IPoolObject obj)
         {
-            //this.LogWarning($"[EF]ObjectPool[{typeof(T).Name}] reach max size! consider increasing max size or decreasing the number of instances!");
             obj.OnDestroy();
         }
 
@@ -140,6 +145,14 @@ namespace CommonObjectPool
             pool.DestroyObject(obj);
         }
 
+        public List<T> GetObjects<T>() where T : class, IPoolObject
+        {
+            var type = typeof(T);
+            if (!_objectPoolMap.TryGetValue(type, out var pool))
+                return null;
+            return pool.GetObjects() as List<T>;
+        }
+        
         public IEnumerable<ObjectPool> GetAllPools()
         {
             return _objectPoolMap.Values;

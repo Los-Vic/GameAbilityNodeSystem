@@ -8,11 +8,16 @@ namespace GAS.Logic
     public struct GameUnitCreateParam
     {
         public GameAbilitySystem AbilitySystem;
+        public string UnitName;
     }
     
     public class GameUnit: IPoolObject
     {
         internal GameAbilitySystem Sys { get;private set; }
+
+        private const string DefaultUnitName = "UnkownUnit";
+        private string _unitName = DefaultUnitName;
+        internal string UnitName => _unitName;
         
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
@@ -27,10 +32,12 @@ namespace GAS.Logic
         internal void Init(ref GameUnitCreateParam param)
         {
             Sys = param.AbilitySystem;
+            _unitName = param.UnitName;
         }
 
         private void UnInit()
         {
+            _unitName = DefaultUnitName;
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
             {

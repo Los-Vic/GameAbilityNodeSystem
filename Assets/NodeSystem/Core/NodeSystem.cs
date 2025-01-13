@@ -20,6 +20,7 @@ namespace NS
 
         public virtual void UnInitSystem()
         {
+            NodePoolMgr.Clear();
             NodeObjectFactory.Clear();
             _graphAssetRuntimeDataMap.Clear();
         }
