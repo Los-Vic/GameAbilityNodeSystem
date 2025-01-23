@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CommonObjectPool;
 using MissQ;
+using NS;
 
 namespace GAS.Logic
 {
@@ -9,6 +10,14 @@ namespace GAS.Logic
     {
         public GameAbilitySystem AbilitySystem;
         public string UnitName;
+    }
+
+    public enum EUnitAbilityCastState
+    {
+        Idle,
+        PreCasting,
+        Casting,
+        PostCasting,
     }
     
     public class GameUnit: IPoolObject
@@ -28,6 +37,11 @@ namespace GAS.Logic
         
         //Effects
         internal readonly List<GameEffect> GameEffects = new();
+        
+        //Ability Cast
+        private GameAbility _castingAbility;
+        internal EUnitAbilityCastState CastingState { get; private set; }
+        internal bool CanCastNewAbility => CastingState == EUnitAbilityCastState.Idle;
         
         internal void Init(ref GameUnitCreateParam param)
         {
@@ -141,6 +155,22 @@ namespace GAS.Logic
         {
             ability.OnRemoveAbility();
             GameAbilities.Remove(ability);
+        }
+
+        #endregion
+
+        #region Cast Ability
+
+        internal void CastAbility(GameAbility ability)
+        {
+            if (!CanCastNewAbility)
+            {
+                NodeSystemLogger.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
+                return;
+            }
+            
+            
+            
         }
 
         #endregion

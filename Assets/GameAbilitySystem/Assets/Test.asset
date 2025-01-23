@@ -105,9 +105,9 @@ MonoBehaviour:
         guid: 263ee3d7-8829-411f-8079-2a4a5ff16f63
         position:
           serializedVersion: 2
-          x: 255.2
-          y: 506.40002
-          width: 184.00002
+          x: 256
+          y: 448
+          width: 184
           height: 76.79999
         nodeName: OnActivateAbility
         OutPortExec: e86397b9-6b88-4775-8dcd-2a6e58ca04b2
