@@ -21,12 +21,6 @@ namespace GAS.Logic
         Duration,
         KillByGraphLogic
     }
-
-    public enum EAbilityCastStyle
-    {
-        Simplified,
-        Complete
-    }
     
     
     [Serializable]
@@ -45,9 +39,6 @@ namespace GAS.Logic
     {
         [Title("Ability")]
         public string abilityName;
-        
-        [BoxGroup("Visual")]
-        [FilePath] public string cueAssetPath;
         
         [BoxGroup("Life")]
         [DetailedInfoBox("click to show life type descriptions", "Activated: 技能生效一次后死亡\n" +
@@ -71,28 +62,13 @@ namespace GAS.Logic
         [BoxGroup("Resource")]
         public List<AbilityCostCfgElement> costs = new();
 
-        [BoxGroup("Cast")] 
-        [OnValueChanged(nameof(OnCastStyleChanged))]
-        public EAbilityCastStyle castStyle;
-
-        [BoxGroup("Cast/Time", VisibleIf = "@castStyle == EAbilityCastStyle.Complete")]
-        [SerializeReference]
-        public ValuePickerBase preCastTime;
-        
-        [BoxGroup("Cast/Time")]
-        [SerializeReference]
-        public ValuePickerBase castTime;
-        
-        [BoxGroup("Cast/Time")]
-        [SerializeReference]
-        public ValuePickerBase postCastTime;
-        
-        [BoxGroup("Cast/Time")]
-        [SerializeReference]
-        [InfoBox("限制完整的cast流程时长。当配置时长大于该值时，会将各部分等比缩小")]
-        public ValuePickerBase castProcessTimeClamp;
-        
         public List<EAbilityTag> abilityTags = new();
+
+        [Title("References")] 
+        [ReadOnly]
+        public List<string> referencedAbilities = new();
+        [ReadOnly] 
+        public List<string> referencedGameCueTags = new();
         
         //Runtime
         public uint Id { get; set; }
@@ -107,17 +83,25 @@ namespace GAS.Logic
             }
         }
 
-        private void OnCastStyleChanged()
+        /// <summary>
+        /// 收集引用的Ability和GameCue，用于加载的时候分析引用关系
+        /// </summary>
+        public override void OnGraphNodeChanged()
         {
-            if (castStyle == EAbilityCastStyle.Simplified)
-            {
-                preCastTime = null;
-                castTime = null;
-                postCastTime = null;
-                castProcessTimeClamp = null;
-            }
+            Debug.Log($"OnGraphNodeChanged:{abilityName}");
+            CollectReferences();
         }
-    
+
+        public override void OnGraphReDraw()
+        {
+            Debug.Log($"OnGraphReDraw:{abilityName}");
+            CollectReferences();
+        }
+
+        private void CollectReferences()
+        {
+            
+        }
 #endif
     }
 }

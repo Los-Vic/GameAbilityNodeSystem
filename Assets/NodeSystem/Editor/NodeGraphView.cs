@@ -75,7 +75,7 @@ namespace NSEditor
         
         private void OnUnserializeAndPaste(string operationname, string data)
         {
-            Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Paste Nodes");
+            Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[NodeSystem] Paste Nodes");
             var content = JsonUtility.FromJson<CopyContent>(data);
             var portIdMap = new Dictionary<string, string>();
             var newNodeList = new List<Node>();
@@ -268,7 +268,7 @@ namespace NSEditor
         /// <param name="node"></param>
         public void AddNodeToGraphAsset(Node node)
         {
-            Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[FlowGraph] Add Node");
+            Undo.RegisterCompleteObjectUndo(_serializedObject.targetObject, "[NodeSystem] Add Node");
             GraphAsset.AddNode(node);
             _serializedObject.Update();
             AddNodeToGraphView(node);
@@ -339,6 +339,7 @@ namespace NSEditor
         public void ReDrawGraph()
         {
             GraphAsset.LoadMap();
+            GraphAsset.OnGraphReDraw();
             
             foreach (var element in graphElements)
             {

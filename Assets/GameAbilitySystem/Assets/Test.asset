@@ -22,23 +22,15 @@ MonoBehaviour:
   - rid: 5115944341010382908
   - rid: 5115944341010382912
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
-  cueAssetPath: 
   lifeType: 0
   lifeParamVal:
     rid: -2
   cooldown:
     rid: -2
   costs: []
-  castStyle: 0
-  preCastTime:
-    rid: -2
-  castTime:
-    rid: -2
-  postCastTime:
-    rid: -2
-  castProcessTimeClamp:
-    rid: -2
   abilityTags: 
+  referencedAbilities: []
+  referencedGameCueTags: []
   references:
     version: 2
     RefIds:
@@ -72,7 +64,7 @@ MonoBehaviour:
         guid: 14fa5b86-f291-4076-b775-2b3cb0ca8c88
         position:
           serializedVersion: 2
-          x: 602.4
+          x: 595.2
           y: 250.4
           width: 161.59998
           height: 76.80002

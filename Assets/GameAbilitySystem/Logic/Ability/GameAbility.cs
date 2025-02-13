@@ -33,7 +33,6 @@ namespace GAS.Logic
     public class GameAbility :IPoolObject, ITickable
     {
         internal AbilityAsset Asset;
-        internal readonly AbilityLogicCue LogicCue = new();
         internal readonly GameAbilityGraphController GraphController = new();
         internal uint Lv;
         public GameUnit Owner { get; private set; }
@@ -65,7 +64,6 @@ namespace GAS.Logic
 
         private void UnInit()
         {
-            LogicCue.Reset();
             _activateAbilityRunners.Clear();
             ResetCooldown();
             GraphController.UnInit();

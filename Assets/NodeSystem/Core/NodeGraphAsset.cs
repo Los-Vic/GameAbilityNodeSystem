@@ -25,6 +25,16 @@ namespace NS
 
         public Node GetNode(string id) => _nodeMap.GetValueOrDefault(id);
         public NodePort GetPort(string id) => _portMap.GetValueOrDefault(id);
+
+        public virtual void OnGraphNodeChanged()
+        {
+        }
+
+        public virtual void OnGraphReDraw()
+        {
+            
+        }
+        
         public void LoadMap()
         {
             _nodeMap.Clear();
@@ -44,6 +54,7 @@ namespace NS
         {
             nodes.Add(node);
             _nodeMap.Add(node.Id, node);
+            OnGraphNodeChanged();
             
             //Create Ports
             if(!needCreatePorts)
@@ -65,6 +76,7 @@ namespace NS
         {
             nodes.Remove(node);
             _nodeMap.Remove(node.Id);
+            OnGraphNodeChanged();
             
             //Remove Ports
             var type = node.GetType();
