@@ -11,6 +11,8 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]
         public string InPortVal;
 
+        [Port(EPortDirection.Output, typeof(EGameEventPortal), "EventType")]
+        public string OutPortEventType;
         [Port(EPortDirection.Output, typeof(GameUnit), "SrcUnit")]
         public string OutPortSrcUnit;
         [Port(EPortDirection.Output, typeof(GameAbility), "SrcAbility")]
@@ -44,6 +46,7 @@ namespace GAS.Logic
             if(inVal == null)
                 return;
             
+            GraphRunner.SetOutPortVal(_node.OutPortEventType, inVal.EventType);
             GraphRunner.SetOutPortVal(_node.OutPortSrcUnit, inVal.EventSrcUnit);
             GraphRunner.SetOutPortVal(_node.OutPortSrcAbility, inVal.EventSrcAbility);
             GraphRunner.SetOutPortVal(_node.OutPortSrcEffect, inVal.EventSrcEffect);

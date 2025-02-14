@@ -7,6 +7,7 @@ namespace GAS.Logic
 {
     public class GameEventNodeParam:PortalParamBase
     {
+        public EGameEventPortal EventType;
         public GameUnit EventSrcUnit; //not null
         public GameAbility EventSrcAbility; //nullable
         public GameEffect EventSrcEffect;  //nullable

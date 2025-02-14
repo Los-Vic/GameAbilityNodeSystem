@@ -267,7 +267,7 @@ namespace NSEditor
                 var baseType = fieldInfo.FieldType;
                 var typeList = GetSerializeReferenceChildClasses(baseType);
                 
-                var dropdownField = new DropdownField("Class");
+                var dropdownField = new DropdownField("ClassType");
                 dropdownField.choices.Add("Null");
                 foreach (var t in typeList)
                 {

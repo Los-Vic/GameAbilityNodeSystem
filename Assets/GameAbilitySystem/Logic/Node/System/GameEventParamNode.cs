@@ -10,6 +10,8 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]
         public string InPortVal;
 
+        [Port(EPortDirection.Output, typeof(EGameEventPortal), "EventType")]
+        public string OutPortEventType;
         [Port(EPortDirection.Output, typeof(GameUnit), "SrcUnit")]
         public string OutPortSrcUnit;
         [Port(EPortDirection.Output, typeof(GameAbility), "SrcAbility")]

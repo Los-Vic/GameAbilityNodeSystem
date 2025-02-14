@@ -62,8 +62,9 @@ namespace GAS.Logic
         [BoxGroup("Resource")]
         public List<AbilityCostCfgElement> costs = new();
 
+        [BoxGroup("AbilityTag")]
         public List<EAbilityTag> abilityTags = new();
-
+        
         [Title("References")] 
         [ReadOnly]
         public List<string> referencedAbilities = new();
