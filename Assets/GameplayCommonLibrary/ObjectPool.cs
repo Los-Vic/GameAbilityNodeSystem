@@ -53,6 +53,7 @@ namespace GameplayCommonLibrary
         }
         
         public List<IPoolObject> GetObjects() => _poolObjects;
+        public bool IsValidObject(IPoolObject obj) => _poolObjects.Contains(obj);
 
         public void Clear()
         {
@@ -65,6 +66,14 @@ namespace GameplayCommonLibrary
         private IPoolObject CreateItem()
         {
             var obj = Activator.CreateInstance(_poolObjectType) as IPoolObject;
+
+            if (obj == null)
+            {
+                Debug.LogError(
+                    $"[ObjectPool]create object item failed: type [{_poolObjectType}] can not assign to IPoolObject");
+                return null;
+            }
+           
             obj.OnCreateFromPool();
             return obj;
         }
@@ -124,7 +133,7 @@ namespace GameplayCommonLibrary
             if (!t.IsAssignableFrom(type))
             {
                 Debug.LogError($"create object failed: type {type} can not assign to IPoolObject");
-                return default;
+                return null;
             }
 
             if (!_objectPoolMap.TryGetValue(type, out var pool))
@@ -151,6 +160,12 @@ namespace GameplayCommonLibrary
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return null;
             return pool.GetObjects() as List<T>;
+        }
+
+        public bool IsValidObject(IPoolObject obj)
+        {
+            var type = obj.GetType();
+            return _objectPoolMap.TryGetValue(type, out var pool) && pool.IsValidObject(obj);
         }
         
         public IEnumerable<ObjectPool> GetAllPools()
