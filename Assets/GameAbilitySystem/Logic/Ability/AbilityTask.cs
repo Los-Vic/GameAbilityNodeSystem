@@ -1,5 +1,5 @@
 ﻿using System;
-using CommonObjectPool;
+using GameplayCommonLibrary;
 using NS;
 
 namespace GAS.Logic

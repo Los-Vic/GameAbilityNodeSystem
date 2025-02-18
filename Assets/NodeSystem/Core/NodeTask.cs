@@ -1,5 +1,5 @@
 ﻿using System;
-using CommonObjectPool;
+using GameplayCommonLibrary;
 
 namespace NS
 {
@@ -14,13 +14,13 @@ namespace NS
     
     public class NodeTask: IPoolObject
     {
-        private string TaskName { get; set; }
         private Func<ETaskStatus> OnStartTask { get; set; }
         private Action OnCompleteTask { get; set; }
         private Action OnCancelTask { get; set; }
         private Func<float, ETaskStatus> OnUpdateTask { get; set; }
 
-        private ETaskStatus Status { get; set; }
+        public string TaskName { get; private set; }
+        public ETaskStatus Status { get; private set; }
         public bool IsEnded => Status is ETaskStatus.Completed or ETaskStatus.Cancelled;
         
         public void InitTask(string taskName, Func<ETaskStatus> startTask, Action completeTask, Action cancelTask, 

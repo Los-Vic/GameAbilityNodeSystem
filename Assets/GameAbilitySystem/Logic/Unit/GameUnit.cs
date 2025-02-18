@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonObjectPool;
+using GameplayCommonLibrary;
 using MissQ;
 using NS;
 
@@ -20,6 +20,15 @@ namespace GAS.Logic
         PostCasting,
     }
     
+    /// <summary>
+    /// GameUnit：
+    /// 1、拥有属性
+    /// 2、可以增加和移除技能
+    /// 3、可以被添加效果
+    /// 4、可以被技能系统作为对象选取
+    /// 5、技能前后摇，技能施放队列管理
+    /// 6、单位标签
+    /// </summary>
     public class GameUnit: IPoolObject
     {
         internal GameAbilitySystem Sys { get;private set; }

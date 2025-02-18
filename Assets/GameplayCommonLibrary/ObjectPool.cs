@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CommonObjectPool
+namespace GameplayCommonLibrary
 {
     public interface IPoolObject
     {
