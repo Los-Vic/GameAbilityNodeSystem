@@ -12,7 +12,7 @@ namespace GAS.Logic
         }
         #region Object Pool
 
-        public void OnCreateFromPool()
+        public void OnCreateFromPool(ObjectPool pool)
         {
         }
 

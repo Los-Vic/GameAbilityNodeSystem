@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MissQ;
 
 namespace GAS.Logic
 {
-    public class AttributeInstanceMgr 
+    public class AttributeInstanceSubsystem:GameAbilitySubsystem
     {
-        private readonly GameAbilitySystem _system;
         private readonly Dictionary<ESimpleAttributeType, IAttributeValSetter> _attributeValSetters = new();
 
-        public AttributeInstanceMgr(GameAbilitySystem sys)
+        public override void UnInit()
         {
-            _system = sys;
+            _attributeValSetters.Clear();
         }
 
         public void RegisterAttributeSetter(ESimpleAttributeType type, IAttributeValSetter setter)
@@ -31,26 +29,26 @@ namespace GAS.Logic
 
         internal SimpleAttribute CreateSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = _system.ObjectPoolMgr.CreateObject<SimpleAttribute>();
+            var attribute = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<SimpleAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
         internal void DestroySimpleAttribute(SimpleAttribute attribute)
         {
-            _system.ObjectPoolMgr.DestroyObject(attribute);
+            System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(attribute);
         }
 
         internal CompositeAttribute CreateCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = _system.ObjectPoolMgr.CreateObject<CompositeAttribute>();
+            var attribute = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<CompositeAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
         internal void DestroyCompositeAttribute(CompositeAttribute attribute)
         {
-            _system.ObjectPoolMgr.DestroyObject(attribute);
+            System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(attribute);
         }
 
         #endregion

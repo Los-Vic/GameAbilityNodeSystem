@@ -29,12 +29,16 @@ namespace GAS.Logic
     /// 5、技能前后摇，技能施放队列管理
     /// 6、单位标签
     /// </summary>
-    public class GameUnit: IPoolObject
+    public class GameUnit: IPoolObject, IRefCountDisposableObj
     {
         internal GameAbilitySystem Sys { get;private set; }
 
         private const string DefaultUnitName = "UnkownUnit";
         private string _unitName = DefaultUnitName;
+        private ObjectPool _pool;
+        private RefCountDisposableComponent _refCountDisposableComponent;
+        private bool _isActive;
+        
         internal string UnitName => _unitName;
         
         //Attributes
@@ -64,20 +68,20 @@ namespace GAS.Logic
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
             {
-                Sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
+                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroySimpleAttribute(attribute);
             }
             SimpleAttributes.Clear();
 
             foreach (var attribute in CompositeAttributes.Values)
             {
-                Sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
+                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroyCompositeAttribute(attribute);
             }
             CompositeAttributes.Clear();
             
             //Clear Abilities
             foreach (var ability in GameAbilities)
             {
-                Sys.AbilityInstanceMgr.DestroyAbility(ability);
+                Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
             }
             GameAbilities.Clear();
             //Clear Effects
@@ -87,7 +91,7 @@ namespace GAS.Logic
 
         internal void AddSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = Sys.AttributeInstanceMgr.CreateSimpleAttribute(ref param);
+            var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
         }
 
@@ -95,7 +99,7 @@ namespace GAS.Logic
         {
             if (SimpleAttributes.Remove(type, out var attribute))
             {
-                Sys.AttributeInstanceMgr.DestroySimpleAttribute(attribute);
+                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroySimpleAttribute(attribute);
             }
         }
 
@@ -112,7 +116,7 @@ namespace GAS.Logic
 
         internal void AddCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = Sys.AttributeInstanceMgr.CreateCompositeAttribute(ref param);
+            var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
         }
 
@@ -120,7 +124,7 @@ namespace GAS.Logic
         {
             if (CompositeAttributes.Remove(type, out var attribute))
             {
-                Sys.AttributeInstanceMgr.DestroyCompositeAttribute(attribute);
+                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroyCompositeAttribute(attribute);
             }
         }
 
@@ -141,7 +145,7 @@ namespace GAS.Logic
 
         public void GrantAbility(uint abilityId)
         {
-            var ability = Sys.AbilityInstanceMgr.CreateAbility(abilityId);
+            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(abilityId);
             if (ability == null)
                 return;
             GameAbilities.Add(ability);
@@ -174,7 +178,7 @@ namespace GAS.Logic
         {
             if (!CanCastNewAbility)
             {
-                NodeSystemLogger.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
+                Sys.Logger.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
                 return;
             }
             
@@ -185,17 +189,19 @@ namespace GAS.Logic
         #endregion
 
         #region Object Pool
-        public void OnCreateFromPool()
+        public void OnCreateFromPool(ObjectPool pool)
         {
-            
+            _pool = pool;
         }
 
         public void OnTakeFromPool()
         {
+            _isActive = true;
         }
 
         public void OnReturnToPool()
         {
+            _isActive = false;
             UnInit();
         }
 
@@ -205,6 +211,30 @@ namespace GAS.Logic
         }
 
         #endregion
-        
+
+        #region IRefCountDisposableObj
+
+        public RefCountDisposableComponent GetRefCountDisposableComponent()
+        {
+            return _refCountDisposableComponent ??= new RefCountDisposableComponent(this);
+        }
+
+        public bool IsDisposed()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ForceDisposeObj()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnObjDispose()
+        {
+            _pool.Release(this);
+        }
+
+        #endregion
+       
     }
 }

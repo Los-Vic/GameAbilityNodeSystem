@@ -7,10 +7,10 @@ namespace GAS.Logic
     [Node("GameEventParam", "System/GameEvent/GameEventParam", ENodeFunctionType.Value , typeof(GameEventParamNodeRunner), CommonNodeCategory.Value)]
     public class GameEventParamNode:Node
     {
-        [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Input, typeof(GameEventArg), "EventParam")]
         public string InPortVal;
 
-        [Port(EPortDirection.Output, typeof(EGameEventPortal), "EventType")]
+        [Port(EPortDirection.Output, typeof(EGameEventType), "EventType")]
         public string OutPortEventType;
         [Port(EPortDirection.Output, typeof(GameUnit), "SrcUnit")]
         public string OutPortSrcUnit;

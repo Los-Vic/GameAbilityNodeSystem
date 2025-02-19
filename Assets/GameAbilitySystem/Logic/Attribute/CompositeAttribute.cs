@@ -92,7 +92,7 @@ namespace GAS.Logic
         }
         
         #region Pool Interface
-        public void OnCreateFromPool()
+        public void OnCreateFromPool(ObjectPool pool)
         {
         }
 

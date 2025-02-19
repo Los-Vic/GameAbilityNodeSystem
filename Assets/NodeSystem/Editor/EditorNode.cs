@@ -369,7 +369,7 @@ namespace NSEditor
 
             if (_graphAsset.GetNodeNameCount(Node.NodeName) > 1)
             {
-                NodeSystemLogger.LogError($"Portal node is repeated! {Node.NodeName}");
+                Debug.LogError($"Portal node is repeated! {Node.NodeName}");
             }
         }
     }

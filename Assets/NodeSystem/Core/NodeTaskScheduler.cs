@@ -17,10 +17,11 @@ namespace NS
         void CancelTasksOfGraphRunner(NodeGraphRunner runner);
         bool HasTaskRunning(NodeGraphRunner runner);
         void UpdateScheduler(float dt);
+        void Clear();
     }
     
     
-    public class NodeTaskScheduler:INodeSystemTaskScheduler
+    public class NodeTaskScheduler:INodeSystemTaskScheduler, IGameLogMsgSender
     {
         protected readonly ObjectPoolMgr PoolMgr;
 
@@ -33,15 +34,26 @@ namespace NS
         private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
         private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
-        public NodeTaskScheduler(ObjectPoolMgr poolMgr)
+        public NodeTaskScheduler(ObjectPoolMgr poolMgr, IGameLogger logger)
         {
             PoolMgr = poolMgr;
+            Logger = logger;
+        }
+
+        public void Clear()
+        {
+            _allTasks.Clear();
+            _updateList.Clear();
+            _pendingAddToUpdateList.Clear();
+            _pendingDestroyList.Clear();
+            PoolMgr.Clear();
         }
 
         public NodeTask CreateTask(string taskName, NodeGraphRunner runner, Func<ETaskStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ETaskStatus> updateTask = null)
         {
-            var task = PoolMgr.CreateObject<NodeTask>();
+            var task = PoolMgr.Get<NodeTask>();
+            task.Logger = Logger;
             _allTasks.Add(task);
             
             taskName = $"{taskName}_{runner.AssetName}_{runner.PortalName}";
@@ -122,10 +134,11 @@ namespace NS
                 if(_graphRunnerTasksMap[runner].Count == 0)
                     _graphRunnerTasksMap.Remove(runner);
                 
-                PoolMgr.DestroyObject(t);
+                PoolMgr.Release(t);
             }
             _pendingDestroyList.Clear();
         }
 
+        public IGameLogger Logger { get; set; }
     }
 }

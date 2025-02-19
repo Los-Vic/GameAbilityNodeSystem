@@ -24,7 +24,7 @@
 
         public override void Execute()
         {
-            NodeSystemLogger.Log(_node.Log);
+            Logger?.Log(_node.Log);
             Complete();
         }
 

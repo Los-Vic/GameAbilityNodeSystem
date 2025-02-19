@@ -49,7 +49,9 @@ namespace GAS.Logic
         
         private bool IsAvailable => State == EAbilityState.Available;
         private readonly List<NodeGraphRunner> _activateAbilityRunners = new();
+        private GameAbilitySystem _system;
         internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
+        
         public string AbilityName => Asset?.abilityName ?? string.Empty;
         
         internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
@@ -60,6 +62,7 @@ namespace GAS.Logic
             Lv = param.Lv;
             
             State = EAbilityState.Initialized;
+            _system = sys;
         }
 
         private void UnInit()
@@ -72,7 +75,7 @@ namespace GAS.Logic
         
         #region Object Pool
 
-        public void OnCreateFromPool()
+        public void OnCreateFromPool(ObjectPool pool)
         {
         }
 
@@ -123,7 +126,7 @@ namespace GAS.Logic
         internal void OnAddAbility(GameUnit owner)
         {
             Owner = owner;
-            NodeSystemLogger.Log($"On add ability: {AbilityName} of {Owner.UnitName}");
+            _system.Logger.Log($"On add ability: {AbilityName} of {Owner.UnitName}");
             State = EAbilityState.Available;
             OnAdd?.Invoke();
             
@@ -133,7 +136,7 @@ namespace GAS.Logic
 
         internal void OnRemoveAbility()
         {
-            NodeSystemLogger.Log($"On remove ability: {AbilityName} of {Owner.UnitName}");
+            _system.Logger.Log($"On remove ability: {AbilityName} of {Owner.UnitName}");
             //todo: Graph unregister to game event
             
             GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
@@ -174,7 +177,7 @@ namespace GAS.Logic
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
                 var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Owner.Sys.AttributeInstanceMgr.SetAttributeVal(Owner, attribute, newVal);
+                Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, attribute, newVal);
             }
         }
         
@@ -202,33 +205,33 @@ namespace GAS.Logic
             var checkResult = CheckAbility();
             if (checkResult != ECheckAbilityResult.Success)
             {
-                NodeSystemLogger.Log($"Activate ability failed, check result : {checkResult}. {AbilityName} of {Owner.UnitName}");
+                _system.Logger.Log($"Activate ability failed, check result : {checkResult}. {AbilityName} of {Owner.UnitName}");
                 return;
             }
             
             CommitAbility();
-            NodeSystemLogger.Log($"Activate ability succeeded. {AbilityName} of {Owner.UnitName}");
+            _system.Logger.Log($"Activate ability succeeded. {AbilityName} of {Owner.UnitName}");
             var runner = GraphController.RunGraph(typeof(OnActivateAbilityPortalNode), null, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
 
-        internal void GF_ActivateAbilityWithGameEventParam(GameEventNodeParam param)
+        internal void GF_ActivateAbilityWithGameEventParam(GameEventArg param)
         {
             if (param == null)
             {
-                NodeSystemLogger.Log($"Activate ability with param failed, param is null. {AbilityName} of {Owner.UnitName}");
+                _system.Logger.Log($"Activate ability with param failed, param is null. {AbilityName} of {Owner.UnitName}");
                 return;
             }
             
             var checkResult = CheckAbility();
             if (checkResult != ECheckAbilityResult.Success)
             {
-                NodeSystemLogger.Log($"Activate ability with param failed, check result : {checkResult}. {AbilityName} of {Owner.UnitName}");
+                _system.Logger.Log($"Activate ability with param failed, check result : {checkResult}. {AbilityName} of {Owner.UnitName}");
                 return;
             }
             
             CommitAbility();
-            NodeSystemLogger.Log($"Activate ability with param succeeded. {AbilityName} of {Owner.UnitName}");
+            _system.Logger.Log($"Activate ability with param succeeded. {AbilityName} of {Owner.UnitName}");
             var runner = GraphController.RunGraph(typeof(OnActivateAbilityByEventPortalNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -237,13 +240,13 @@ namespace GAS.Logic
         {
             if (_activateAbilityRunners.Count == 0)
             {
-                NodeSystemLogger.Log($"Cancel ability failed, not activated. {AbilityName} of {Owner.UnitName}");
+                _system.Logger.Log($"Cancel ability failed, not activated. {AbilityName} of {Owner.UnitName}");
                 return;
             }
 
             foreach (var runner in _activateAbilityRunners)
             {
-                NodeSystemLogger.Log($"Cancel ability runner, portal name:{runner.PortalName}. {AbilityName} of {Owner.UnitName}");
+                _system.Logger.Log($"Cancel ability runner, portal name:{runner.PortalName}. {AbilityName} of {Owner.UnitName}");
                 runner.CancelRunner();
             }
         }

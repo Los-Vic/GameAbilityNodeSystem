@@ -5,18 +5,20 @@ using GameplayCommonLibrary;
 
 namespace NS
 {
-    public class NodeSystemObjectFactory
+    public class NodeSystemObjectFactory:IGameLogMsgSender
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
         private readonly ObjectPoolMgr _objectPoolMgr;
 
-        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr)
+        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr, IGameLogger logger)
         {
             _objectPoolMgr = objectPoolMgr;
+            Logger = logger;
         }
         
         public void Clear()
         {
+            _cachedNodeToNodeRunnerTypeMap.Clear();
             _objectPoolMgr.Clear();
         }
         
@@ -38,7 +40,11 @@ namespace NS
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 
-            var runner = _objectPoolMgr.CreateObject(runnerType) as NodeRunner;
+            var runner = _objectPoolMgr.Get(runnerType) as NodeRunner;
+            if (runner != null)
+            {
+                runner.Logger = Logger;
+            }
             return runner ?? NodeRunner.DefaultRunner;
         }
 
@@ -46,17 +52,19 @@ namespace NS
         {
             if(runner == NodeRunner.DefaultRunner)
                 return;
-            _objectPoolMgr.DestroyObject(runner);
+            _objectPoolMgr.Release(runner);
         }
 
         public NodeGraphRunner CreateGraphRunner()
         {
-            return _objectPoolMgr.CreateObject<NodeGraphRunner>() ;
+            return _objectPoolMgr.Get<NodeGraphRunner>() ;
         }
 
         public virtual void DestroyGraphRunner(NodeGraphRunner runner)
         {
-            _objectPoolMgr.DestroyObject(runner);
+            _objectPoolMgr.Release(runner);
         }
+
+        public IGameLogger Logger { get; set; }
     }
 }

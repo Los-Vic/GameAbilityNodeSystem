@@ -39,7 +39,7 @@ namespace NS
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
-        public void Init(NodeSystem system, NodeGraphAsset asset, string portalNodeId, PortalParamBase actionStartParam
+        public void Init(NodeSystem system, NodeGraphAsset asset, string portalNodeId, IPortalParam actionStartParam
         , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd, NodeGraphRunnerContext context = null)
         {
             _nodeSystem = system;
@@ -52,14 +52,14 @@ namespace NS
             
             if (!_portalNode.IsPortalNode())
             {
-                NodeSystemLogger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
+                _nodeSystem.Logger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
                 return;
             }
 
             var portalNodeRunner = GetNodeRunner(portalNodeId) as PortalNodeRunner;
             if (portalNodeRunner == null)
             {
-                NodeSystemLogger.LogError($"not valid portal node runner {portalNodeId} of {asset.name}");
+                _nodeSystem.Logger.LogError($"not valid portal node runner {portalNodeId} of {asset.name}");
                 return;
             }
             portalNodeRunner.SetPortalParam(actionStartParam);
@@ -99,24 +99,24 @@ namespace NS
         {
             if (!_isValid)
             {
-                NodeSystemLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. not valid.");
+                _nodeSystem.Logger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. not valid.");
                 return;
             }
 
             if (IsRunning())
             {
-                NodeSystemLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. already running.");
+                _nodeSystem.Logger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. already running.");
                 return;
             }
             
-            NodeSystemLogger.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            NodeSystemLogger.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -124,7 +124,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            NodeSystemLogger.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();
@@ -137,7 +137,7 @@ namespace NS
                 CompleteRunner();
                 return;
             }
-            NodeSystemLogger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner.Execute();
         }
 
@@ -182,7 +182,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(inPortId);
             if (port.direction != EPortDirection.Input)
             {
-                NodeSystemLogger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
+                _nodeSystem.Logger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
                 return default;
             }
             
@@ -198,7 +198,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(outPortId);
             if (port.direction != EPortDirection.Output)
             {
-                NodeSystemLogger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
+                _nodeSystem.Logger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
                 return;
             }
             
@@ -243,7 +243,7 @@ namespace NS
         
         #region Pool Object
 
-        public void OnCreateFromPool()
+        public void OnCreateFromPool(ObjectPool pool)
         {
         }
 

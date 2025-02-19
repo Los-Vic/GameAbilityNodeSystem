@@ -5,34 +5,21 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    public class GameEventNodeParam:PortalParamBase
-    {
-        public EGameEventPortal EventType;
-        public GameUnit EventSrcUnit; //not null
-        public GameAbility EventSrcAbility; //nullable
-        public GameEffect EventSrcEffect;  //nullable
-        public GameUnit EventTargetUnit;   //nullable
-        public FP EventValue1;
-        public FP EventValue2;
-        public FP EventValue3;
-        public string EventString;
-    }
-    
     [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Portal, NodeScopeDefine.System)]
     public class GameEventPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [FormerlySerializedAs("NodePortal")] [PortalType]
-        public EGameEventPortal nodeEventPortal;
+        [FormerlySerializedAs("nodeEventPortal")] [FormerlySerializedAs("NodePortal")] [PortalType]
+        public EGameEventType nodeEventType;
         
-        [Port(EPortDirection.Output, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]
         public string OutParam1;
         
         public override string DisplayName()
         {
-            return nodeEventPortal.ToString();
+            return nodeEventType.ToString();
         }
     }
     
@@ -53,9 +40,9 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetPortalParam(PortalParamBase paramBase)
+        public override void SetPortalParam(IPortalParam paramBase)
         {
-            if (paramBase is not GameEventNodeParam param) 
+            if (paramBase is not GameEventArg param) 
                 return;
             GraphRunner.SetOutPortVal(_node.OutParam1, param);
         }

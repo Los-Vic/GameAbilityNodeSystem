@@ -8,7 +8,7 @@ namespace NS
     }
     
     [Serializable]
-    public class NodeDemoPortalParam:PortalParamBase
+    public class NodeDemoPortalParam:IPortalParam
     {
         public int IntParam1;
         public int IntParam2;
@@ -52,7 +52,7 @@ namespace NS
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetPortalParam(PortalParamBase paramBase)
+        public override void SetPortalParam(IPortalParam paramBase)
         {
             if (paramBase is not NodeDemoPortalParam param) 
                 return;

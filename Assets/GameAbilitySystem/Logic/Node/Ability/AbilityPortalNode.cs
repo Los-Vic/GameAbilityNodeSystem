@@ -27,7 +27,7 @@ namespace GAS.Logic
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
-        [Port(EPortDirection.Output, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]
         public string OutPortParam;
     }
     
@@ -76,7 +76,7 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetPortalParam(PortalParamBase paramBase)
+        public override void SetPortalParam(IPortalParam paramBase)
         {
            GraphRunner.SetOutPortVal(_node.OutPortParam, paramBase);
         }

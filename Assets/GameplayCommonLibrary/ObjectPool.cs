@@ -6,7 +6,7 @@ namespace GameplayCommonLibrary
 {
     public interface IPoolObject
     {
-        void OnCreateFromPool();
+        void OnCreateFromPool(ObjectPool pool);
         void OnTakeFromPool();
         void OnReturnToPool();
         void OnDestroy();
@@ -15,9 +15,10 @@ namespace GameplayCommonLibrary
 
     public class ObjectPool
     {
+        //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
         private readonly UnityEngine.Pool.ObjectPool<IPoolObject> _pool;
         private readonly Type _poolObjectType;
-        private readonly List<IPoolObject> _poolObjects = new();
+        private readonly List<IPoolObject> _activePoolObjects = new();
 
         //Constructor
         public ObjectPool(Type type, int capacity, int maxSize)
@@ -37,29 +38,50 @@ namespace GameplayCommonLibrary
                 true, capacity, maxSize);
         }
 
-        public IPoolObject CreateObject()
+        public IPoolObject Get()
         {
             var obj = _pool.Get();
-            _poolObjects.Add(obj);
+            _activePoolObjects.Add(obj);
             obj.OnTakeFromPool();
             return obj;
         }
 
-        public void DestroyObject(IPoolObject obj)
+        public void Release(IPoolObject obj)
         {
-            _poolObjects.Remove(obj);
-            obj.OnReturnToPool();
-            _pool.Release(obj);
+            if (_activePoolObjects.Remove(obj))
+            {
+                obj.OnReturnToPool();
+                _pool.Release(obj);
+            }
+            else
+            {
+                if (_poolObjectType != obj.GetType())
+                {
+                    Debug.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
+                }
+                else
+                {
+                    Debug.LogError($"[ObjectPool]destroy object failed: object is already destroyed");
+                }
+            }
+           
         }
         
-        public List<IPoolObject> GetObjects() => _poolObjects;
-        public bool IsValidObject(IPoolObject obj) => _poolObjects.Contains(obj);
-
         public void Clear()
         {
-            Debug.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], count [{_poolObjects.Count}]");
+            Debug.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], active [{_activePoolObjects.Count}], total [{_pool.CountAll}]");
             _pool.Clear();
+            
+            foreach (var obj in _activePoolObjects)
+            {
+                obj.OnDestroy(); 
+            }
+            _activePoolObjects.Clear();
         }
+        
+        public List<IPoolObject> GetActiveObjects() => _activePoolObjects;
+        public bool IsActiveObject(IPoolObject obj) => _activePoolObjects.Contains(obj);
+
         
         #region Pool Callback
 
@@ -74,7 +96,7 @@ namespace GameplayCommonLibrary
                 return null;
             }
            
-            obj.OnCreateFromPool();
+            obj.OnCreateFromPool(this);
             return obj;
         }
 
@@ -115,7 +137,7 @@ namespace GameplayCommonLibrary
         private const int DefaultCapacity = 32;
         private const int DefaultMaxSize = 10000;
 
-        public T CreateObject<T>() where T : class, IPoolObject, new()
+        public T Get<T>() where T : class, IPoolObject, new()
         {
             var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
@@ -124,10 +146,10 @@ namespace GameplayCommonLibrary
                 _objectPoolMap.Add(type, pool);
             }
 
-            return pool.CreateObject() as T;
+            return pool.Get() as T;
         }
 
-        public IPoolObject CreateObject(Type type)
+        public IPoolObject Get(Type type)
         {
             var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
@@ -142,30 +164,30 @@ namespace GameplayCommonLibrary
                 _objectPoolMap.Add(type, pool);
             }
 
-            return pool.CreateObject();
+            return pool.Get();
         }
 
-        public void DestroyObject(IPoolObject obj)
+        public void Release(IPoolObject obj)
         {
             var type = obj.GetType();
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return;
 
-            pool.DestroyObject(obj);
+            pool.Release(obj);
         }
 
-        public List<T> GetObjects<T>() where T : class, IPoolObject
+        public List<T> GetActiveObjects<T>() where T : class, IPoolObject
         {
             var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return null;
-            return pool.GetObjects() as List<T>;
+            return pool.GetActiveObjects() as List<T>;
         }
 
-        public bool IsValidObject(IPoolObject obj)
+        public bool IsActiveObject(IPoolObject obj)
         {
             var type = obj.GetType();
-            return _objectPoolMap.TryGetValue(type, out var pool) && pool.IsValidObject(obj);
+            return _objectPoolMap.TryGetValue(type, out var pool) && pool.IsActiveObject(obj);
         }
         
         public IEnumerable<ObjectPool> GetAllPools()

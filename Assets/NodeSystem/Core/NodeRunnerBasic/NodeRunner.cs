@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    public class NodeRunner:IPoolObject
+    public class NodeRunner:IPoolObject, IGameLogMsgSender
     {
         public static readonly NodeRunner DefaultRunner = new();
         protected NodeGraphRunner GraphRunner { get; private set; }
@@ -18,7 +18,7 @@ namespace NS
 
         #region Pool Object
         
-        public virtual void OnCreateFromPool()
+        public virtual void OnCreateFromPool(ObjectPool pool)
         {
         }
 
@@ -35,6 +35,7 @@ namespace NS
         }
 
         #endregion
-        
+
+        public IGameLogger Logger { get; set; }
     }
 }

@@ -29,7 +29,7 @@
         {
             ExecuteDependentValNodes(_node.Id);
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
-            NodeSystemLogger.Log($"input delay [{_delay}]");
+            Logger?.Log($"input delay [{_delay}]");
             
             var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
             TaskScheduler.StartTask(task);

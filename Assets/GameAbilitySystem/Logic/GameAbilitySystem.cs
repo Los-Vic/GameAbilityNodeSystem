@@ -1,4 +1,5 @@
-﻿using GameplayCommonLibrary;
+﻿using System;
+using System.Collections.Generic;
 using NS;
 using UnityEngine;
 
@@ -6,11 +7,10 @@ namespace GAS.Logic
 {
     public class GameAbilitySystem:NodeSystem
     {
-        //Mgr
-        internal ObjectPoolMgr ObjectPoolMgr { get; private set; }
-        internal AttributeInstanceMgr AttributeInstanceMgr { get; private set; }
-        internal AbilityInstanceMgr AbilityInstanceMgr { get; private set; }
-        internal GameUnitInstanceMgr GameUnitInstanceMgr { get; private set; }
+        //Subsystem
+        private readonly Dictionary<Type, GameAbilitySubsystem> _subsystems = new();
+        private readonly List<GameAbilitySubsystem> _tickableSubsystems = new();
+        
         //Provider
         internal IAssetConfigProvider AssetConfigProvider { get; private set; }
         
@@ -22,45 +22,92 @@ namespace GAS.Logic
         public override void InitSystem()
         {
             base.InitSystem();
-            ObjectPoolMgr = new ObjectPoolMgr();
-            AttributeInstanceMgr = new AttributeInstanceMgr(this);
-            AbilityInstanceMgr = new AbilityInstanceMgr(this);
-            GameUnitInstanceMgr = new GameUnitInstanceMgr(this);
+            
+            CreateSubsystem<ObjectPoolSubsystem>(false);
+            CreateSubsystem<GameEventSubsystem>(false);
+            CreateSubsystem<AttributeInstanceSubsystem>(false);
+            CreateSubsystem<AbilityInstanceSubsystem>(false);
+            CreateSubsystem<UnitInstanceSubsystem>(false);
+            CreateSubsystem<AbilityActivationReqSubsystem>(false);
         }
 
         public override void UnInitSystem()
         {
+            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
+            {
+                subsystem.UnInit();
+            }
+            _subsystems.Clear();
+            _tickableSubsystems.Clear();
+            
             base.UnInitSystem();
-            ObjectPoolMgr.Clear();
+        }
+
+        public override void ResetSystem()
+        {
+            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
+            {
+                subsystem.Reset();
+            }
+            base.ResetSystem();
         }
 
         public override void UpdateSystem(float dt)
         {
             base.UpdateSystem(dt);
+            foreach (var subsystem in _tickableSubsystems)
+            {
+                subsystem.Update(dt);
+            }
         }
 
+        #region Subsystem
+
+        private void CreateSubsystem<T>(bool isTickable) where T : GameAbilitySubsystem, new()
+        {
+            if (_subsystems.ContainsKey(typeof(T)))
+            {
+                Logger.LogError($"Subsystem of {typeof(T)} already exists");
+                return;
+            }
+            var subsystem = new T();
+            subsystem.Init(this);
+            _subsystems.Add(typeof(T), subsystem);
+            
+            if(isTickable)
+                _tickableSubsystems.Add(subsystem);
+        }
+
+        public T GetSubsystem<T>() where T : GameAbilitySubsystem
+        {
+            return _subsystems.GetValueOrDefault(typeof(T)) as T;
+        }
+
+        #endregion
+        
+        
         #region GameUnit
 
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            return GameUnitInstanceMgr.CreateGameUnit(ref param);
+            return GetSubsystem<UnitInstanceSubsystem>().CreateGameUnit(ref param);
         }
 
         public void DestroyGameUnit(GameUnit gameUnit)
         {
-            GameUnitInstanceMgr.DestroyGameUnit(gameUnit);
+            GetSubsystem<UnitInstanceSubsystem>().DestroyGameUnit(gameUnit);
         }
 
         #endregion
 
         public override void DumpObjectPool()
         {
-            Debug.Log("----------Dump ObjectPools Start----------");
-            Debug.Log("----------NodeObjectPool------------------");
+            Logger.Log("----------Dump ObjectPools Start----------");
+            Logger.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
-            Debug.Log("----------ObjectPool----------------------");
-            ObjectPoolMgr.Log();
-            Debug.Log("----------Dump ObjectPools End------------");
+            Logger.Log("----------ObjectPool----------------------");
+            GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Log();
+            Logger.Log("----------Dump ObjectPools End------------");
         }
         
     }

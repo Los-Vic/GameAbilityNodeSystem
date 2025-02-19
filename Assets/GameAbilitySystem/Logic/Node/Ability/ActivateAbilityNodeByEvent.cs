@@ -10,7 +10,7 @@ namespace GAS.Logic
         public string InPortExec;
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
-        [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Input, typeof(GameEventArg), "EventParam")]
         public string InPortVal;
     }
 
@@ -26,7 +26,7 @@ namespace GAS.Logic
         public override void Execute()
         {
             ExecuteDependentValNodes(_node.Id);
-            var param = GraphRunner.GetInPortVal<GameEventNodeParam>(_node.InPortVal);
+            var param = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal);
             if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
             {
                 context.Ability.GF_ActivateAbilityWithGameEventParam(param);

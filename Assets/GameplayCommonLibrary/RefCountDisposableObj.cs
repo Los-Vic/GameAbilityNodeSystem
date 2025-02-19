@@ -46,15 +46,18 @@ namespace GameplayCommonLibrary
 #if BUILD_DEV || UNITY_EDITOR
         private readonly Dictionary<IRefCountRequester, string> _refCountRequesterMap = new();
 #endif
+
         private readonly List<IRefCountRequester> _refCountRequesters = new();
+        private bool _isPendingDispose;
 
         public RefCountDisposableComponent(IRefCountDisposableObj owner)
         {
             Owner = owner;
         }
 
-        public void Reset()
+        private void Reset()
         {
+            _isPendingDispose = false;
             _refCountRequesters.Clear();
 #if BUILD_DEV || UNITY_EDITOR
             _refCountRequesterMap.Clear();
@@ -81,9 +84,29 @@ namespace GameplayCommonLibrary
             _refCountRequesterMap.Remove(requester);
 #endif
             _refCountRequesters.Remove(requester);
-            if (RefCount == 0 && !Owner.IsDisposed())
+            TryDisposeOwner();
+        }
+
+        public void MarkForDispose()
+        {
+            _isPendingDispose = true;
+            TryDisposeOwner();
+        }
+
+        public void DisposeOwner()
+        {
+            Reset();
+            if(Owner.IsDisposed())
+                return;
+            
+            Owner.OnObjDispose();
+        }
+
+        private void TryDisposeOwner()
+        {
+            if (_isPendingDispose && RefCount == 0)
             {
-                Owner.OnObjDispose();
+                DisposeOwner();
             }
         }
 

@@ -8,10 +8,10 @@ namespace GAS.Logic
     [Node("SplitGameEventParam", "System/GameEvent/SplitGameEventParam", ENodeFunctionType.Value, typeof(SplitGameEventParamNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.System)]
     public class SplitGameEventParamNode : Node
     {
-        [Port(EPortDirection.Input, typeof(GameEventNodeParam), "EventParam")]
+        [Port(EPortDirection.Input, typeof(GameEventArg), "EventParam")]
         public string InPortVal;
 
-        [Port(EPortDirection.Output, typeof(EGameEventPortal), "EventType")]
+        [Port(EPortDirection.Output, typeof(EGameEventType), "EventType")]
         public string OutPortEventType;
         [Port(EPortDirection.Output, typeof(GameUnit), "SrcUnit")]
         public string OutPortSrcUnit;
@@ -42,7 +42,7 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            var inVal = GraphRunner.GetInPortVal<GameEventNodeParam>(_node.InPortVal);
+            var inVal = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal);
             if(inVal == null)
                 return;
             
