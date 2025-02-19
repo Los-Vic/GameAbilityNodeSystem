@@ -109,14 +109,14 @@ namespace NS
                 return;
             }
             
-            _nodeSystem.Logger.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger?.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            _nodeSystem.Logger.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger?.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -124,7 +124,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            _nodeSystem.Logger.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger?.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();
@@ -137,7 +137,7 @@ namespace NS
                 CompleteRunner();
                 return;
             }
-            _nodeSystem.Logger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            _nodeSystem.Logger?.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner.Execute();
         }
 

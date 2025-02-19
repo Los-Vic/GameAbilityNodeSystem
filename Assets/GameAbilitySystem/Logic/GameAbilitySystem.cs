@@ -102,12 +102,12 @@ namespace GAS.Logic
 
         public override void DumpObjectPool()
         {
-            Logger.Log("----------Dump ObjectPools Start----------");
-            Logger.Log("----------NodeObjectPool------------------");
+            Logger?.Log("----------Dump ObjectPools Start----------");
+            Logger?.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
-            Logger.Log("----------ObjectPool----------------------");
+            Logger?.Log("----------ObjectPool----------------------");
             GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Log();
-            Logger.Log("----------Dump ObjectPools End------------");
+            Logger?.Log("----------Dump ObjectPools End------------");
         }
         
     }

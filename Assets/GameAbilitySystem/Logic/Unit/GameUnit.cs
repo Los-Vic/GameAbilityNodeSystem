@@ -178,7 +178,7 @@ namespace GAS.Logic
         {
             if (!CanCastNewAbility)
             {
-                Sys.Logger.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
+                Sys.Logger?.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
                 return;
             }
             
