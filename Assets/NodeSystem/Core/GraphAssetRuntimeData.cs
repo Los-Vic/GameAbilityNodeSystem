@@ -5,7 +5,7 @@ using GameplayCommonLibrary;
 
 namespace NS
 {
-    public class GraphAssetRuntimeData:IGameLogMsgSender
+    public class GraphAssetRuntimeData
     {
         public NodeGraphAsset Asset { get; private set; }
         
@@ -44,7 +44,7 @@ namespace NS
                     var enumVal = (int)fieldInfo.GetValue(node);
                     if (!_portalNodeMap.TryAdd((nodeType, enumVal), node.Id))
                     {
-                        Logger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}, portal val: {enumVal}");
+                        GameLogger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}, portal val: {enumVal}");
                     }
                 }
 
@@ -52,7 +52,7 @@ namespace NS
                     continue;
                 if (!_portalNodeMap.TryAdd((nodeType, 0), node.Id))
                 {
-                    Logger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}");
+                    GameLogger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}");
                 }
 
             }
@@ -108,6 +108,6 @@ namespace NS
         public List<string> GetPortIdsOfNode(string nodeId) => _nodePortsMap.GetValueOrDefault(nodeId, new List<string>());
         public List<string> GetDependentNodeIds(string nodeId) => _nodeValDependencyMap.GetValueOrDefault(nodeId, new List<string>());
         public string GetPortalNodeId(Type nodeType, int portalVal = 0) => _portalNodeMap.GetValueOrDefault((nodeType, portalVal));
-        public IGameLogger Logger { get; set; }
+        
     }
 }

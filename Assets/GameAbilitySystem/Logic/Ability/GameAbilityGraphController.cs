@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameplayCommonLibrary;
 using NS;
 
 namespace GAS.Logic
@@ -61,7 +62,7 @@ namespace GAS.Logic
         {
             if (!_gameEventTypeNodeIdMap.TryGetValue(eventTypeType, out var nodeId))
             {
-                _system.Logger.LogError($"Not found {eventTypeType} node in {_asset.name}!");
+                GameLogger.LogError($"Not found {eventTypeType} node in {_asset.name}!");
                 return null;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
@@ -79,7 +80,7 @@ namespace GAS.Logic
         {
             if (!_portTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
             {
-                _system.Logger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
+                GameLogger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
                 return null;
             }
             var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();

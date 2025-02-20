@@ -1,4 +1,4 @@
-﻿using NS;
+﻿using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
@@ -10,13 +10,13 @@ namespace GAS.Logic
         {
             var unit = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<GameUnit>();
             unit.Init(ref param);
-            System.Logger?.Log($"Create unit:{param.UnitName}!");
+            GameLogger.Log($"Create unit:{param.UnitName}!");
             return unit;
         }
 
         internal void DestroyGameUnit(GameUnit unit)
         {
-            System.Logger?.Log($"Destroy unit:{unit.UnitName}!");
+            GameLogger.Log($"Destroy unit:{unit.UnitName}!");
             unit.GetRefCountDisposableComponent().MarkForDispose();
         }
 

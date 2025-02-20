@@ -1,4 +1,4 @@
-﻿using NS;
+﻿using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
@@ -9,7 +9,7 @@ namespace GAS.Logic
             var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
             {
-                System.Logger?.LogError($"Fail to get ActiveAbilityAsset of {id}");
+                GameLogger.LogError($"Fail to get ActiveAbilityAsset of {id}");
                 return null;
             }
             
@@ -20,13 +20,13 @@ namespace GAS.Logic
             };
             
             ability.Init(System, ref param);
-            System.Logger?.Log($"Created Ability: {param.Asset.abilityName}");
+            GameLogger.Log($"Created Ability: {param.Asset.abilityName}");
             return ability;
         }
 
         internal void DestroyAbility(GameAbility ability)
         {
-            System.Logger?.Log($"Destroy Ability: {ability.Asset.abilityName}");
+            GameLogger.Log($"Destroy Ability: {ability.Asset.abilityName}");
             System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(ability);
         }
     }

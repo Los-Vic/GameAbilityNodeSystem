@@ -1,4 +1,6 @@
-﻿namespace NS
+﻿using GameplayCommonLibrary;
+
+namespace NS
 {
     [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
     public class DelayNode:Node
@@ -29,7 +31,7 @@
         {
             ExecuteDependentValNodes(_node.Id);
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
-            Logger?.Log($"input delay [{_delay}]");
+            GameLogger.Log($"input delay [{_delay}]");
             
             var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
             TaskScheduler.StartTask(task);

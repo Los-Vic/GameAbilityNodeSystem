@@ -21,7 +21,7 @@ namespace NS
     }
     
     
-    public class NodeTaskScheduler:INodeSystemTaskScheduler, IGameLogMsgSender
+    public class NodeTaskScheduler:INodeSystemTaskScheduler
     {
         protected readonly ObjectPoolMgr PoolMgr;
 
@@ -34,10 +34,9 @@ namespace NS
         private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
         private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
-        public NodeTaskScheduler(ObjectPoolMgr poolMgr, IGameLogger logger)
+        public NodeTaskScheduler(ObjectPoolMgr poolMgr)
         {
             PoolMgr = poolMgr;
-            Logger = logger;
         }
 
         public void Clear()
@@ -53,7 +52,6 @@ namespace NS
             Func<float, ETaskStatus> updateTask = null)
         {
             var task = PoolMgr.Get<NodeTask>();
-            task.Logger = Logger;
             _allTasks.Add(task);
             
             taskName = $"{taskName}_{runner.AssetName}_{runner.PortalName}";
@@ -138,7 +136,5 @@ namespace NS
             }
             _pendingDestroyList.Clear();
         }
-
-        public IGameLogger Logger { get; set; }
     }
 }

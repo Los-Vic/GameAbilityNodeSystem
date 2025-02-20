@@ -5,15 +5,14 @@ using GameplayCommonLibrary;
 
 namespace NS
 {
-    public class NodeSystemObjectFactory:IGameLogMsgSender
+    public class NodeSystemObjectFactory
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
         private readonly ObjectPoolMgr _objectPoolMgr;
 
-        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr, IGameLogger logger)
+        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr)
         {
             _objectPoolMgr = objectPoolMgr;
-            Logger = logger;
         }
         
         public void Clear()
@@ -41,10 +40,6 @@ namespace NS
             }
 
             var runner = _objectPoolMgr.Get(runnerType) as NodeRunner;
-            if (runner != null)
-            {
-                runner.Logger = Logger;
-            }
             return runner ?? NodeRunner.DefaultRunner;
         }
 
@@ -64,7 +59,5 @@ namespace NS
         {
             _objectPoolMgr.Release(runner);
         }
-
-        public IGameLogger Logger { get; set; }
     }
 }

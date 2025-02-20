@@ -52,14 +52,14 @@ namespace NS
             
             if (!_portalNode.IsPortalNode())
             {
-                _nodeSystem.Logger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
+                GameLogger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
                 return;
             }
 
             var portalNodeRunner = GetNodeRunner(portalNodeId) as PortalNodeRunner;
             if (portalNodeRunner == null)
             {
-                _nodeSystem.Logger.LogError($"not valid portal node runner {portalNodeId} of {asset.name}");
+                GameLogger.LogError($"not valid portal node runner {portalNodeId} of {asset.name}");
                 return;
             }
             portalNodeRunner.SetPortalParam(actionStartParam);
@@ -99,24 +99,24 @@ namespace NS
         {
             if (!_isValid)
             {
-                _nodeSystem.Logger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. not valid.");
+                GameLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. not valid.");
                 return;
             }
 
             if (IsRunning())
             {
-                _nodeSystem.Logger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. already running.");
+                GameLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. already running.");
                 return;
             }
             
-            _nodeSystem.Logger?.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            _nodeSystem.Logger?.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -124,7 +124,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            _nodeSystem.Logger?.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();
@@ -137,7 +137,7 @@ namespace NS
                 CompleteRunner();
                 return;
             }
-            _nodeSystem.Logger?.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
             _curNodeRunner.Execute();
         }
 
@@ -182,7 +182,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(inPortId);
             if (port.direction != EPortDirection.Input)
             {
-                _nodeSystem.Logger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
+                GameLogger.LogWarning($"GetInPortVal failed: port {inPortId} is not input port.");
                 return default;
             }
             
@@ -198,7 +198,7 @@ namespace NS
             var port = GraphAssetRuntimeData.GetPortById(outPortId);
             if (port.direction != EPortDirection.Output)
             {
-                _nodeSystem.Logger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
+                GameLogger.LogWarning($"SetOutPortVal failed: port {outPortId} is not output port.");
                 return;
             }
             
@@ -261,6 +261,5 @@ namespace NS
         }
 
         #endregion
-       
     }
 }

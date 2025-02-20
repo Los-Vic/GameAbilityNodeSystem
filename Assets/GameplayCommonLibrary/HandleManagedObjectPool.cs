@@ -63,7 +63,7 @@ namespace GameplayCommonLibrary
         {
             if (!_lookup.TryGetValue(handle.ID, out T obj))
             {
-                Debug.LogError($"Destroy object[{typeof(T)}] failed, could not find object id: {handle.ID}");
+                GameLogger.LogError($"Destroy object[{typeof(T)}] failed, could not find object id: {handle.ID}");
                 return;
             }
 
@@ -75,6 +75,5 @@ namespace GameplayCommonLibrary
         {
             return _lookup.GetValueOrDefault(handle.ID);
         }
-        
     }
 }

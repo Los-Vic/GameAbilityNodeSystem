@@ -12,7 +12,7 @@ namespace NS
         Cancelled
     }
     
-    public class NodeTask: IPoolObject, IGameLogMsgSender
+    public class NodeTask: IPoolObject
     {
         private Func<ETaskStatus> OnStartTask { get; set; }
         private Action OnCompleteTask { get; set; }
@@ -38,10 +38,10 @@ namespace NS
         {
             if (OnStartTask == null || Status != ETaskStatus.Waiting)
             {
-                Logger?.LogWarning($"start task:{TaskName} failed! status:{Status}");
+                GameLogger.LogWarning($"start task:{TaskName} failed! status:{Status}");
                 return Status;
             }
-            Logger?.Log($"start task:{TaskName} succeeded!");
+            GameLogger.Log($"start task:{TaskName} succeeded!");
             var status = OnStartTask.Invoke();
             UpdateStatusFromDelegateResult(status);
             return Status;
@@ -51,7 +51,7 @@ namespace NS
         {
             if (OnUpdateTask == null || Status != ETaskStatus.Running)
             {
-                Logger?.LogWarning($"update task:{TaskName} failed! status:{Status}");
+                GameLogger.LogWarning($"update task:{TaskName} failed! status:{Status}");
                 return;
             }
             var status = OnUpdateTask.Invoke(deltaTime);
@@ -62,10 +62,10 @@ namespace NS
         {
             if (IsEnded)
             {
-                Logger?.LogWarning($"cancel task:{TaskName} failed! already ended, status:{Status}!");
+                GameLogger.LogWarning($"cancel task:{TaskName} failed! already ended, status:{Status}!");
                 return;
             }
-            Logger?.Log($"cancel task:{TaskName} succeeded!");
+            GameLogger.Log($"cancel task:{TaskName} succeeded!");
             Status = ETaskStatus.Cancelled;
             OnCancelTask?.Invoke();
         }
@@ -90,10 +90,10 @@ namespace NS
         {
             if (IsEnded)
             {
-                Logger?.LogWarning($"complete task:{TaskName} failed! already ended, status:{Status}!");
+                GameLogger.LogWarning($"complete task:{TaskName} failed! already ended, status:{Status}!");
                 return;
             }
-            Logger?.Log($"complete task:{TaskName} succeeded!");
+            GameLogger.Log($"complete task:{TaskName} succeeded!");
             Status = ETaskStatus.Completed;
             OnCompleteTask?.Invoke();
         }
@@ -121,8 +121,6 @@ namespace NS
         {
         }
         #endregion
-
-        public IGameLogger Logger { get; set; }
     }
     
 }

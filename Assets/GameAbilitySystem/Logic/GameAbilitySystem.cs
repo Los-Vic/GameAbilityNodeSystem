@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameplayCommonLibrary;
 using NS;
 using UnityEngine;
 
@@ -67,7 +68,7 @@ namespace GAS.Logic
         {
             if (_subsystems.ContainsKey(typeof(T)))
             {
-                Logger.LogError($"Subsystem of {typeof(T)} already exists");
+                GameLogger.LogError($"Subsystem of {typeof(T)} already exists");
                 return;
             }
             var subsystem = new T();
@@ -102,12 +103,12 @@ namespace GAS.Logic
 
         public override void DumpObjectPool()
         {
-            Logger?.Log("----------Dump ObjectPools Start----------");
-            Logger?.Log("----------NodeObjectPool------------------");
+            GameLogger.Log("----------Dump ObjectPools Start----------");
+            GameLogger.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
-            Logger?.Log("----------ObjectPool----------------------");
+            GameLogger.Log("----------ObjectPool----------------------");
             GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Log();
-            Logger?.Log("----------Dump ObjectPools End------------");
+            GameLogger.Log("----------Dump ObjectPools End------------");
         }
         
     }

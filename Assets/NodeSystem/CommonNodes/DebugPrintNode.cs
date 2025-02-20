@@ -1,4 +1,6 @@
-﻿namespace NS
+﻿using GameplayCommonLibrary;
+
+namespace NS
 {
     [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
     public class DebugPrintNode:Node
@@ -24,7 +26,7 @@
 
         public override void Execute()
         {
-            Logger?.Log(_node.Log);
+            GameLogger.Log(_node.Log);
             Complete();
         }
 

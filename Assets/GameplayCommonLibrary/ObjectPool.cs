@@ -26,12 +26,12 @@ namespace GameplayCommonLibrary
             var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
             {
-                Debug.LogError(
+                GameLogger.LogError(
                     $"[ObjectPool]create object pool failed: type [{type}] can not assign to IPoolObject");
                 return;
             }
 
-            Debug.Log($"[ObjectPool]create object pool success: type [{type}]");
+            GameLogger.Log($"[ObjectPool]create object pool success: type [{type}]");
             _poolObjectType = type;
             _pool = new UnityEngine.Pool.ObjectPool<IPoolObject>(CreateItem, OnTakeFromPool, OnReturnToPool,
                 OnDestroyItem,
@@ -57,11 +57,11 @@ namespace GameplayCommonLibrary
             {
                 if (_poolObjectType != obj.GetType())
                 {
-                    Debug.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
+                    GameLogger.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
                 }
                 else
                 {
-                    Debug.LogError($"[ObjectPool]destroy object failed: object is already destroyed");
+                    GameLogger.LogError($"[ObjectPool]destroy object failed: object is already destroyed");
                 }
             }
            
@@ -69,7 +69,7 @@ namespace GameplayCommonLibrary
         
         public void Clear()
         {
-            Debug.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], active [{_activePoolObjects.Count}], total [{_pool.CountAll}]");
+            GameLogger.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], active [{_activePoolObjects.Count}], total [{_pool.CountAll}]");
             _pool.Clear();
             
             foreach (var obj in _activePoolObjects)
@@ -91,7 +91,7 @@ namespace GameplayCommonLibrary
 
             if (obj == null)
             {
-                Debug.LogError(
+                GameLogger.LogError(
                     $"[ObjectPool]create object item failed: type [{_poolObjectType}] can not assign to IPoolObject");
                 return null;
             }
@@ -120,7 +120,7 @@ namespace GameplayCommonLibrary
 
         public (int, int) LogState()
         {
-            Debug.Log(
+            GameLogger.Log(
                 $"[ObjectPool][{_poolObjectType.Name}]: active/total:[{_pool.CountActive}/{_pool.CountAll}]");
             return (_pool.CountActive, _pool.CountAll);
         }
@@ -154,7 +154,7 @@ namespace GameplayCommonLibrary
             var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
             {
-                Debug.LogError($"create object failed: type {type} can not assign to IPoolObject");
+                GameLogger.LogError($"create object failed: type {type} can not assign to IPoolObject");
                 return null;
             }
 
