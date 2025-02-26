@@ -3,13 +3,15 @@
 namespace GAS.Logic
 {
     [Node("ActivateAbility", "Ability/Exec/ActivateAbility", ENodeFunctionType.Flow, typeof(ActivateAbilityNodeRunner), 
-        CommonNodeCategory.Action, NodeScopeDefine.Ability, "Trigger OnActivateAbility portal, means activity is activated")]
+        CommonNodeCategory.Action, NodeScopeDefine.Ability, "Trigger OnActivateAbility portal immediately, means activity is activated")]
     public class ActivateAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
+        [Port(EPortDirection.Input, typeof(GameEventArg), "EventParam")]
+        public string InPortVal;
     }
 
     public class ActivateAbilityNodeRunner : FlowNodeRunner
@@ -23,9 +25,11 @@ namespace GAS.Logic
 
         public override void Execute()
         {
+            ExecuteDependentValNodes(_node.Id);
+            var param = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal);
             if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
             {
-                context.Ability.GF_ActivateAbility();
+                context.Ability.GF_ActivateAbilityWithGameEventParam(param);
             }
             Complete();
         }
@@ -34,7 +38,7 @@ namespace GAS.Logic
         {
             var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
-                return default;
+                return null;
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
