@@ -9,29 +9,49 @@ namespace GAS.Logic
         public string OutPortExec;
     }
     
-    [Node("OnAddAbility", "Ability/Portal/OnAddAbility", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public class OnAddAbilityPortalNode:AbilityPortalNode
+    [Node("OnAdd", "Ability/Portal/OnAdd", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnAddAbilityPortalNode:AbilityPortalNode
     {
     }
-    [Node("OnRemoveAbility", "Ability/Portal/OnRemoveAbility", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public class OnRemoveAbilityPortalNode:AbilityPortalNode
-    {
-    }
-    [Node("OnActivateAbility", "Ability/Portal/OnActivateAbility", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public class OnActivateAbilityPortalNode:AbilityPortalNode
+    [Node("OnRemove", "Ability/Portal/OnRemove", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnRemoveAbilityPortalNode:AbilityPortalNode
     {
     }
     
-    [Node("OnActivateAbilityByEvent", "Ability/Portal/OnActivateAbilityByEvent", ENodeFunctionType.Portal, typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public class OnActivateAbilityByEventPortalNode:Node
+    public class OnActivateAbilityPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
-        [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]
+        [Port(EPortDirection.Output, typeof(GameEventArg), "EventArg")]
         public string OutPortParam;
     }
+
+    [Node("OnStartPreCast", "Ability/Portal/OnStartPreCast", ENodeFunctionType.Portal,
+        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnStartPreCastAbilityPortalNode : OnActivateAbilityPortalNode
+    {
+    }
     
-    public class AbilityPortalNodeRunner:PortalNodeRunner
+    [Node("OnStartCast", "Ability/Portal/OnStartCast", ENodeFunctionType.Portal,
+        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnStartCastAbilityPortalNode : OnActivateAbilityPortalNode
+    {
+    }
+    
+    [Node("OnStartPostCast", "Ability/Portal/OnStartPostCast", ENodeFunctionType.Portal,
+        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnStartPostCastAbilityPortalNode : OnActivateAbilityPortalNode
+    {
+    }
+    
+    [Node("OnEndPostCast", "Ability/Portal/OnEndPostCast", ENodeFunctionType.Portal,
+        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    public sealed class OnEndPostCastAbilityPortalNode : OnActivateAbilityPortalNode
+    {
+    }
+    
+    
+    public sealed class AbilityPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
         private AbilityPortalNode _node;
@@ -60,14 +80,15 @@ namespace GAS.Logic
         
     }
     
-    public class AbilityGameEventPortalNodeRunner:PortalNodeRunner
+    public sealed class AbilityGameEventPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
-        private OnActivateAbilityByEventPortalNode _node;
+        private OnActivateAbilityPortalNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
-            _node = (OnActivateAbilityByEventPortalNode)nodeAsset;
+            base.Init(nodeAsset, graphRunner);
+            _node = (OnActivateAbilityPortalNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -78,7 +99,9 @@ namespace GAS.Logic
 
         public override void SetPortalParam(IPortalParam paramBase)
         {
-           GraphRunner.SetOutPortVal(_node.OutPortParam, paramBase);
+            if (paramBase == null)
+                return;
+            GraphRunner.SetOutPortVal(_node.OutPortParam, paramBase);
         }
 
         public override void Execute()

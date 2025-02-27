@@ -3,7 +3,7 @@
 namespace NS
 {
     [Node("FP", "Common/LiteralValue/FP", ENodeFunctionType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
-    public class FPNode:Node
+    public sealed class FPNode:Node
     {
         [ExposedProp]
         public float Val;
@@ -12,7 +12,7 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class FPNodeRunner:NodeRunner
+    public sealed class FPNodeRunner:NodeRunner
     {
         private FPNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

@@ -3,7 +3,7 @@
 namespace NS
 {
     [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
-    public class DebugPrintNode:Node
+    public sealed class DebugPrintNode:Node
     {
         [ExposedProp]
         public string Log;
@@ -15,7 +15,7 @@ namespace NS
         
     }
     
-    public class DebugPrintFlowNodeRunner:FlowNodeRunner
+    public sealed class DebugPrintFlowNodeRunner:FlowNodeRunner
     {
         private DebugPrintNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

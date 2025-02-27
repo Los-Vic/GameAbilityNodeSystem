@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GAS.Logic
 {
     [Node("ValuePicker", "System/Value/ValuePicker", ENodeFunctionType.Value , typeof(ValuePickerNodeRunner), CommonNodeCategory.Value)]
-    public class ValuePickerNode:Node
+    public sealed class ValuePickerNode:Node
     {
         [ExposedProp]
         [SerializeReference]
@@ -19,8 +19,22 @@ namespace GAS.Logic
         public string OutPortVal;
     }
 
-    public class ValuePickerNodeRunner : NodeRunner
+    public sealed class ValuePickerNodeRunner : NodeRunner
     {
+        private GameUnit _unit;
+        private ValuePickerNode _node;
         
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            _node = (ValuePickerNode)nodeAsset;
+            
+            _unit = GraphRunner.GetInPortVal<GameUnit>(_node.InPortUnit);
+        }
+
+        public override void Execute()
+        {
+            GraphRunner.SetOutPortVal(_node.OutPortVal, ValuePickerUtility.GetValue(_node.Config, _unit));
+        }
     }
 }

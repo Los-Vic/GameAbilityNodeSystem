@@ -4,7 +4,7 @@ namespace GAS.Logic.Value
 {
     public static class ValuePickerUtility
     {
-        public static FP GetValue(ValuePickerBase valuePicker, GameUnit unit, uint lv = 1)
+        public static FP GetValue(ValuePickerBase valuePicker, GameUnit unit, uint lv = 0)
         {
             switch (valuePicker)
             {

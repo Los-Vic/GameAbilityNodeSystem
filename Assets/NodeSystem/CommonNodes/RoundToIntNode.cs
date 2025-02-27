@@ -3,7 +3,7 @@
 namespace NS
 {
     [Node("RoundToInt", "Common/LiteralValue/RoundToInt",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), CommonNodeCategory.Value )]
-    public class RoundToIntNode:Node
+    public sealed class RoundToIntNode:Node
     {
         [Port(EPortDirection.Input, typeof(float))]
         public string InPortVal;
@@ -12,7 +12,7 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class RoundToIntNodeRunner:NodeRunner
+    public sealed class RoundToIntNodeRunner:NodeRunner
     {
         private RoundToIntNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

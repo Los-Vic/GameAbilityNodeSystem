@@ -31,7 +31,12 @@ namespace GAS.Authoring
         
         private void Start()
         {
-            _system = new GameAbilitySystem(this);
+            _system = new GameAbilitySystem(new GameAbilitySystemCreateParam()
+            {
+                PlayerNums = 1,
+                AssetConfigProvider = this
+            });
+            _system.OnCreateSystem();
             _system.InitSystem();
 
             if (configHub.abilityEffectParamConfig)
@@ -59,6 +64,7 @@ namespace GAS.Authoring
         private void OnDestroy()
         {
             _system.UnInitSystem();
+            _system.OnDestroySystem();
         }
 
         public AbilityAsset GetAbilityAsset(uint abilityId)

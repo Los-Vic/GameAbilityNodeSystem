@@ -158,7 +158,7 @@ namespace NSEditor
                 var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
                 if (nodeAttribute is { IsSingleton: true })
                 {
-                    Debug.LogWarning($"Can't copy SingletonNode [{node.NodeName}]");
+                    Debug.LogWarning($"[Editor]Can't copy SingletonNode [{node.NodeName}]");
                     continue;
                 }
                 content.Nodes.Add(node);

@@ -89,13 +89,13 @@ namespace GAS.Logic
         /// </summary>
         public override void OnGraphNodeChanged()
         {
-            Debug.Log($"OnGraphNodeChanged:{abilityName}");
+            Debug.Log($"[Editor]OnGraphNodeChanged graph[{name}], ability[{abilityName}]");
             CollectReferences();
         }
 
         public override void OnGraphReDraw()
         {
-            Debug.Log($"OnGraphReDraw:{abilityName}");
+            Debug.Log($"[Editor]OnGraphReDraw graph[{name}], ability[{abilityName}]");
             CollectReferences();
         }
 

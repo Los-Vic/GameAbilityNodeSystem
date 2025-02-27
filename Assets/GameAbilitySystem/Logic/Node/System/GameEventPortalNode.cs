@@ -1,12 +1,11 @@
-﻿using MissQ;
-using NS;
+﻿using NS;
 using UnityEngine.Serialization;
 using Node = NS.Node;
 
 namespace GAS.Logic
 {
     [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Portal, NodeScopeDefine.System)]
-    public class GameEventPortalNode:Node
+    public sealed class GameEventPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
@@ -23,7 +22,7 @@ namespace GAS.Logic
         }
     }
     
-    public class GamePortalPortalNodeRunner:PortalNodeRunner
+    public sealed class GamePortalPortalNodeRunner:PortalNodeRunner
     {
         private string _nextNode;
         private GameEventPortalNode _node;

@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("Branch", "Common/FlowControl/Branch", ENodeFunctionType.Flow, typeof(BranchFlowNodeRunner), CommonNodeCategory.FlowControl)]
-    public class BranchNode:Node
+    public sealed class BranchNode:Node
     {
         [Port(EPortDirection.Input,typeof(BaseFlowPort))]
         public string InPortExec;
@@ -16,7 +16,7 @@
         public string OutPortFalseExec;
     }
     
-    public class BranchFlowNodeRunner:FlowNodeRunner
+    public sealed class BranchFlowNodeRunner:FlowNodeRunner
     {
         private BranchNode _node;
         private bool _condition;

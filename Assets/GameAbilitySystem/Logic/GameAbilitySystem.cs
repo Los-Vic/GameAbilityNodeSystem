@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using GameplayCommonLibrary;
 using NS;
-using UnityEngine;
 
 namespace GAS.Logic
 {
+    public struct GameAbilitySystemCreateParam
+    {
+        public IAssetConfigProvider AssetConfigProvider;
+        public int PlayerNums;
+    }
+    
     public class GameAbilitySystem:NodeSystem
     {
+        //Data
+        internal int PlayerNums { get; private set; }
+        
+        
         //Subsystem
         private readonly Dictionary<Type, GameAbilitySubsystem> _subsystems = new();
         private readonly List<GameAbilitySubsystem> _tickableSubsystems = new();
@@ -15,21 +24,34 @@ namespace GAS.Logic
         //Provider
         internal IAssetConfigProvider AssetConfigProvider { get; private set; }
         
-        public GameAbilitySystem(IAssetConfigProvider provider)
+        public GameAbilitySystem(GameAbilitySystemCreateParam param)
         {
-            AssetConfigProvider = provider;
+            PlayerNums = param.PlayerNums;
+            AssetConfigProvider = param.AssetConfigProvider;
         }
-        
+
+        public override void OnCreateSystem()
+        {
+            base.OnCreateSystem();
+            
+            AddSubsystem<ObjectPoolSubsystem>(false);
+            AddSubsystem<GameEventSubsystem>(false);
+            AddSubsystem<AttributeInstanceSubsystem>(false);
+            AddSubsystem<AbilityInstanceSubsystem>(false);
+            AddSubsystem<UnitInstanceSubsystem>(false);
+            
+            var abilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
+            abilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
+        }
+
         public override void InitSystem()
         {
             base.InitSystem();
-            
-            CreateSubsystem<ObjectPoolSubsystem>(false);
-            CreateSubsystem<GameEventSubsystem>(false);
-            CreateSubsystem<AttributeInstanceSubsystem>(false);
-            CreateSubsystem<AbilityInstanceSubsystem>(false);
-            CreateSubsystem<UnitInstanceSubsystem>(false);
-            CreateSubsystem<AbilityActivationReqSubsystem>(false);
+
+            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
+            {
+                subsystem.Init();
+            }
         }
 
         public override void UnInitSystem()
@@ -38,19 +60,8 @@ namespace GAS.Logic
             {
                 subsystem.UnInit();
             }
-            _subsystems.Clear();
-            _tickableSubsystems.Clear();
             
             base.UnInitSystem();
-        }
-
-        public override void ResetSystem()
-        {
-            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
-            {
-                subsystem.Reset();
-            }
-            base.ResetSystem();
         }
 
         public override void UpdateSystem(float dt)
@@ -64,19 +75,21 @@ namespace GAS.Logic
 
         #region Subsystem
 
-        private void CreateSubsystem<T>(bool isTickable) where T : GameAbilitySubsystem, new()
+        private T AddSubsystem<T>(bool isTickable) where T : GameAbilitySubsystem, new()
         {
             if (_subsystems.ContainsKey(typeof(T)))
             {
                 GameLogger.LogError($"Subsystem of {typeof(T)} already exists");
-                return;
+                return _subsystems[typeof(T)] as T;
             }
             var subsystem = new T();
-            subsystem.Init(this);
+            subsystem.OnCreate(this);
             _subsystems.Add(typeof(T), subsystem);
             
             if(isTickable)
                 _tickableSubsystems.Add(subsystem);
+
+            return subsystem;
         }
 
         public T GetSubsystem<T>() where T : GameAbilitySubsystem

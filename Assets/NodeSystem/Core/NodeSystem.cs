@@ -10,20 +10,17 @@ namespace NS
         public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
         
         private readonly Dictionary<NodeGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
-        
-        public virtual void InitSystem()
+
+        public virtual void OnCreateSystem()
         {
             NodePoolMgr = new ObjectPoolMgr();
             NodeObjectFactory = new NodeSystemObjectFactory(NodePoolMgr);
             TaskScheduler = new NodeTaskScheduler(NodePoolMgr);
         }
-
-        public virtual void ResetSystem()
+        
+        public virtual void InitSystem()
         {
-            NodePoolMgr.Clear();
-            NodeObjectFactory.Clear();
-            _graphAssetRuntimeDataMap.Clear();
-            TaskScheduler.Clear();
+          
         }
         
         public virtual void UnInitSystem()
@@ -37,6 +34,11 @@ namespace NS
         public virtual void UpdateSystem(float dt)
         {
             TaskScheduler.UpdateScheduler(dt);
+        }
+
+        public virtual void OnDestroySystem()
+        {
+            
         }
         
         public GraphAssetRuntimeData GetGraphRuntimeData(NodeGraphAsset asset)

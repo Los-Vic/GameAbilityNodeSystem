@@ -16,6 +16,9 @@ namespace GameplayCommonLibrary
         void OnObjDispose();
     }
 
+    /// <summary>
+    /// 主要作用是：当期望销毁Owner时，有可能存在一些对象仍需要Owner, 这些对象通过Add/RemoveRefCount增加引用来推迟Owner的销毁
+    /// </summary>
     public class RefCountDisposableComponent
     {
         public IRefCountDisposableObj Owner { get; }
@@ -87,6 +90,9 @@ namespace GameplayCommonLibrary
             TryDisposeOwner();
         }
 
+        /// <summary>
+        /// Owner的管理者在期望销毁Owner的时候调用
+        /// </summary>
         public void MarkForDispose()
         {
             _isPendingDispose = true;

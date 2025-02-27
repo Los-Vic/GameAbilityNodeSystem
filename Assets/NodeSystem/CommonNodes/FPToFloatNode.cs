@@ -3,7 +3,7 @@
 namespace NS
 {
     [Node("FPToFloat", "Common/LiteralValue/FPToFloat",ENodeFunctionType.Value ,  typeof(FPToFloatNodeRunner), CommonNodeCategory.Value )]
-    public class FPToFloatNode:Node
+    public sealed class FPToFloatNode:Node
     {
         [Port(EPortDirection.Input, typeof(FP))]
         public string InPortVal;
@@ -12,7 +12,7 @@ namespace NS
         public string OutPortVal;
     }
     
-    public class FPToFloatNodeRunner:NodeRunner
+    public sealed class FPToFloatNodeRunner:NodeRunner
     {
         private FPToFloatNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

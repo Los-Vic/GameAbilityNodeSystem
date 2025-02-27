@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("IntToFloat", "Common/LiteralValue/IntToFloat",ENodeFunctionType.Value ,  typeof(IntToFloatNodeRunner), CommonNodeCategory.Value )]
-    public class IntToFloatNode:Node
+    public sealed class IntToFloatNode:Node
     {
         [Port(EPortDirection.Input, typeof(int))]
         public string InPortVal;
@@ -10,7 +10,7 @@
         public string OutPortVal;
     }
     
-    public class IntToFloatNodeRunner:NodeRunner
+    public sealed class IntToFloatNodeRunner:NodeRunner
     {
         private IntToFloatNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

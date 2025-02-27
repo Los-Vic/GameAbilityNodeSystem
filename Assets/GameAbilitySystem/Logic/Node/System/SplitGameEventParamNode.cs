@@ -6,7 +6,7 @@ namespace GAS.Logic
 {
     
     [Node("SplitGameEventParam", "System/GameEvent/SplitGameEventParam", ENodeFunctionType.Value, typeof(SplitGameEventParamNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.System)]
-    public class SplitGameEventParamNode : Node
+    public sealed class SplitGameEventParamNode : Node
     {
         [Port(EPortDirection.Input, typeof(GameEventArg), "EventParam")]
         public string InPortVal;
@@ -31,7 +31,7 @@ namespace GAS.Logic
         public string OutPortString;
     }
 
-    public class SplitGameEventParamNodeRunner : NodeRunner
+    public sealed class SplitGameEventParamNodeRunner : NodeRunner
     {
         private SplitGameEventParamNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

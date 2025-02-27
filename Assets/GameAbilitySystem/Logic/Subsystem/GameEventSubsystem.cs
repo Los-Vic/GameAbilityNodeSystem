@@ -8,11 +8,6 @@ namespace GAS.Logic
     {
         private readonly Dictionary<EGameEventType, GameplayEvent<GameEventArg>> _gameEvents = new();
 
-        public override void Reset()
-        {
-            _gameEvents.Clear();
-        }
-
         public override void UnInit()
         {
             _gameEvents.Clear();

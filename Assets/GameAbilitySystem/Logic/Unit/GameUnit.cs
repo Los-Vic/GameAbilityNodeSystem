@@ -10,6 +10,7 @@ namespace GAS.Logic
     {
         public GameAbilitySystem AbilitySystem;
         public string UnitName;
+        public int PlayerIndex;
     }
 
     public enum EUnitAbilityCastState
@@ -32,6 +33,7 @@ namespace GAS.Logic
     public class GameUnit: IPoolObject, IRefCountDisposableObj
     {
         internal GameAbilitySystem Sys { get;private set; }
+        public int PlayerIndex { get; private set; }
 
         private const string DefaultUnitName = "UnkownUnit";
         private string _unitName = DefaultUnitName;
@@ -59,11 +61,15 @@ namespace GAS.Logic
         internal void Init(ref GameUnitCreateParam param)
         {
             Sys = param.AbilitySystem;
+            PlayerIndex = param.PlayerIndex;
             _unitName = param.UnitName;
+            
+            Sys.GetSubsystem<AbilityActivationReqSubsystem>().CreateGameUnitQueue(this);
         }
 
         private void UnInit()
         {
+            Sys.GetSubsystem<AbilityActivationReqSubsystem>().RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
@@ -221,12 +227,12 @@ namespace GAS.Logic
 
         public bool IsDisposed()
         {
-            throw new NotImplementedException();
+            return !_isActive;
         }
 
         public void ForceDisposeObj()
         {
-            throw new NotImplementedException();
+            GetRefCountDisposableComponent().DisposeOwner();
         }
 
         public void OnObjDispose()

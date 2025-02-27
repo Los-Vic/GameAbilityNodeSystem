@@ -75,6 +75,7 @@ namespace GAS.Logic
             graphRunner.StartRunner();
             return graphRunner;
         }
+        internal bool HasPortalNode(Type portalNodeType) => _portTypeNodeIdMap.ContainsKey(portalNodeType);
         
         internal NodeGraphRunner RunGraph(Type portalNodeType, GameEventArg param = null, Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null)
         {

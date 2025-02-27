@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,6 +12,7 @@ namespace GAS.Logic.Value
     [Serializable]
     public class ValuePickerParam:ValuePickerBase
     {
+        [Header("参数")]
         [ValueDropdown(nameof(GetAllParams))]
         public string paramName;
         

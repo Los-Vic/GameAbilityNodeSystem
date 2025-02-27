@@ -6,17 +6,11 @@ namespace GAS.Logic
     {
         internal ObjectPoolMgr ObjectPoolMgr { get; private set; }
 
-        public override void Init(GameAbilitySystem system)
+        public override void Init()
         {
-            base.Init(system);
             ObjectPoolMgr = new ObjectPoolMgr();
         }
-
-        public override void Reset()
-        {
-            ObjectPoolMgr.Clear();
-        }
-
+        
         public override void UnInit()
         {
             ObjectPoolMgr.Clear();

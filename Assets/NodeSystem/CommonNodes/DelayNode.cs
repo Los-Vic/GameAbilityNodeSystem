@@ -3,7 +3,7 @@
 namespace NS
 {
     [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
-    public class DelayNode:Node
+    public sealed class DelayNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
@@ -14,7 +14,7 @@ namespace NS
         public string InPortFloat;
     }
     
-    public class DelayFlowNodeRunner:FlowNodeRunner
+    public sealed class DelayFlowNodeRunner:FlowNodeRunner
     {
         private DelayNode _node;
         private float _delay;

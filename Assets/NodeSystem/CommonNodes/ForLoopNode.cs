@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("ForLoop", "Common/FlowControl/ForLoop", ENodeFunctionType.Flow, typeof(ForLoopFlowNodeRunner), CommonNodeCategory.FlowControl)]
-    public class ForLoopNode:Node
+    public sealed class ForLoopNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InExecPort;
@@ -19,7 +19,7 @@
         public string OutForEachExecPort;
     }
     
-    public class ForLoopFlowNodeRunner:FlowNodeRunner
+    public sealed class ForLoopFlowNodeRunner:FlowNodeRunner
     {
         private ForLoopNode _node;
         private bool _started;

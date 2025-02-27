@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("Int", "Common/LiteralValue/Int", ENodeFunctionType.Value , typeof(IntNodeRunner), CommonNodeCategory.Value)]
-    public class IntNode:Node
+    public sealed class IntNode:Node
     {
         [ExposedProp]
         public int Val;
@@ -10,7 +10,7 @@
         public string OutPortVal;
     }
     
-    public class IntNodeRunner:NodeRunner
+    public sealed class IntNodeRunner:NodeRunner
     {
         private IntNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("Float", "Common/LiteralValue/Float", ENodeFunctionType.Value, typeof(FloatNodeRunner), CommonNodeCategory.Value)]
-    public class FloatNode:Node
+    public sealed class FloatNode:Node
     {
         [ExposedProp]
         public float Val;
@@ -10,7 +10,7 @@
         public string OutPortVal;
     }
     
-    public class FloatNodeRunner:NodeRunner
+    public sealed class FloatNodeRunner:NodeRunner
     {
         private FloatNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

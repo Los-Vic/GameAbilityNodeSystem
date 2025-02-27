@@ -260,6 +260,9 @@ namespace NSEditor
             
             var prop = _serializedNode.FindPropertyRelative(fieldInfo.Name);
             var field = new PropertyField(prop);
+            field.BindProperty(prop);
+           // field.bindingPath = prop.propertyPath;
+            extensionContainer.Add(field);
             
             //create dropdown field to select instance
             if (fieldInfo.GetCustomAttribute<SerializeReference>() != null)
@@ -295,11 +298,6 @@ namespace NSEditor
                     OnSerializeReferenceDropdownFieldValueChanged(evt, prop, typeList, field));
                 extensionContainer.Add(dropdownField);
             }
-            
-           
-            field.BindProperty(prop);
-           // field.bindingPath = prop.propertyPath;
-            extensionContainer.Add(field);
             
             return field;
         }
@@ -369,7 +367,7 @@ namespace NSEditor
 
             if (_graphAsset.GetNodeNameCount(Node.NodeName) > 1)
             {
-                Debug.LogError($"Portal node is repeated! {Node.NodeName}");
+                Debug.LogError($"[Editor]Portal node is repeated! {Node.NodeName}");
             }
         }
     }

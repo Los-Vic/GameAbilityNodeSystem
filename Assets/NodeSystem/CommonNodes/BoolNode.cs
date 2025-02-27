@@ -1,7 +1,7 @@
 ﻿namespace NS
 {
     [Node("Bool", "Common/LiteralValue/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), CommonNodeCategory.Value)]
-    public class BoolNode : Node
+    public sealed class BoolNode : Node
     {
         [ExposedProp] public bool Val;
 
@@ -9,7 +9,7 @@
         public string OutPortVal;
     }
     
-    public class BoolNodeRunner:NodeRunner
+    public sealed class BoolNodeRunner:NodeRunner
     {
         private BoolNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

@@ -117,7 +117,7 @@ namespace NSEditor
             var element = (SearchContextElement)searchTreeEntry.userData;
             if (!element.TargetType.IsSubclassOf(typeof(Node)))
             {
-                Debug.LogError($"Can't add node of invalid type [{element.TargetType}]");
+                Debug.LogError($"[Editor]Can't add node of invalid type [{element.TargetType}]");
                 return false;
             }
             
@@ -129,7 +129,7 @@ namespace NSEditor
                 if (nodeAttribute.IsSingleton &&
                     GraphView.GraphAsset.HasNodeName(node.NodeName))
                 {
-                    Debug.LogWarning($"Can't add SingletonNode [{node.NodeName}]");
+                    Debug.LogWarning($"[Editor]Can't add SingletonNode [{node.NodeName}]");
                     return true;
                 }
             }

@@ -42,12 +42,16 @@ namespace NSEditor
 
     public static class NodeGraphAssetEditorUtility
     {
-        public static void ValidateGraph(SerializedObject serializedObject)
+        public static bool ValidateGraph(SerializedObject serializedObject)
         {
-            Debug.Log($"ValidateGraph:{serializedObject.targetObject.name}");
+            var noErrorFound = true;
+            
             var graphAsset = serializedObject.targetObject as NodeGraphAsset;
-            if(graphAsset == null)
-                return;
+            if (graphAsset == null)
+            {
+                Debug.LogError($"[Editor]Validate graph [{serializedObject.targetObject.name}] failed: not node graph asset.");
+                return false;
+            }
             
             var nodeMap = new Dictionary<string, Node>();
             var portMap = new Dictionary<string, NodePort>();
@@ -59,8 +63,11 @@ namespace NSEditor
             //Remove Null
             for (var i = graphAsset.nodes.Count - 1; i >= 0; i--)
             {
-                if(graphAsset.nodes[i] == null)
+                if (graphAsset.nodes[i] == null)
+                {
+                    noErrorFound = false;
                     graphAsset.nodes.RemoveAt(i);
+                }
             }
             
             //Construct Node Map
@@ -154,10 +161,15 @@ namespace NSEditor
                     continue;
                 if (badPortIds.Contains(port.connectPortId) || !portMap.ContainsKey(port.connectPortId))
                 {
+                    noErrorFound = false;
                     //Break Connection
                     port.Disconnect();
                 }
             }
+
+            if (badNodes.Count > 0 || badPorts.Count > 0)
+                noErrorFound = false;
+            
             //Remove Bad Nodes & Ports
             foreach (var node in badNodes)
             {
@@ -167,11 +179,22 @@ namespace NSEditor
             {
                 graphAsset.ports.Remove(port);
             }
+
+            if (noErrorFound)
+            {
+                Debug.Log($"[Editor]Validate graph [{serializedObject.targetObject.name}]: no error found.");
+            }
+            else
+            {
+                Debug.LogWarning($"[Editor]Validate graph [{serializedObject.targetObject.name}]: some error has been fixed, please open graph to check.");
+            }
+           
+            return noErrorFound;
         }
 
         public static void ClearGraph(SerializedObject serializedObject)
         {
-            Debug.Log($"ClearGraph:{serializedObject.targetObject.name}");
+            Debug.Log($"[Editor]Clear graph [{serializedObject.targetObject.name}]");
             var graphAsset = serializedObject.targetObject as NodeGraphAsset;
             if(graphAsset == null)
                 return;
