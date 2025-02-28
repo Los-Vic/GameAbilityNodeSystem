@@ -30,7 +30,7 @@ namespace GAS.Logic
         UnInitialized,
     }
     
-    public class GameAbility :IPoolObject, ITickable
+    public class GameAbility :IPoolObject, ITickable, IRefCountDisposableObj
     {
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
@@ -54,6 +54,10 @@ namespace GAS.Logic
         private readonly List<AbilityActivationReqJob> _activationReqJobs = new();
             
         internal GameAbilitySystem System { get; private set; }
+        private bool _isActive;
+        private RefCountDisposableComponent _refCountDisposableComponent;
+        private ObjectPool _pool;
+        
         internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
         
         public string AbilityName => Asset?.abilityName ?? string.Empty;
@@ -82,14 +86,17 @@ namespace GAS.Logic
 
         public void OnCreateFromPool(ObjectPool pool)
         {
+            _pool = pool;
         }
 
         public void OnTakeFromPool()
         {
+            _isActive = true;
         }
 
         public void OnReturnToPool()
         {
+            _isActive = false;
             UnInit();
         }
 
@@ -100,21 +107,22 @@ namespace GAS.Logic
         #endregion
 
         #region Tick
-
-        public void TickCooldown(float deltaTime)
-        {
-            if (!IsInCooldown) 
-                return;
-            CooldownCounter += deltaTime;
-            if (CooldownCounter >= CooldownDuration)
-            {
-                ResetCooldown();
-            }
-        }
         
         public void OnTick(float deltaTime)
         {
+            var needTick = true;
             
+            CooldownCounter += deltaTime;
+            if (CooldownCounter >= CooldownDuration)
+            {
+                needTick = false;
+                ResetCooldown();
+            }
+
+            if (!needTick)
+            {
+                System.GetSubsystem<AbilityInstanceSubsystem>().RemoveFromTickList(this);
+            }
         }
         
         #endregion
@@ -133,23 +141,36 @@ namespace GAS.Logic
             Owner = owner;
             GameLogger.Log($"On add ability: {AbilityName} of {Owner.UnitName}");
             State = EAbilityState.Available;
-            OnAdd?.Invoke();
+            OnAdd?.SafeInvoke();
             
-            GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
-            //todo: Graph register to game event
+            if(GraphController.HasPortalNode(typeof(OnAddAbilityPortalNode)))
+                GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
+            foreach (var eventType in  GraphController.GetRegisteredGameEvents())
+            {
+                System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent(eventType, OnGameEventInvoked);
+            }
         }
 
         internal void OnRemoveAbility()
         {
             GameLogger.Log($"On remove ability: {AbilityName} of {Owner.UnitName}");
-            //todo: Graph unregister to game event
+            foreach (var eventType in  GraphController.GetRegisteredGameEvents())
+            {
+                System.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent(eventType, OnGameEventInvoked);
+            }
             
-            GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
-            OnRemove?.Invoke();
+            if(GraphController.HasPortalNode(typeof(OnRemoveAbilityPortalNode)))
+                GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
+            OnRemove?.SafeInvoke();
             Owner = null;
             State = EAbilityState.MarkDestroy;
         }
-        
+
+        private void OnGameEventInvoked(GameEventArg arg)
+        {
+           GraphController.RunGraphGameEvent(arg.EventType, arg);
+        }
+
         //检测技能执行条件是否满足
         private ECheckAbilityResult CheckAbility()
         {
@@ -197,29 +218,16 @@ namespace GAS.Logic
         private void StartCooldown()
         {
             CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
-            if(CooldownDuration > 0)
+            if (CooldownDuration > 0)
+            {
+                System.GetSubsystem<AbilityInstanceSubsystem>().AddToTickList(this);
                 IsInCooldown = true;
+            }
         }
 
         #endregion
 
         #region Activate / Cancel Ability
-        
-        internal void ActivateAbilityWithGameEventParam(GameEventArg param)
-        {
-            var checkResult = CheckAbility();
-            if (checkResult != ECheckAbilityResult.Success)
-            {
-                GameLogger.Log($"Activate ability failed, check result : {checkResult}. {AbilityName} of {Owner.UnitName}");
-                return;
-            }
-            
-            CommitAbility();
-            GameLogger.Log($"Activate ability succeeded. {AbilityName} of {Owner.UnitName}");
-            var runner = GraphController.RunGraph(typeof(OnActivateAbilityPortalNode), param, OnActivateAbilityRunnerEnd);
-            _activateAbilityRunners.Add(runner);
-        }
-
         internal void CancelAbility()
         {
             if (_activateAbilityRunners.Count == 0)
@@ -288,6 +296,15 @@ namespace GAS.Logic
 
         internal void AddActivationReqJob(AbilityActivationReqJob job)
         {
+            var checkRes = CheckAbility();
+            if (checkRes != ECheckAbilityResult.Success)
+            {
+                GameLogger.Log($"Failed to add activation req job, check ability : {checkRes}");
+                return;
+            }
+            
+            CommitAbility();
+            
             if (Owner == null)
             {
                 GameLogger.Log($"Add activation req job failed, owner is null. {AbilityName}");
@@ -307,6 +324,30 @@ namespace GAS.Logic
         }
 
         #endregion
-     
+
+        #region IRefCountDisposable
+
+        public RefCountDisposableComponent GetRefCountDisposableComponent()
+        {
+            return _refCountDisposableComponent ?? new RefCountDisposableComponent(this);
+        }
+
+        public bool IsDisposed()
+        {
+            return !_isActive;
+        }
+
+        public void ForceDisposeObj()
+        {
+            GetRefCountDisposableComponent().DisposeOwner();
+        }
+
+        public void OnObjDispose()
+        {
+            _pool.Release(this);
+        }
+
+        #endregion
+        
     }
 }

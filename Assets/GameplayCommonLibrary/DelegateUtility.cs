@@ -1,6 +1,4 @@
 ﻿using System;
-using UnityEngine;
-
 namespace GameplayCommonLibrary
 {
     public static class DelegateUtility
@@ -19,7 +17,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke();
                 }
             }
@@ -37,7 +35,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t);
                 }
             }
@@ -56,7 +54,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t1, t2);
                 }
             }
@@ -76,7 +74,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t1, t2, t3);
                 }
             }
@@ -95,7 +93,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t1, t2, t3, t4);
                 }
             }
@@ -114,7 +112,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t1, t2, t3, t4, t5);
                 }
             }
@@ -139,7 +137,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke();
                 }
             }
@@ -159,7 +157,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t);
                 }
             }
@@ -180,7 +178,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                     onException?.Invoke(t1, t2);
                 }
             }

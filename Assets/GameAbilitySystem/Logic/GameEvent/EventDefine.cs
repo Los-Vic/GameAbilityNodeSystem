@@ -41,7 +41,7 @@ namespace GAS.Logic
         private RefCountDisposableComponent _refCountDisposableComponent;
         private ObjectPool _pool;
 
-        public void Init(GameEventInitParam param)
+        public void Init(ref GameEventInitParam param)
         {
             EventType = param.EventType;
             EventSrcUnit = param.EventSrcUnit;

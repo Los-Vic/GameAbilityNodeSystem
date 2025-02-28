@@ -8,13 +8,14 @@ namespace NS
     {
         Completed,
         Canceled,
+        UnInit,
     }
     
     public abstract class NodeGraphRunnerContext
     {
     }
     
-    public class NodeGraphRunner:IPoolObject
+    public class NodeGraphRunner:IPoolObject, IRefCountRequester
     {
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
@@ -29,6 +30,7 @@ namespace NS
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
+        private Action<NodeGraphRunner> _onRunnerDestroy;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string PortalName => _portalNode?.DisplayName() ?? "";
@@ -40,13 +42,14 @@ namespace NS
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
         public void Init(NodeSystem system, NodeGraphAsset asset, string portalNodeId, IPortalParam actionStartParam
-        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd, NodeGraphRunnerContext context = null)
+        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd, Action<NodeGraphRunner> onRunnerDestroy = null, NodeGraphRunnerContext context = null)
         {
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
             _isValid = false;
             _onRunnerRunEnd = onRunnerRunEnd;
+            _onRunnerDestroy = onRunnerDestroy;
             _portalNode = GraphAssetRuntimeData.GetNodeById(portalNodeId);
             Context = context;
             
@@ -66,10 +69,14 @@ namespace NS
             _isValid = true;
         }
 
-        private void DeInit()
+        private void UnInit()
         {
+            _onRunnerDestroy?.Invoke(this);
+            _onRunnerDestroy = null;
+            
             TaskScheduler.CancelTasksOfGraphRunner(this);
             Clear();
+            
             _onRunnerRunEnd = null;
             _asset = null;
             _portalNode = null;
@@ -253,7 +260,7 @@ namespace NS
 
         public void OnReturnToPool()
         {
-            DeInit();
+            UnInit();
         }
 
         public void OnDestroy()
@@ -261,5 +268,15 @@ namespace NS
         }
 
         #endregion
+
+        public bool IsRequesterStillValid()
+        {
+            return _isValid;
+        }
+
+        public string GetRequesterDesc()
+        {
+            return $"graph:{_asset.name}, portal:{_portalNode.DisplayName()}";
+        }
     }
 }

@@ -51,11 +51,10 @@ namespace NS
             _graphAssetRuntimeDataMap.Add(asset, data);
             return data;
         }
-
+        
         public virtual void DumpObjectPool()
         {
             NodePoolMgr.Log();
         }
-        
     }
 }

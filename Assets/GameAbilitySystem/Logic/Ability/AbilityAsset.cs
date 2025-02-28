@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameplayCommonLibrary;
 using GAS.Logic.Target;
 using GAS.Logic.Value;
 using NS;

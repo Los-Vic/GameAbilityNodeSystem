@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using GameplayCommonLibrary;
 using NS;
 
@@ -37,7 +38,7 @@ namespace GAS.Logic
             AddSubsystem<ObjectPoolSubsystem>(false);
             AddSubsystem<GameEventSubsystem>(false);
             AddSubsystem<AttributeInstanceSubsystem>(false);
-            AddSubsystem<AbilityInstanceSubsystem>(false);
+            AddSubsystem<AbilityInstanceSubsystem>(true);
             AddSubsystem<UnitInstanceSubsystem>(false);
             
             var abilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
@@ -98,6 +99,21 @@ namespace GAS.Logic
         }
 
         #endregion
+
+        #region GameEvent
+
+        public GameplayEvent<GameEventArg> GetGameEvent(EGameEventType type)
+        {
+            return GetSubsystem<GameEventSubsystem>().GetGameEvent(type);
+        }
+
+        public void PostGameEvent(GameEventInitParam param)
+        {
+            GetSubsystem<GameEventSubsystem>().PostGameEvent(ref param);
+        }
+        
+
+        #endregion
         
         
         #region GameUnit
@@ -114,6 +130,7 @@ namespace GAS.Logic
 
         #endregion
 
+    
         public override void DumpObjectPool()
         {
             GameLogger.Log("----------Dump ObjectPools Start----------");
@@ -123,6 +140,25 @@ namespace GAS.Logic
             GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Log();
             GameLogger.Log("----------Dump ObjectPools End------------");
         }
-        
+
+        public void DumpRefCounterObjects()
+        {
+            var poolMgr = GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr;
+
+            var list = poolMgr.GetActiveObjects(typeof(GameEventArg));
+            if (list != null)
+            {
+                foreach (var arg in list)
+                {
+                    var a = (GameEventArg)arg;
+                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
+                    foreach (var log in logList)
+                    {
+                        GameLogger.Log(log);
+                    }
+                }
+            }
+            
+        }
     }
 }

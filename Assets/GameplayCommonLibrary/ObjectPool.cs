@@ -175,13 +175,12 @@ namespace GameplayCommonLibrary
 
             pool.Release(obj);
         }
-
-        public List<T> GetActiveObjects<T>() where T : class, IPoolObject
+        
+        public List<IPoolObject> GetActiveObjects(Type type)
         {
-            var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return null;
-            return pool.GetActiveObjects() as List<T>;
+            return pool.GetActiveObjects();
         }
 
         public bool IsActiveObject(IPoolObject obj)

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
-using NS;
 
 namespace GAS.Logic
 {
@@ -11,14 +9,6 @@ namespace GAS.Logic
         public GameAbilitySystem AbilitySystem;
         public string UnitName;
         public int PlayerIndex;
-    }
-
-    public enum EUnitAbilityCastState
-    {
-        Idle,
-        PreCasting,
-        Casting,
-        PostCasting,
     }
     
     /// <summary>
@@ -53,11 +43,6 @@ namespace GAS.Logic
         //Effects
         internal readonly List<GameEffect> GameEffects = new();
         
-        //Ability Cast
-        private GameAbility _castingAbility;
-        internal EUnitAbilityCastState CastingState { get; private set; }
-        internal bool CanCastNewAbility => CastingState == EUnitAbilityCastState.Idle;
-        
         internal void Init(ref GameUnitCreateParam param)
         {
             Sys = param.AbilitySystem;
@@ -87,6 +72,7 @@ namespace GAS.Logic
             //Clear Abilities
             foreach (var ability in GameAbilities)
             {
+                ability.OnRemoveAbility();
                 Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
             }
             GameAbilities.Clear();
@@ -164,8 +150,7 @@ namespace GAS.Logic
             {
                 if (abilityId != ability.ID) 
                     continue;
-                ability.OnRemoveAbility();
-                GameAbilities.Remove(ability);
+                RemoveAbility(ability);
                 break;
             }
         }
@@ -174,22 +159,7 @@ namespace GAS.Logic
         {
             ability.OnRemoveAbility();
             GameAbilities.Remove(ability);
-        }
-
-        #endregion
-
-        #region Cast Ability
-
-        internal void CastAbility(GameAbility ability)
-        {
-            if (!CanCastNewAbility)
-            {
-                GameLogger.Log($"Cast ability failed, state is not idle. unit {UnitName}, ability {ability.AbilityName}");
-                return;
-            }
-            
-            
-            
+            Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
         }
 
         #endregion
@@ -241,6 +211,5 @@ namespace GAS.Logic
         }
 
         #endregion
-       
     }
 }

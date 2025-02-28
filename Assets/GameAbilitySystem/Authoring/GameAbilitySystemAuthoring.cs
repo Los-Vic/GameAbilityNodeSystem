@@ -108,9 +108,16 @@ namespace GAS.Authoring
             {
                 AbilitySystem = _system,
                 UnitName = "TestUnit",
+                PlayerIndex = 0
             };
             _testUnit = _system.CreateGameUnit(ref param);
             _testUnit.GrantAbility(0);
+            
+            _system.PostGameEvent(new GameEventInitParam()
+            {
+                EventType = EGameEventType.OnPostPrepareStart,
+                EventSrcUnit = _testUnit,
+            });
         }
 
         [Button("DumpObjectPool")]
@@ -120,6 +127,14 @@ namespace GAS.Authoring
                 return;
             
             _system.DumpObjectPool();
+        }
+
+        [Button("DumpRefCounterObjects")]
+        private void DumpRefCounterObjects()
+        {
+            if(!Application.isPlaying)
+                return;
+            _system.DumpRefCounterObjects();
         }
         
         #endregion

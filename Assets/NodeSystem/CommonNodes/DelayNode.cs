@@ -31,7 +31,7 @@ namespace NS
         {
             ExecuteDependentValNodes(_node.Id);
             _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
-            GameLogger.Log($"input delay [{_delay}]");
+            GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.PortalName}");
             
             var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
             TaskScheduler.StartTask(task);

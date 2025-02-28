@@ -14,17 +14,17 @@ namespace GameplayCommonLibrary
     {
         public void Log(int threadId, string message)
         {
-            Debug.Log($"@{threadId}: {message}");
+            Debug.Log($"[{Time.frameCount}]@{threadId}: {message}");
         }
 
         public void LogWarning(int threadId, string message)
         {
-            Debug.LogWarning($"@{threadId}: {message}");
+            Debug.LogWarning($"[{Time.frameCount}]@{threadId}: {message}");
         }
 
         public void LogError(int threadId, string message)
         {
-            Debug.LogError($"@{threadId}: {message}");
+            Debug.LogError($"[{Time.frameCount}]@{threadId}: {message}");
         }
     }
     

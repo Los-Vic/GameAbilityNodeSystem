@@ -58,7 +58,7 @@ namespace GameplayCommonLibrary
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    GameLogger.LogError(e.ToString());
                 }
             }
         }

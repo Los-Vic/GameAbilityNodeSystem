@@ -51,7 +51,7 @@ namespace GameplayCommonLibrary
 #endif
 
         private readonly List<IRefCountRequester> _refCountRequesters = new();
-        private bool _isPendingDispose;
+        public bool IsPendingDispose { get; private set; }
 
         public RefCountDisposableComponent(IRefCountDisposableObj owner)
         {
@@ -60,7 +60,7 @@ namespace GameplayCommonLibrary
 
         private void Reset()
         {
-            _isPendingDispose = false;
+            IsPendingDispose = false;
             _refCountRequesters.Clear();
 #if BUILD_DEV || UNITY_EDITOR
             _refCountRequesterMap.Clear();
@@ -95,7 +95,7 @@ namespace GameplayCommonLibrary
         /// </summary>
         public void MarkForDispose()
         {
-            _isPendingDispose = true;
+            IsPendingDispose = true;
             TryDisposeOwner();
         }
 
@@ -110,7 +110,7 @@ namespace GameplayCommonLibrary
 
         private void TryDisposeOwner()
         {
-            if (_isPendingDispose && RefCount == 0)
+            if (IsPendingDispose && RefCount == 0)
             {
                 DisposeOwner();
             }

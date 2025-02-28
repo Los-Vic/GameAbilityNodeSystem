@@ -1,9 +1,21 @@
-﻿using GameplayCommonLibrary;
+﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
+        public override void UnInit()
+        {
+            var units = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
+            if(units == null)
+                return;
+            foreach (var u in units.ToArray())
+            {
+                DestroyGameUnit((GameUnit)u);
+            }
+        }
+
         #region Game Unit Instance Create/Destroy
 
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
