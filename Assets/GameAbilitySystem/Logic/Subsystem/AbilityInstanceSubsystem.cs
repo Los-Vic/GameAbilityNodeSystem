@@ -34,7 +34,7 @@ namespace GAS.Logic
                 return null;
             }
             
-            var ability = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<GameAbility>();
+            var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
             var param = new AbilityCreateParam()
             {
                 Asset = abilityAsset

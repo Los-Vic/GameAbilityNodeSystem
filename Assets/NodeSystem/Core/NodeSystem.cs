@@ -5,7 +5,7 @@ namespace NS
 {
     public class NodeSystem
     {
-        private ObjectPoolMgr NodePoolMgr { get; set; }
+        private ClassObjectPoolMgr NodePoolMgr { get; set; }
         public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
         public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
         
@@ -13,7 +13,7 @@ namespace NS
 
         public virtual void OnCreateSystem()
         {
-            NodePoolMgr = new ObjectPoolMgr();
+            NodePoolMgr = new ClassObjectPoolMgr();
             NodeObjectFactory = new NodeSystemObjectFactory(NodePoolMgr);
             TaskScheduler = new NodeTaskScheduler(NodePoolMgr);
         }

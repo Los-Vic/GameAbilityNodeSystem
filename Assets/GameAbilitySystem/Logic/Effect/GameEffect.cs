@@ -4,7 +4,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    public class GameEffect:IPoolObject
+    public class GameEffect:IPoolClass
     {
         private void UnInit()
         {
@@ -12,7 +12,7 @@ namespace GAS.Logic
         }
         #region Object Pool
 
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 

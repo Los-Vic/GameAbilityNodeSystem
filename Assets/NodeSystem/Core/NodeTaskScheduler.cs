@@ -23,7 +23,7 @@ namespace NS
     
     public class NodeTaskScheduler:INodeSystemTaskScheduler
     {
-        protected readonly ObjectPoolMgr PoolMgr;
+        protected readonly ClassObjectPoolMgr PoolMgr;
 
         private readonly List<NodeTask> _allTasks = new List<NodeTask>();
         private readonly List<NodeTask> _updateList = new();
@@ -34,7 +34,7 @@ namespace NS
         private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
         private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
-        public NodeTaskScheduler(ObjectPoolMgr poolMgr)
+        public NodeTaskScheduler(ClassObjectPoolMgr poolMgr)
         {
             PoolMgr = poolMgr;
         }

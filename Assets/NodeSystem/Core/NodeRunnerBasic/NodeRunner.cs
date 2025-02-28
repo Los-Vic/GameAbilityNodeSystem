@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    public class NodeRunner:IPoolObject
+    public class NodeRunner:IPoolClass
     {
         public static readonly NodeRunner DefaultRunner = new();
         protected NodeGraphRunner GraphRunner { get; private set; }
@@ -18,7 +18,7 @@ namespace NS
 
         #region Pool Object
         
-        public virtual void OnCreateFromPool(ObjectPool pool)
+        public virtual void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 

@@ -20,14 +20,14 @@ namespace GAS.Logic
     /// 5、技能前后摇，技能施放队列管理
     /// 6、单位标签
     /// </summary>
-    public class GameUnit: IPoolObject, IRefCountDisposableObj
+    public class GameUnit: IPoolClass, IRefCountDisposableObj
     {
         internal GameAbilitySystem Sys { get;private set; }
         public int PlayerIndex { get; private set; }
 
         private const string DefaultUnitName = "UnkownUnit";
         private string _unitName = DefaultUnitName;
-        private ObjectPool _pool;
+        private ClassObjectPool _pool;
         private RefCountDisposableComponent _refCountDisposableComponent;
         private bool _isActive;
         
@@ -165,7 +165,7 @@ namespace GAS.Logic
         #endregion
 
         #region Object Pool
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
             _pool = pool;
         }

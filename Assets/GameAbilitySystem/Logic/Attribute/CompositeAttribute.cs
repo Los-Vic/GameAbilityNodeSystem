@@ -12,7 +12,7 @@ namespace GAS.Logic
         public Func<List<FP>, FP> ValEquation;
     }
     
-    public class CompositeAttribute:IPoolObject
+    public class CompositeAttribute:IPoolClass
     {
         public ECompositeAttributeType Type { get; private set; }
 
@@ -92,7 +92,7 @@ namespace GAS.Logic
         }
         
         #region Pool Interface
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 

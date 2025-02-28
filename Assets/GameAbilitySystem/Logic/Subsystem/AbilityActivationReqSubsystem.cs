@@ -43,7 +43,7 @@ namespace GAS.Logic
         public AbilityCastCfg CastCfg;
     }
     
-    public class AbilityActivationReqJob:IRefCountRequester, IPoolObject
+    public class AbilityActivationReqJob:IRefCountRequester, IPoolClass
     {
         public AbilityActivationReq Req { get;private set; }
         public EActivationReqJobState JobState { get; private set; }
@@ -146,7 +146,7 @@ namespace GAS.Logic
             return $"ReqJob_{Req.Ability?.AbilityName}_{Req.Ability?.Owner.UnitName}";
         }
 
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 
@@ -197,7 +197,7 @@ namespace GAS.Logic
                 if(job.JobState == EActivationReqJobState.Running)
                     break;
                 _worldQueue.Dequeue();
-                System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
             }
             //Player
             foreach (var queue in _playerQueues.Values)
@@ -209,7 +209,7 @@ namespace GAS.Logic
                     if(job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
-                    System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                    System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                 }
             }
             //Unit
@@ -230,7 +230,7 @@ namespace GAS.Logic
                     if(job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
-                    System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                    System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                 }
             }
             
@@ -247,7 +247,7 @@ namespace GAS.Logic
                 if (job.JobState == EActivationReqJobState.Running)
                     continue;
                 _independentJobList.Remove(job);
-                System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
             }
         }
 
@@ -272,7 +272,7 @@ namespace GAS.Logic
                            }
                            else
                            {
-                               System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                               System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                            }
                        }
                    }
@@ -298,7 +298,7 @@ namespace GAS.Logic
                            }
                            else
                            {
-                               System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                               System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                            }
                        }
                    }
@@ -321,7 +321,7 @@ namespace GAS.Logic
                        }
                        else
                        {
-                           System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                           System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                        }
                    }
                    break;
@@ -333,7 +333,7 @@ namespace GAS.Logic
                    }
                    else
                    {
-                       System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(job);
+                       System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(job);
                    }
                    break;
             }

@@ -27,7 +27,7 @@ namespace GAS.Logic
 
         internal void PostGameEvent(ref GameEventInitParam param)
         {
-            var eventArg = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<GameEventArg>();
+            var eventArg = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameEventArg>();
             eventArg.Init(ref param);
             
             GameLogger.Log($"Post game event, event type:{param.EventType}, event src:{param.EventSrcUnit.UnitName}");

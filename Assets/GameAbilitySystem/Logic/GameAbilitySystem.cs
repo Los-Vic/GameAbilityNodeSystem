@@ -35,7 +35,7 @@ namespace GAS.Logic
         {
             base.OnCreateSystem();
             
-            AddSubsystem<ObjectPoolSubsystem>(false);
+            AddSubsystem<ClassObjectPoolSubsystem>(false);
             AddSubsystem<GameEventSubsystem>(false);
             AddSubsystem<AttributeInstanceSubsystem>(false);
             AddSubsystem<AbilityInstanceSubsystem>(true);
@@ -137,13 +137,13 @@ namespace GAS.Logic
             GameLogger.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
             GameLogger.Log("----------ObjectPool----------------------");
-            GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Log();
+            GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Log();
             GameLogger.Log("----------Dump ObjectPools End------------");
         }
 
         public void DumpRefCounterObjects()
         {
-            var poolMgr = GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr;
+            var poolMgr = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr;
 
             var list = poolMgr.GetActiveObjects(typeof(GameEventArg));
             if (list != null)

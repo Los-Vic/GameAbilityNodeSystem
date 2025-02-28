@@ -8,17 +8,17 @@ namespace NS
     public class NodeSystemObjectFactory
     {
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
-        private readonly ObjectPoolMgr _objectPoolMgr;
+        private readonly ClassObjectPoolMgr _classObjectPoolMgr;
 
-        public NodeSystemObjectFactory(ObjectPoolMgr objectPoolMgr)
+        public NodeSystemObjectFactory(ClassObjectPoolMgr classObjectPoolMgr)
         {
-            _objectPoolMgr = objectPoolMgr;
+            _classObjectPoolMgr = classObjectPoolMgr;
         }
         
         public void Clear()
         {
             _cachedNodeToNodeRunnerTypeMap.Clear();
-            _objectPoolMgr.Clear();
+            _classObjectPoolMgr.Clear();
         }
         
         public NodeRunner CreateNodeRunner(Type type)
@@ -39,7 +39,7 @@ namespace NS
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 
-            var runner = _objectPoolMgr.Get(runnerType) as NodeRunner;
+            var runner = _classObjectPoolMgr.Get(runnerType) as NodeRunner;
             return runner ?? NodeRunner.DefaultRunner;
         }
 
@@ -47,17 +47,17 @@ namespace NS
         {
             if(runner == NodeRunner.DefaultRunner)
                 return;
-            _objectPoolMgr.Release(runner);
+            _classObjectPoolMgr.Release(runner);
         }
 
         public NodeGraphRunner CreateGraphRunner()
         {
-            return _objectPoolMgr.Get<NodeGraphRunner>() ;
+            return _classObjectPoolMgr.Get<NodeGraphRunner>() ;
         }
 
         public virtual void DestroyGraphRunner(NodeGraphRunner runner)
         {
-            _objectPoolMgr.Release(runner);
+            _classObjectPoolMgr.Release(runner);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace GAS.Logic
         public string EventString;
     }
     
-    public class GameEventArg:IPortalParam, IPoolObject, IRefCountRequester, IRefCountDisposableObj
+    public class GameEventArg:IPortalParam, IPoolClass, IRefCountRequester, IRefCountDisposableObj
     {
         public EGameEventType EventType;
         
@@ -39,7 +39,7 @@ namespace GAS.Logic
 
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
-        private ObjectPool _pool;
+        private ClassObjectPool _pool;
 
         public void Init(ref GameEventInitParam param)
         {
@@ -63,7 +63,7 @@ namespace GAS.Logic
         }
         
         #region IPoolObject
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
             _pool = pool;
         }

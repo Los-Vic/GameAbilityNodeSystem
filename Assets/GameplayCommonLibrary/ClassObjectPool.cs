@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace GameplayCommonLibrary
 {
-    public interface IPoolObject
+    public interface IPoolClass
     {
-        void OnCreateFromPool(ObjectPool pool);
+        void OnCreateFromPool(ClassObjectPool pool);
         void OnTakeFromPool();
         void OnReturnToPool();
         void OnDestroy();
     }
 
 
-    public class ObjectPool
+    public class ClassObjectPool
     {
         //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
-        private readonly UnityEngine.Pool.ObjectPool<IPoolObject> _pool;
+        private readonly UnityEngine.Pool.ObjectPool<IPoolClass> _pool;
         private readonly Type _poolObjectType;
-        private readonly List<IPoolObject> _activePoolObjects = new();
+        private readonly List<IPoolClass> _activePoolObjects = new();
 
         //Constructor
-        public ObjectPool(Type type, int capacity, int maxSize)
+        public ClassObjectPool(Type type, int capacity, int maxSize)
         {
-            var t = typeof(IPoolObject);
+            var t = typeof(IPoolClass);
             if (!t.IsAssignableFrom(type))
             {
                 GameLogger.LogError(
@@ -33,12 +32,12 @@ namespace GameplayCommonLibrary
 
             GameLogger.Log($"[ObjectPool]create object pool success: type [{type}]");
             _poolObjectType = type;
-            _pool = new UnityEngine.Pool.ObjectPool<IPoolObject>(CreateItem, OnTakeFromPool, OnReturnToPool,
+            _pool = new UnityEngine.Pool.ObjectPool<IPoolClass>(CreateItem, OnTakeFromPool, OnReturnToPool,
                 OnDestroyItem,
                 true, capacity, maxSize);
         }
 
-        public IPoolObject Get()
+        public IPoolClass Get()
         {
             var obj = _pool.Get();
             _activePoolObjects.Add(obj);
@@ -46,7 +45,7 @@ namespace GameplayCommonLibrary
             return obj;
         }
 
-        public void Release(IPoolObject obj)
+        public void Release(IPoolClass obj)
         {
             if (_activePoolObjects.Remove(obj))
             {
@@ -79,15 +78,15 @@ namespace GameplayCommonLibrary
             _activePoolObjects.Clear();
         }
         
-        public List<IPoolObject> GetActiveObjects() => _activePoolObjects;
-        public bool IsActiveObject(IPoolObject obj) => _activePoolObjects.Contains(obj);
+        public List<IPoolClass> GetActiveObjects() => _activePoolObjects;
+        public bool IsActiveObject(IPoolClass obj) => _activePoolObjects.Contains(obj);
 
         
         #region Pool Callback
 
-        private IPoolObject CreateItem()
+        private IPoolClass CreateItem()
         {
-            var obj = Activator.CreateInstance(_poolObjectType) as IPoolObject;
+            var obj = Activator.CreateInstance(_poolObjectType) as IPoolClass;
 
             if (obj == null)
             {
@@ -100,15 +99,15 @@ namespace GameplayCommonLibrary
             return obj;
         }
 
-        private static void OnTakeFromPool(IPoolObject obj)
+        private static void OnTakeFromPool(IPoolClass obj)
         {
         }
 
-        private static void OnReturnToPool(IPoolObject obj)
+        private static void OnReturnToPool(IPoolClass obj)
         {
         }
 
-        private static void OnDestroyItem(IPoolObject obj)
+        private static void OnDestroyItem(IPoolClass obj)
         {
             obj.OnDestroy();
         }
@@ -131,27 +130,27 @@ namespace GameplayCommonLibrary
     /// <summary>
     /// 对象池管理器，对象池实例都在这里
     /// </summary>
-    public class ObjectPoolMgr
+    public class ClassObjectPoolMgr
     {
-        private readonly Dictionary<Type, ObjectPool> _objectPoolMap = new();
+        private readonly Dictionary<Type, ClassObjectPool> _objectPoolMap = new();
         private const int DefaultCapacity = 32;
         private const int DefaultMaxSize = 10000;
 
-        public T Get<T>() where T : class, IPoolObject, new()
+        public T Get<T>() where T : class, IPoolClass, new()
         {
             var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
             {
-                pool = new ObjectPool(typeof(T), DefaultCapacity, DefaultMaxSize);
+                pool = new ClassObjectPool(typeof(T), DefaultCapacity, DefaultMaxSize);
                 _objectPoolMap.Add(type, pool);
             }
 
             return pool.Get() as T;
         }
 
-        public IPoolObject Get(Type type)
+        public IPoolClass Get(Type type)
         {
-            var t = typeof(IPoolObject);
+            var t = typeof(IPoolClass);
             if (!t.IsAssignableFrom(type))
             {
                 GameLogger.LogError($"create object failed: type {type} can not assign to IPoolObject");
@@ -160,14 +159,14 @@ namespace GameplayCommonLibrary
 
             if (!_objectPoolMap.TryGetValue(type, out var pool))
             {
-                pool = new ObjectPool(type, DefaultCapacity, DefaultMaxSize);
+                pool = new ClassObjectPool(type, DefaultCapacity, DefaultMaxSize);
                 _objectPoolMap.Add(type, pool);
             }
 
             return pool.Get();
         }
 
-        public void Release(IPoolObject obj)
+        public void Release(IPoolClass obj)
         {
             var type = obj.GetType();
             if (!_objectPoolMap.TryGetValue(type, out var pool))
@@ -176,20 +175,20 @@ namespace GameplayCommonLibrary
             pool.Release(obj);
         }
         
-        public List<IPoolObject> GetActiveObjects(Type type)
+        public List<IPoolClass> GetActiveObjects(Type type)
         {
             if (!_objectPoolMap.TryGetValue(type, out var pool))
                 return null;
             return pool.GetActiveObjects();
         }
 
-        public bool IsActiveObject(IPoolObject obj)
+        public bool IsActiveObject(IPoolClass obj)
         {
             var type = obj.GetType();
             return _objectPoolMap.TryGetValue(type, out var pool) && pool.IsActiveObject(obj);
         }
         
-        public IEnumerable<ObjectPool> GetAllPools()
+        public IEnumerable<ClassObjectPool> GetAllPools()
         {
             return _objectPoolMap.Values;
         }

@@ -7,7 +7,7 @@ namespace GAS.Logic
     {
         public override void UnInit()
         {
-            var units = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
+            var units = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
             if(units == null)
                 return;
             foreach (var u in units.ToArray())
@@ -20,7 +20,7 @@ namespace GAS.Logic
 
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var unit = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<GameUnit>();
+            var unit = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameUnit>();
             unit.Init(ref param);
             GameLogger.Log($"Create unit:{param.UnitName}!");
             return unit;

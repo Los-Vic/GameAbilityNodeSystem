@@ -29,26 +29,26 @@ namespace GAS.Logic
 
         internal SimpleAttribute CreateSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<SimpleAttribute>();
+            var attribute = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<SimpleAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
         internal void DestroySimpleAttribute(SimpleAttribute attribute)
         {
-            System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(attribute);
+            System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(attribute);
         }
 
         internal CompositeAttribute CreateCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Get<CompositeAttribute>();
+            var attribute = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<CompositeAttribute>();
             attribute.Init(ref param);
             return attribute;
         }
 
         internal void DestroyCompositeAttribute(CompositeAttribute attribute)
         {
-            System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr.Release(attribute);
+            System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(attribute);
         }
 
         #endregion

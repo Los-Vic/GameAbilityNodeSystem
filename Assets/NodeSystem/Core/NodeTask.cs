@@ -12,7 +12,7 @@ namespace NS
         Cancelled
     }
     
-    public class NodeTask: IPoolObject
+    public class NodeTask: IPoolClass
     {
         private Func<ETaskStatus> OnStartTask { get; set; }
         private Action OnCompleteTask { get; set; }
@@ -99,7 +99,7 @@ namespace NS
         }
         
         #region PoolObject
-        public virtual void OnCreateFromPool(ObjectPool pool)
+        public virtual void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 

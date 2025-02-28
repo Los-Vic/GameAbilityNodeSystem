@@ -27,6 +27,12 @@ namespace GAS.Logic
         [ExposedProp]
         [SerializeReference]
         public ValuePickerBase PostCastTime;
+
+        [Header("完整前后摇过程的时间上限")]
+        [Tooltip("如果过程超过上限，各步骤会等比例的缩短时长")]
+        [ExposedProp]
+        [SerializeReference]
+        public ValuePickerBase CastProcessClampTime;
         
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
@@ -54,18 +60,33 @@ namespace GAS.Logic
             
             if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
             {
-                var job = context.Ability.System.GetSubsystem<ObjectPoolSubsystem>().ObjectPoolMgr
+                var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr
                     .Get<AbilityActivationReqJob>();
 
                 var lv = (uint)context.Ability.Owner.GetSimpleAttributeVal(ESimpleAttributeType.Level);
+
+                var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, lv);
+                var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, lv);
+                var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, lv);
+                var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner, lv);
+
+                var total = preCast + cast + postCast;
+                if (total > clamp)
+                {
+                    var ratio = clamp / total;
+                    preCast *= ratio;
+                    cast *= ratio;
+                    postCast *= ratio;
+                }
+                
                 job.InitJob(new AbilityActivationReq()
                 {
                     Ability = context.Ability,
                     CastCfg = new AbilityCastCfg()
                     {
-                        PreCastTime = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, lv),
-                        CastTime = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, lv),
-                        PostCastTime = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, lv),
+                        PreCastTime = preCast,
+                        CastTime = cast,
+                        PostCastTime = postCast,
                     },
                     EventArgs =  GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal),
                     QueueType = _node.QueueType

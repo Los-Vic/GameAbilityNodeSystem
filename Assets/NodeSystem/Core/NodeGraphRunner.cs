@@ -15,7 +15,7 @@ namespace NS
     {
     }
     
-    public class NodeGraphRunner:IPoolObject, IRefCountRequester
+    public class NodeGraphRunner:IPoolClass, IRefCountRequester
     {
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
@@ -250,7 +250,7 @@ namespace NS
         
         #region Pool Object
 
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 

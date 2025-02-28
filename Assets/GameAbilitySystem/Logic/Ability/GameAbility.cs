@@ -30,7 +30,7 @@ namespace GAS.Logic
         UnInitialized,
     }
     
-    public class GameAbility :IPoolObject, ITickable, IRefCountDisposableObj
+    public class GameAbility :IPoolClass, ITickable, IRefCountDisposableObj
     {
         internal AbilityAsset Asset;
         internal readonly GameAbilityGraphController GraphController = new();
@@ -56,7 +56,7 @@ namespace GAS.Logic
         internal GameAbilitySystem System { get; private set; }
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
-        private ObjectPool _pool;
+        private ClassObjectPool _pool;
         
         internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
         
@@ -84,7 +84,7 @@ namespace GAS.Logic
         
         #region Object Pool
 
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
             _pool = pool;
         }

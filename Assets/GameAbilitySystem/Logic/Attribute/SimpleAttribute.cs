@@ -20,7 +20,7 @@ namespace GAS.Logic
         public List<IValueDecorator> Decorators;
     }
     
-    public class SimpleAttribute:IPoolObject
+    public class SimpleAttribute:IPoolClass
     {
         public ESimpleAttributeType Type { get; private set; }
         
@@ -63,7 +63,7 @@ namespace GAS.Logic
         
         #region Pool Interface
 
-        public void OnCreateFromPool(ObjectPool pool)
+        public void OnCreateFromPool(ClassObjectPool pool)
         {
         }
 
