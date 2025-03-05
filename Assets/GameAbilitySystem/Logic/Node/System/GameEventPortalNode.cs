@@ -55,6 +55,12 @@ namespace GAS.Logic
         {
             return _nextNode;
         }
-        
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
+            _nextNode = null;
+        }
     }
 }

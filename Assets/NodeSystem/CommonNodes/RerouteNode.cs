@@ -24,5 +24,11 @@
             var inVal = GraphRunner.GetInPortVal<object>(_node.InPortVal);
             GraphRunner.SetOutPortVal(_node.OutPortVal, inVal);
         }
+        
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
+        }
     }
 }

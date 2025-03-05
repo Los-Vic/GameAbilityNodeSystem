@@ -36,5 +36,12 @@ namespace GAS.Logic
         {
             GraphRunner.SetOutPortVal(_node.OutPortVal, ValuePickerUtility.GetValue(_node.Config, _unit));
         }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _unit = null;
+            _node = null;
+        }
     }
 }

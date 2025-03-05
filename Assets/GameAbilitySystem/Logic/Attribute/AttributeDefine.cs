@@ -23,6 +23,7 @@ namespace GAS.Logic
     [DrawWithUnity]
     public enum ECompositeAttributeType
     {
-        //这里添加新的属性
+        [InspectorName("无")]
+        None = 0,
     }
 }

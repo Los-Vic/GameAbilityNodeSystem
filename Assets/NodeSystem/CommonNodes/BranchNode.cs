@@ -44,5 +44,11 @@
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
+        
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
+        }
     }
 }

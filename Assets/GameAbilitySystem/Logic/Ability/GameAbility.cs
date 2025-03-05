@@ -57,6 +57,11 @@ namespace GAS.Logic
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
         private ClassObjectPool _pool;
+
+        /// <summary>
+        /// 技能生效次数
+        /// </summary>
+        internal int ActivatedCount { get; private set; }
         
         internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
         
@@ -75,11 +80,13 @@ namespace GAS.Logic
 
         private void UnInit()
         {
+            ActivatedCount = 0;
             CancelAllActivationReqJobs();
             _activateAbilityRunners.Clear();
             ResetCooldown();
             GraphController.UnInit();
             State = EAbilityState.UnInitialized;
+            Owner = null;
         }
         
         #region Object Pool
@@ -162,7 +169,6 @@ namespace GAS.Logic
             if(GraphController.HasPortalNode(typeof(OnRemoveAbilityPortalNode)))
                 GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
             OnRemove?.SafeInvoke();
-            Owner = null;
             State = EAbilityState.MarkDestroy;
         }
 
@@ -227,7 +233,7 @@ namespace GAS.Logic
 
         #endregion
 
-        #region Activate / Cancel Ability
+        #region Activate / Cancel / End Ability
         internal void CancelAbility()
         {
             if (_activateAbilityRunners.Count == 0)
@@ -244,6 +250,11 @@ namespace GAS.Logic
 
             CancelAllActivationReqJobs();
         }
+
+        internal void EndAbility()
+        {
+            Owner.RemoveAbility(this);
+        }
         
         private void OnActivateAbilityRunnerEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
@@ -252,6 +263,8 @@ namespace GAS.Logic
 
         internal void ActivateOnStartPreCast(GameEventArg param)
         {
+            ActivatedCount++;
+            
             if(!GraphController.HasPortalNode(typeof(OnStartPreCastAbilityPortalNode)))
                 return;
             
@@ -344,6 +357,8 @@ namespace GAS.Logic
 
         public void OnObjDispose()
         {
+            GameLogger.Log($"Release Ability: {AbilityName} of {Owner.UnitName}");
+            Owner.GameAbilities.Remove(this);
             _pool.Release(this);
         }
 

@@ -48,9 +48,9 @@ namespace GAS.Logic
 
         internal void UnInit()
         {
-            foreach (var graphRunner in _graphRunners)
+            for(var i = _graphRunners.Count - 1; i >= 0; i--)
             {
-                _system.NodeObjectFactory.DestroyGraphRunner(graphRunner);
+                _system.NodeObjectFactory.DestroyGraphRunner(_graphRunners[i]);
             }
 
             _graphRunners.Clear();

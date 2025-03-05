@@ -71,7 +71,7 @@ namespace GAS.Logic
                 var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner, lv);
 
                 var total = preCast + cast + postCast;
-                if (total > clamp)
+                if (clamp > 0 && total > clamp)
                 {
                     var ratio = clamp / total;
                     preCast *= ratio;
@@ -104,6 +104,12 @@ namespace GAS.Logic
                 return null;
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
+        }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
         }
     }
 }

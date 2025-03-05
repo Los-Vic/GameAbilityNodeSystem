@@ -13,20 +13,16 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   nodes:
-  - rid: 4614383740253896801
   - rid: 4614383740253896805
   - rid: 4614383740253896808
   - rid: 4614383740253896814
   - rid: 4614383740253896817
-  - rid: 4614383761267097657
-  - rid: 4614383761267097660
-  - rid: 4614383761267097664
   - rid: 4614383761267097666
-  - rid: 4614383761267097668
+  - rid: 654239224430592061
+  - rid: 654239224430592098
+  - rid: 654239224430592102
+  - rid: 654239224430592104
   ports:
-  - rid: 4614383740253896802
-  - rid: 4614383740253896803
-  - rid: 4614383740253896804
   - rid: 4614383740253896806
   - rid: 4614383740253896807
   - rid: 4614383740253896809
@@ -35,20 +31,14 @@ MonoBehaviour:
   - rid: 4614383740253896816
   - rid: 4614383740253896818
   - rid: 4614383740253896819
-  - rid: 4614383761267097658
-  - rid: 4614383761267097659
-  - rid: 4614383761267097661
-  - rid: 4614383761267097662
-  - rid: 4614383761267097663
-  - rid: 4614383761267097665
   - rid: 4614383761267097667
-  - rid: 4614383761267097669
-  - rid: 4614383761267097670
-  - rid: 4614383761267097671
+  - rid: 654239224430592062
+  - rid: 654239224430592099
+  - rid: 654239224430592100
+  - rid: 654239224430592101
+  - rid: 654239224430592103
+  - rid: 654239224430592105
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
-  lifeType: 0
-  lifeParamVal:
-    rid: -2
   cooldown:
     rid: -2
   costs: []
@@ -60,56 +50,114 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 4614383740253896801
-      type: {class: ReqActivateAbilityNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+    - rid: 654239224430592061
+      type: {class: OnRemoveAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
       data:
-        guid: df9542f5-030a-48ba-948f-9ce487306866
+        guid: aae35ce4-4178-4c43-8912-6dab405d6ff1
         position:
           serializedVersion: 2
-          x: 740.8
-          y: 269.6
-          width: 208.79999
-          height: 332.80002
-        nodeName: ReqActivateAbility
-        QueueType: 0
-        PreCastTime:
-          rid: -2
-        CastTime:
-          rid: -2
-        PostCastTime:
-          rid: -2
-        InPortExec: 7c24fe6b-d8f2-46db-814e-c8e236496eb4
-        OutPortExec: 6b28021b-dc2e-476b-ab80-4525305bbab8
-        InPortVal: 09d171b3-d40a-4ce9-9a49-8eb17daf0210
-    - rid: 4614383740253896802
+          x: 277.6
+          y: 59.199997
+          width: 132
+          height: 76.8
+        nodeName: OnRemove
+        OutPortExec: 761fbb16-da37-4aa1-b27e-4ff6b6c577b7
+    - rid: 654239224430592062
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 7c24fe6b-d8f2-46db-814e-c8e236496eb4
-        belongNodeId: df9542f5-030a-48ba-948f-9ce487306866
-        connectPortId: c8485f90-7635-4834-8225-9714e1318250
-        direction: 0
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383740253896803
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 6b28021b-dc2e-476b-ab80-4525305bbab8
-        belongNodeId: df9542f5-030a-48ba-948f-9ce487306866
+        guid: 761fbb16-da37-4aa1-b27e-4ff6b6c577b7
+        belongNodeId: aae35ce4-4178-4c43-8912-6dab405d6ff1
         connectPortId: 
         direction: 1
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4614383740253896804
+    - rid: 654239224430592098
+      type: {class: DelayNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: a536187b-4501-4670-9359-12b4960ddf2e
+        position:
+          serializedVersion: 2
+          x: 660
+          y: -222.4
+          width: 119.20001
+          height: 100.799995
+        nodeName: Delay
+        InPortExec: 34657930-62ec-486f-8af8-771cd3da6226
+        OutPortExec: 3c2ffb9f-af39-4ab8-8f7b-27d8cd0c61d6
+        InPortFP: 618be869-7fa2-404e-969d-49ed00b6b8ca
+    - rid: 654239224430592099
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
-        guid: 09d171b3-d40a-4ce9-9a49-8eb17daf0210
-        belongNodeId: df9542f5-030a-48ba-948f-9ce487306866
-        connectPortId: abf9baab-c8da-408b-8cce-9ae61f349c94
+        guid: 34657930-62ec-486f-8af8-771cd3da6226
+        belongNodeId: a536187b-4501-4670-9359-12b4960ddf2e
+        connectPortId: 55cc9088-0226-4a39-b582-8296edcdf74d
         direction: 0
-        portType: GAS.Logic.GameEventArg, GameAbilitySystem.Logic, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 654239224430592100
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 3c2ffb9f-af39-4ab8-8f7b-27d8cd0c61d6
+        belongNodeId: a536187b-4501-4670-9359-12b4960ddf2e
+        connectPortId: d91fdd75-fdd0-4dce-9b67-b3f22fb20b46
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 654239224430592101
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 618be869-7fa2-404e-969d-49ed00b6b8ca
+        belongNodeId: a536187b-4501-4670-9359-12b4960ddf2e
+        connectPortId: 92c0294b-a13a-4b85-b433-8485a649a310
+        direction: 0
+        portType: MissQ.FP, Smf.Math, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        isFlowPort: 0
+    - rid: 654239224430592102
+      type: {class: EndAbilityNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+      data:
+        guid: 28918842-0fe2-4d7c-86d3-8b5ef384e9f6
+        position:
+          serializedVersion: 2
+          x: 898.4
+          y: -222.4
+          width: 126.400024
+          height: 76.799995
+        nodeName: EndAbility
+        InPortExec: d91fdd75-fdd0-4dce-9b67-b3f22fb20b46
+    - rid: 654239224430592103
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: d91fdd75-fdd0-4dce-9b67-b3f22fb20b46
+        belongNodeId: 28918842-0fe2-4d7c-86d3-8b5ef384e9f6
+        connectPortId: 3c2ffb9f-af39-4ab8-8f7b-27d8cd0c61d6
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 654239224430592104
+      type: {class: FPNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: b25ad16e-7e61-456b-bfc4-a59df85e4f3d
+        position:
+          serializedVersion: 2
+          x: 465.6
+          y: -99.2
+          width: 155.19998
+          height: 95.2
+        nodeName: FP
+        Val: 3
+        OutPortVal: 92c0294b-a13a-4b85-b433-8485a649a310
+    - rid: 654239224430592105
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 92c0294b-a13a-4b85-b433-8485a649a310
+        belongNodeId: b25ad16e-7e61-456b-bfc4-a59df85e4f3d
+        connectPortId: 618be869-7fa2-404e-969d-49ed00b6b8ca
+        direction: 1
+        portType: MissQ.FP, Smf.Math, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         isFlowPort: 0
     - rid: 4614383740253896805
       type: {class: OnStartCastAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
@@ -117,10 +165,10 @@ MonoBehaviour:
         guid: 1d966617-faec-49ab-ab20-66722e3ec8b0
         position:
           serializedVersion: 2
-          x: 288
-          y: 726.4
-          width: 1
-          height: 1
+          x: 265.6
+          y: 237.6
+          width: 144
+          height: 100.79999
         nodeName: OnStartCast
         OutPortExec: 0442ba8e-81fb-4024-ad92-569d492f4b36
         OutPortParam: 4cc35071-6032-4791-8e9d-1031b5974b2b
@@ -150,10 +198,10 @@ MonoBehaviour:
         guid: fc856b89-723d-44c2-a21d-91d00ea4b3f4
         position:
           serializedVersion: 2
-          x: 574.4
-          y: 726.4
-          width: 148
-          height: 95.19995
+          x: 552
+          y: 237.6
+          width: 216
+          height: 95.19998
         nodeName: Print
         Log: OnStartCast!
         InPortExec: d97b1cff-8f44-4624-ac60-f44804748776
@@ -184,8 +232,8 @@ MonoBehaviour:
         guid: 4822dedf-600b-42aa-aa71-3db96ca61fd1
         position:
           serializedVersion: 2
-          x: 288
-          y: 896
+          x: 265.6
+          y: 407.2
           width: 170.4
           height: 100.79999
         nodeName: OnStartPreCast
@@ -217,9 +265,9 @@ MonoBehaviour:
         guid: 2a7f323f-01ff-4991-8e90-2c6901e9cdef
         position:
           serializedVersion: 2
-          x: 574.4
-          y: 896
-          width: 216
+          x: 552
+          y: 407.2
+          width: 233.59998
           height: 95.20001
         nodeName: Print
         Log: OnStartPreCast!
@@ -245,115 +293,16 @@ MonoBehaviour:
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4614383761267097657
-      type: {class: GameEventPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
-      data:
-        guid: 60fee01b-e2a3-400c-86b1-52a961ae3c1f
-        position:
-          serializedVersion: 2
-          x: 91.2
-          y: 269.6
-          width: 270.40002
-          height: 120
-        nodeName: GameEventPortal_On Post Prepare Start
-        OutPortExec: 2329b196-03ed-4225-b909-29de062a1661
-        nodeEventType: 1
-        OutParam1: abf9baab-c8da-408b-8cce-9ae61f349c94
-    - rid: 4614383761267097658
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 2329b196-03ed-4225-b909-29de062a1661
-        belongNodeId: 60fee01b-e2a3-400c-86b1-52a961ae3c1f
-        connectPortId: b8b007cb-7c85-4148-82d4-441985d64eb4
-        direction: 1
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383761267097659
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: abf9baab-c8da-408b-8cce-9ae61f349c94
-        belongNodeId: 60fee01b-e2a3-400c-86b1-52a961ae3c1f
-        connectPortId: 09d171b3-d40a-4ce9-9a49-8eb17daf0210
-        direction: 1
-        portType: GAS.Logic.GameEventArg, GameAbilitySystem.Logic, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        isFlowPort: 0
-    - rid: 4614383761267097660
-      type: {class: DelayNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: 33a83cf5-9198-4f7c-a6da-0d1723236913
-        position:
-          serializedVersion: 2
-          x: 492
-          y: 231.2
-          width: 119.20001
-          height: 100.8
-        nodeName: Delay
-        InPortExec: b8b007cb-7c85-4148-82d4-441985d64eb4
-        OutPortExec: c8485f90-7635-4834-8225-9714e1318250
-        InPortFloat: faa8f2ff-cb93-4388-8da4-05c9b52a4669
-    - rid: 4614383761267097661
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: b8b007cb-7c85-4148-82d4-441985d64eb4
-        belongNodeId: 33a83cf5-9198-4f7c-a6da-0d1723236913
-        connectPortId: 2329b196-03ed-4225-b909-29de062a1661
-        direction: 0
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383761267097662
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: c8485f90-7635-4834-8225-9714e1318250
-        belongNodeId: 33a83cf5-9198-4f7c-a6da-0d1723236913
-        connectPortId: 7c24fe6b-d8f2-46db-814e-c8e236496eb4
-        direction: 1
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383761267097663
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: faa8f2ff-cb93-4388-8da4-05c9b52a4669
-        belongNodeId: 33a83cf5-9198-4f7c-a6da-0d1723236913
-        connectPortId: 9758598b-0c62-42d5-8702-fa93a3477f10
-        direction: 0
-        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
-    - rid: 4614383761267097664
-      type: {class: FloatNode, ns: NS, asm: NodeSystem}
-      data:
-        guid: ca0244e9-5a3e-49ee-bccd-2729a473d0da
-        position:
-          serializedVersion: 2
-          x: 396.8
-          y: 389.6
-          width: 155.20001
-          height: 95.19998
-        nodeName: Float
-        Val: 3
-        OutPortVal: 9758598b-0c62-42d5-8702-fa93a3477f10
-    - rid: 4614383761267097665
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 9758598b-0c62-42d5-8702-fa93a3477f10
-        belongNodeId: ca0244e9-5a3e-49ee-bccd-2729a473d0da
-        connectPortId: faa8f2ff-cb93-4388-8da4-05c9b52a4669
-        direction: 1
-        portType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        isFlowPort: 0
     - rid: 4614383761267097666
       type: {class: OnAddAbilityPortalNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
       data:
         guid: e451859b-798a-4cbf-9d10-582d5e006891
         position:
           serializedVersion: 2
-          x: 330.4
-          y: -70.4
+          x: 441.6
+          y: -222.4
           width: 101.600006
-          height: 76.8
+          height: 76.799995
         nodeName: OnAdd
         OutPortExec: 55cc9088-0226-4a39-b582-8296edcdf74d
     - rid: 4614383761267097667
@@ -361,59 +310,8 @@ MonoBehaviour:
       data:
         guid: 55cc9088-0226-4a39-b582-8296edcdf74d
         belongNodeId: e451859b-798a-4cbf-9d10-582d5e006891
-        connectPortId: 52fc5241-19d4-4ee1-892e-daa0db9b22ee
+        connectPortId: 34657930-62ec-486f-8af8-771cd3da6226
         direction: 1
         portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
           PublicKeyToken=null
         isFlowPort: 1
-    - rid: 4614383761267097668
-      type: {class: ReqActivateAbilityNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
-      data:
-        guid: 9d353af8-b29e-40da-8e7e-f067a388f1e4
-        position:
-          serializedVersion: 2
-          x: 659.2
-          y: -120.8
-          width: 208.79999
-          height: 332.8
-        nodeName: ReqActivateAbility
-        QueueType: 0
-        PreCastTime:
-          rid: -2
-        CastTime:
-          rid: -2
-        PostCastTime:
-          rid: -2
-        InPortExec: 52fc5241-19d4-4ee1-892e-daa0db9b22ee
-        OutPortExec: 422f26bd-a1a2-4b17-8adb-0b9f78803f40
-        InPortVal: d6f7c2a7-0c36-4bee-9ddc-ce187c8cdb19
-    - rid: 4614383761267097669
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 52fc5241-19d4-4ee1-892e-daa0db9b22ee
-        belongNodeId: 9d353af8-b29e-40da-8e7e-f067a388f1e4
-        connectPortId: 55cc9088-0226-4a39-b582-8296edcdf74d
-        direction: 0
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383761267097670
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: 422f26bd-a1a2-4b17-8adb-0b9f78803f40
-        belongNodeId: 9d353af8-b29e-40da-8e7e-f067a388f1e4
-        connectPortId: 
-        direction: 1
-        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
-        isFlowPort: 1
-    - rid: 4614383761267097671
-      type: {class: NodePort, ns: NS, asm: NodeSystem}
-      data:
-        guid: d6f7c2a7-0c36-4bee-9ddc-ce187c8cdb19
-        belongNodeId: 9d353af8-b29e-40da-8e7e-f067a388f1e4
-        connectPortId: 
-        direction: 0
-        portType: GAS.Logic.GameEventArg, GameAbilitySystem.Logic, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        isFlowPort: 0

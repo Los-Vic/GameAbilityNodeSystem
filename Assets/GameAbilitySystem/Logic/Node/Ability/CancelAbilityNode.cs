@@ -4,7 +4,7 @@ namespace GAS.Logic
 {
     [Node("CancelAbility", "Ability/Exec/CancelAbility", ENodeFunctionType.Flow, typeof(CancelAbilityNodeNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.Ability, 
-        "Cancel ability if ability is in activated, that is either OnActivateAbility or OnActivateAbilityByEvent is running with tasks")]
+        "Cancel ability if ability is in activated, will stop all tasks and cast processes.")]
     public sealed class CancelAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
@@ -35,9 +35,15 @@ namespace GAS.Logic
         {
             var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
-                return default;
+                return null;
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
+        }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
         }
     }
 }

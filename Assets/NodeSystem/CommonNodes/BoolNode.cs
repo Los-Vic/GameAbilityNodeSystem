@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("Bool", "Common/LiteralValue/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), CommonNodeCategory.Value)]
+    [Node("Bool", "Common/Value/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), CommonNodeCategory.Value)]
     public sealed class BoolNode : Node
     {
         [ExposedProp] public bool Val;
@@ -21,6 +21,12 @@
         public override void Execute()
         {
             GraphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
+        }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
         }
     }
 }

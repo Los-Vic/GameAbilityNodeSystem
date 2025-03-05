@@ -1,0 +1,37 @@
+﻿using NS;
+
+namespace GAS.Logic
+{
+    [Node("EndAbility", "Ability/Exec/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeNodeRunner), 
+        CommonNodeCategory.Action, NodeScopeDefine.Ability, 
+        "End ability if ability is in activated, that is either OnActivateAbility or OnActivateAbilityByEvent is running with tasks")]
+    public sealed class EndAbilityNode:Node
+    {
+        [Port(EPortDirection.Input, typeof(BaseFlowPort))]
+        public string InPortExec;
+    }
+    
+    public sealed class EndAbilityNodeNodeRunner : FlowNodeRunner
+    {
+        private EndAbilityNode _node;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            _node = (EndAbilityNode)nodeAsset;
+        }
+
+        public override void Execute()
+        {
+            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
+            {
+                context.Ability.EndAbility();
+            }
+        }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
+        }
+    }
+}

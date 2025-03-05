@@ -77,7 +77,13 @@ namespace GAS.Logic
         {
             return _nextNode;
         }
-        
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _nextNode = null;
+            _node = null;
+        }
     }
     
     public sealed class AbilityGameEventPortalNodeRunner:PortalNodeRunner
@@ -113,6 +119,12 @@ namespace GAS.Logic
         {
             return _nextNode;
         }
-        
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _nextNode = null;
+            _node = null;
+        }
     }
 }

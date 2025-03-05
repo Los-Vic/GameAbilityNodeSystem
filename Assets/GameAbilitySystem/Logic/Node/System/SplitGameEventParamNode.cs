@@ -56,6 +56,12 @@ namespace GAS.Logic
             GraphRunner.SetOutPortVal(_node.OutPortVal3, inVal.EventValue3);
             GraphRunner.SetOutPortVal(_node.OutPortString, inVal.EventString);
         }
+
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
+        }
     }
     
     

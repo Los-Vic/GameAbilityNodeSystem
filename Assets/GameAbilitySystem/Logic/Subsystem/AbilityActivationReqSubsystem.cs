@@ -60,12 +60,14 @@ namespace GAS.Logic
 
         internal void StartJob()
         {
+            GameLogger.Log($"Start activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
             JobState = EActivationReqJobState.Running;
             ExecuteStartPreCast();
         }
 
         internal void CancelJob()
         {
+            GameLogger.Log($"Cancel activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
             JobState = EActivationReqJobState.Cancelled;
             Req.EventArgs?.GetRefCountDisposableComponent().RemoveRefCount(this);
         }
@@ -134,6 +136,7 @@ namespace GAS.Logic
             CastState = EActivationJobInCastState.None;
             Req.Ability.ActivateOnEndPostCast(Req.EventArgs);
             JobState = EActivationReqJobState.Completed;
+            GameLogger.Log($"Complete activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
         }
         
         public bool IsRequesterStillValid()

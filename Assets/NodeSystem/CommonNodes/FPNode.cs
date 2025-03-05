@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("FP", "Common/LiteralValue/FP", ENodeFunctionType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
+    [Node("FP", "Common/Value/FP", ENodeFunctionType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
     public sealed class FPNode:Node
     {
         [ExposedProp]
@@ -24,6 +24,12 @@ namespace NS
         public override void Execute()
         {
             GraphRunner.SetOutPortVal(_node.OutPortVal, (FP)_node.Val);
+        }
+        
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
         }
     }
 }

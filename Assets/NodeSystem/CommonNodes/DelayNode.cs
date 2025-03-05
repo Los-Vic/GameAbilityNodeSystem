@@ -1,4 +1,5 @@
 ﻿using GameplayCommonLibrary;
+using MissQ;
 
 namespace NS
 {
@@ -10,14 +11,14 @@ namespace NS
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [Port(EPortDirection.Input, typeof(float), "Duration")]
-        public string InPortFloat;
+        [Port(EPortDirection.Input, typeof(FP), "Duration")]
+        public string InPortFP;
     }
     
     public sealed class DelayFlowNodeRunner:FlowNodeRunner
     {
         private DelayNode _node;
-        private float _delay;
+        private FP _delay;
         private float _elapsedTime;
         private const string DelayTaskName = "DelayNodeTask";
         
@@ -30,7 +31,7 @@ namespace NS
         public override void Execute()
         {
             ExecuteDependentValNodes(_node.Id);
-            _delay = GraphRunner.GetInPortVal<float>(_node.InPortFloat);
+            _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
             GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.PortalName}");
             
             var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
@@ -68,6 +69,12 @@ namespace NS
         {
             _elapsedTime = 0;
             return ETaskStatus.Running;
+        }
+        
+        public override void OnReturnToPool()
+        {
+            base.OnReturnToPool();
+            _node = null;
         }
     }
 }

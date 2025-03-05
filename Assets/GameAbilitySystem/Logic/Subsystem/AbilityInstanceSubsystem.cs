@@ -41,12 +41,10 @@ namespace GAS.Logic
             };
             
             ability.Init(System, ref param);
-            GameLogger.Log($"Created Ability: {param.Asset.abilityName}");
             return ability;
         }
         internal void DestroyAbility(GameAbility ability)
         {
-            GameLogger.Log($"Destroy Ability: {ability.Asset.abilityName}");
             RemoveFromTickList(ability);
             ability.GetRefCountDisposableComponent().MarkForDispose();
         }

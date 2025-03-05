@@ -158,7 +158,6 @@ namespace GAS.Logic
         public void RemoveAbility(GameAbility ability)
         {
             ability.OnRemoveAbility();
-            GameAbilities.Remove(ability);
             Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
         }
 
@@ -207,6 +206,7 @@ namespace GAS.Logic
 
         public void OnObjDispose()
         {
+            GameLogger.Log($"Release Unit: {UnitName}");
             _pool.Release(this);
         }
 
