@@ -43,7 +43,7 @@ MonoBehaviour:
     rid: -2
   costs: []
   abilityTags: 
-  referencedAbilities: []
+  referencedEffects: []
   referencedGameCueTags: []
   references:
     version: 2

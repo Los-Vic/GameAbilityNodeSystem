@@ -7,5 +7,6 @@ namespace GAS.Logic
     {
         public AbilityConfig abilityConfig;
         public AbilityEffectParamConfig abilityEffectParamConfig;
+        public EffectConfig effectConfig;
     }
 }

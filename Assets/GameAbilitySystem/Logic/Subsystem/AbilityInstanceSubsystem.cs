@@ -25,7 +25,7 @@ namespace GAS.Logic
             }
         }
 
-        internal GameAbility CreateAbility(uint id)
+        internal GameAbility CreateAbility(uint id, uint lv)
         {
             var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(id);
             if (abilityAsset == null)
@@ -37,7 +37,9 @@ namespace GAS.Logic
             var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
             var param = new AbilityCreateParam()
             {
-                Asset = abilityAsset
+                Id = id,
+                Asset = abilityAsset,
+                Lv = lv
             };
             
             ability.Init(System, ref param);

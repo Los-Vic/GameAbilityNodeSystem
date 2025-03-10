@@ -32,9 +32,9 @@ namespace GAS.Logic
     
     public class GameAbility :IPoolClass, ITickable, IRefCountDisposableObj
     {
-        internal AbilityAsset Asset;
+        internal AbilityAsset Asset { get; private set; }
         internal readonly GameAbilityGraphController GraphController = new();
-        internal uint Lv;
+        internal uint Lv { get; private set; }
         public GameUnit Owner { get; private set; }
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }

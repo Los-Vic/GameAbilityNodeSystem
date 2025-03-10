@@ -135,9 +135,9 @@ namespace GAS.Logic
 
         #region Abilities
 
-        public void GrantAbility(uint abilityId)
+        public void GrantAbility(uint abilityId, uint lv)
         {
-            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(abilityId);
+            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(abilityId, lv);
             if (ability == null)
                 return;
             GameAbilities.Add(ability);
