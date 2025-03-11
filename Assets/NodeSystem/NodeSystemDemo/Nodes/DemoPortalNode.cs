@@ -14,13 +14,13 @@ namespace NS
         public int IntParam2;
     }
     
-    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Portal, typeof(PortalPortalNodeRunner), CommonNodeCategory.Portal, -1)]
+    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Entry, typeof(PortalPortalNodeRunner), CommonNodeCategory.Entry, -1)]
     public class DemoPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [PortalType]
+        [Entry]
         public ENodeDemoPortalType NodeDemoPortal;
 
         [Port(EPortDirection.Output, typeof(int), "IntParam1")]

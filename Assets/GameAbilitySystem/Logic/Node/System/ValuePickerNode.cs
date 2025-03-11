@@ -8,7 +8,7 @@ namespace GAS.Logic
     [Node("ValuePicker", "System/Value/ValuePicker", ENodeFunctionType.Value , typeof(ValuePickerNodeRunner), CommonNodeCategory.Value)]
     public sealed class ValuePickerNode:Node
     {
-        [ExposedProp]
+        [Exposed]
         [SerializeReference]
         public ValuePickerBase Config;
 

@@ -87,6 +87,7 @@ namespace NSEditor
             {
                 var type = node.GetType();
                 var newNode = (Node)Activator.CreateInstance(type);
+                newNode.InitNode();
                 newNode.Position = new Rect(node.Position.x + 200 + randomOffset, node.Position.y + 200 + randomOffset, node.Position.width,
                     node.Position.height);
                 newNodeList.Add(newNode);

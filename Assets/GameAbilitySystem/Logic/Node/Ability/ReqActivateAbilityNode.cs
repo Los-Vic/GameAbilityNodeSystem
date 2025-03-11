@@ -5,32 +5,32 @@ using UnityEngine;
 namespace GAS.Logic
 {
     
-    [Node("ReqActivateAbility", "Ability/Exec/ReqActivateAbility", ENodeFunctionType.Flow, typeof(ReqActivateAbilityNodeRunner), 
+    [Node("ReqActivateAbility", "Ability/Exec/ReqActivateAbility", ENodeFunctionType.Action, typeof(ReqActivateAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.Ability, "Request to activate ability")]
     public sealed class ReqActivateAbilityNode:Node
     {
         [Header("队列类型")]
-        [ExposedProp]
+        [Exposed]
         public EActivationQueueType QueueType;
         
         [Header("前摇时间")]
-        [ExposedProp]
+        [Exposed]
         [SerializeReference]
         public ValuePickerBase PreCastTime;
         
         [Header("施放时间")]
-        [ExposedProp]
+        [Exposed]
         [SerializeReference]
         public ValuePickerBase CastTime;
         
         [Header("后摇时间")]
-        [ExposedProp]
+        [Exposed]
         [SerializeReference]
         public ValuePickerBase PostCastTime;
 
         [Header("完整前后摇过程的时间上限")]
         [Tooltip("如果过程超过上限，各步骤会等比例的缩短时长")]
-        [ExposedProp]
+        [Exposed]
         [SerializeReference]
         public ValuePickerBase CastProcessClampTime;
         

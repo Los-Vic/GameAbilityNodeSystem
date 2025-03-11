@@ -32,7 +32,7 @@ namespace GAS.Logic
 
             foreach (var node in asset.nodes)
             {
-                if (!node.IsPortalNode())
+                if (!node.IsEntryNode())
                     continue;
 
                 if (node is GameEventPortalNode eventNode)
@@ -50,7 +50,7 @@ namespace GAS.Logic
         {
             for(var i = _graphRunners.Count - 1; i >= 0; i--)
             {
-                _system.NodeObjectFactory.DestroyGraphRunner(_graphRunners[i]);
+                _system.DestroyGraphRunner(_graphRunners[i]);
             }
 
             _graphRunners.Clear();
@@ -69,7 +69,7 @@ namespace GAS.Logic
                 return null;
             }
 
-            var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
+            var graphRunner = _system.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
             graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
             {
@@ -99,7 +99,7 @@ namespace GAS.Logic
                 return null;
             }
 
-            var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
+            var graphRunner = _system.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
             graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
             {
@@ -116,7 +116,7 @@ namespace GAS.Logic
 
         private void OnRunGraphEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
-            _system.NodeObjectFactory.DestroyGraphRunner(runner);
+            _system.DestroyGraphRunner(runner);
         }
 
         private void OnRunGraphDestroy(NodeGraphRunner runner)

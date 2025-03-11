@@ -54,7 +54,7 @@ namespace NS
             var task = PoolMgr.Get<NodeTask>();
             _allTasks.Add(task);
             
-            taskName = $"{taskName}_{runner.AssetName}_{runner.PortalName}";
+            taskName = $"{taskName}_{runner.AssetName}_{runner.EntryName}";
             task.InitTask(taskName, startTask, endTask, cancelTask, updateTask);
             
             _graphRunnerTasksMap.TryAdd(runner, new List<NodeTask>());

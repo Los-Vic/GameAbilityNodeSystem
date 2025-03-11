@@ -2,10 +2,10 @@
 
 namespace NS
 {
-    [Node("Print","Common/Debug/Print", ENodeFunctionType.Flow, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
+    [Node("Print","Common/Debug/Print", ENodeFunctionType.Action, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
     public sealed class DebugPrintNode:Node
     {
-        [ExposedProp]
+        [Exposed]
         public string Log;
 
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

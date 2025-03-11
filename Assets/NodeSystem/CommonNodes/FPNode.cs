@@ -5,7 +5,7 @@ namespace NS
     [Node("FP", "Common/Value/FP", ENodeFunctionType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
     public sealed class FPNode:Node
     {
-        [ExposedProp]
+        [Exposed]
         public float Val;
 
         [Port(EPortDirection.Output, typeof(FP))]

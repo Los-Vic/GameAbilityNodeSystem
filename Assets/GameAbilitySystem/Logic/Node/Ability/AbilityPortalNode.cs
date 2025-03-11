@@ -9,11 +9,11 @@ namespace GAS.Logic
         public string OutPortExec;
     }
     
-    [Node("OnAdd", "Ability/Portal/OnAdd", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    [Node("OnAdd", "Ability/Portal/OnAdd", ENodeFunctionType.Entry, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnAddAbilityPortalNode:AbilityPortalNode
     {
     }
-    [Node("OnRemove", "Ability/Portal/OnRemove", ENodeFunctionType.Portal, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
+    [Node("OnRemove", "Ability/Portal/OnRemove", ENodeFunctionType.Entry, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnRemoveAbilityPortalNode:AbilityPortalNode
     {
     }
@@ -26,25 +26,25 @@ namespace GAS.Logic
         public string OutPortParam;
     }
 
-    [Node("OnStartPreCast", "Ability/Portal/OnStartPreCast", ENodeFunctionType.Portal,
+    [Node("OnStartPreCast", "Ability/Portal/OnStartPreCast", ENodeFunctionType.Entry,
         typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnStartPreCastAbilityPortalNode : OnActivateAbilityPortalNode
     {
     }
     
-    [Node("OnStartCast", "Ability/Portal/OnStartCast", ENodeFunctionType.Portal,
+    [Node("OnStartCast", "Ability/Portal/OnStartCast", ENodeFunctionType.Entry,
         typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnStartCastAbilityPortalNode : OnActivateAbilityPortalNode
     {
     }
     
-    [Node("OnStartPostCast", "Ability/Portal/OnStartPostCast", ENodeFunctionType.Portal,
+    [Node("OnStartPostCast", "Ability/Portal/OnStartPostCast", ENodeFunctionType.Entry,
         typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnStartPostCastAbilityPortalNode : OnActivateAbilityPortalNode
     {
     }
     
-    [Node("OnEndPostCast", "Ability/Portal/OnEndPostCast", ENodeFunctionType.Portal,
+    [Node("OnEndPostCast", "Ability/Portal/OnEndPostCast", ENodeFunctionType.Entry,
         typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
     public sealed class OnEndPostCastAbilityPortalNode : OnActivateAbilityPortalNode
     {

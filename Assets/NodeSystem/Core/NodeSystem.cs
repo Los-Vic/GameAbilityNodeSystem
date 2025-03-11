@@ -1,21 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using GameplayCommonLibrary;
 
 namespace NS
 {
     public class NodeSystem
     {
-        private ClassObjectPoolMgr NodePoolMgr { get; set; }
-        public NodeSystemObjectFactory NodeObjectFactory { get; protected set; }
-        public INodeSystemTaskScheduler TaskScheduler { get; protected set; }
+        public INodeSystemTaskScheduler TaskScheduler { get; private set; }
         
+        public ClassObjectPoolMgr NodePoolMgr { get; private set; }
         private readonly Dictionary<NodeGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
+        private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
+
 
         public virtual void OnCreateSystem()
         {
             NodePoolMgr = new ClassObjectPoolMgr();
-            NodeObjectFactory = new NodeSystemObjectFactory(NodePoolMgr);
-            TaskScheduler = new NodeTaskScheduler(NodePoolMgr);
+            TaskScheduler = CreateTaskScheduler();
         }
         
         public virtual void InitSystem()
@@ -26,9 +28,9 @@ namespace NS
         public virtual void UnInitSystem()
         {
             NodePoolMgr.Clear();
-            NodeObjectFactory.Clear();
-            _graphAssetRuntimeDataMap.Clear();
             TaskScheduler.Clear();
+            _cachedNodeToNodeRunnerTypeMap.Clear();
+            _graphAssetRuntimeDataMap.Clear();
         }
 
         public virtual void UpdateSystem(float dt)
@@ -40,6 +42,59 @@ namespace NS
         {
             
         }
+        
+        protected virtual INodeSystemTaskScheduler CreateTaskScheduler()
+        {
+            return new NodeTaskScheduler(NodePoolMgr);
+        }
+
+        #region Graph Runner
+
+        public virtual NodeGraphRunner CreateGraphRunner()
+        {
+            return NodePoolMgr.Get<NodeGraphRunner>() ;
+        }
+
+        public virtual void DestroyGraphRunner(NodeGraphRunner runner)
+        {
+            NodePoolMgr.Release(runner);
+        }
+
+        #endregion
+
+        #region Node Runner
+
+        public NodeRunner CreateNodeRunner(Type type)
+        {
+            if (!_cachedNodeToNodeRunnerTypeMap.TryGetValue(type, out var runnerType))
+            {
+                var nodeAttribute = type.GetCustomAttribute<NodeAttribute>();
+                if (nodeAttribute == null)
+                {
+                    return NodeRunner.DefaultRunner;
+                }
+
+                runnerType = nodeAttribute.NodeRunnerType;
+                if (runnerType == null)
+                {
+                    return NodeRunner.DefaultRunner;
+                }
+                _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
+            }
+
+            var runner = NodePoolMgr.Get(runnerType) as NodeRunner;
+            return runner ?? NodeRunner.DefaultRunner;
+        }
+
+        public virtual void DestroyNodeRunner(NodeRunner runner)
+        {
+            if(runner == NodeRunner.DefaultRunner)
+                return;
+            NodePoolMgr.Release(runner);
+        }
+
+        #endregion
+      
         
         public GraphAssetRuntimeData GetGraphRuntimeData(NodeGraphAsset asset)
         {
@@ -56,5 +111,6 @@ namespace NS
         {
             NodePoolMgr.Log();
         }
+        
     }
 }

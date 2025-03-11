@@ -244,7 +244,7 @@ namespace GAS.Logic
 
             foreach (var runner in _activateAbilityRunners)
             {
-                GameLogger.Log($"Cancel ability runner, portal name:{runner.PortalName}. {AbilityName} of {Owner.UnitName}");
+                GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName} of {Owner.UnitName}");
                 runner.CancelRunner();
             }
 

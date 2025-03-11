@@ -4,13 +4,13 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Portal, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Portal, NodeScopeDefine.System)]
+    [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Entry, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.System)]
     public sealed class GameEventPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [FormerlySerializedAs("nodeEventPortal")] [FormerlySerializedAs("NodePortal")] [PortalType]
+        [FormerlySerializedAs("nodeEventPortal")] [FormerlySerializedAs("NodePortal")] [Entry]
         public EGameEventType nodeEventType;
         
         [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]

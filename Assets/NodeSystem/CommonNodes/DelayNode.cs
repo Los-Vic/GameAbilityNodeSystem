@@ -3,7 +3,7 @@ using MissQ;
 
 namespace NS
 {
-    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Flow, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
+    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Action, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
     public sealed class DelayNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
@@ -32,7 +32,7 @@ namespace NS
         {
             ExecuteDependentValNodes(_node.Id);
             _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
-            GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.PortalName}");
+            GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.EntryName}");
             
             var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
             TaskScheduler.StartTask(task);

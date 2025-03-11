@@ -3,7 +3,7 @@
     [Node("Bool", "Common/Value/Bool", ENodeFunctionType.Value ,typeof(BoolNodeRunner), CommonNodeCategory.Value)]
     public sealed class BoolNode : Node
     {
-        [ExposedProp] public bool Val;
+        [Exposed] public bool Val;
 
         [Port(EPortDirection.Output, typeof(bool))] 
         public string OutPortVal;

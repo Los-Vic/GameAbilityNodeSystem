@@ -122,6 +122,7 @@ namespace NSEditor
             }
             
             var node = (Node)Activator.CreateInstance(element.TargetType);
+            node.InitNode();
             node.Position = new Rect(graphMousePosition, Vector2.one);
             var nodeAttribute = node.GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute != null)

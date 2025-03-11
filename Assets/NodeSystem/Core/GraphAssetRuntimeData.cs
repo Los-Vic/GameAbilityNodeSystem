@@ -13,7 +13,7 @@ namespace NS
         private readonly Dictionary<string, Node> _nodeIdMap = new();
         private readonly Dictionary<string, NodePort> _portIdMap = new();
         private readonly Dictionary<string, List<string>> _nodePortsMap = new();
-        //To execute flow node, we need output value of dependent value nodes
+        //To execute action node, we need output value of dependent value && reroute nodes
         private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
         private readonly Dictionary<(Type, int), string> _portalNodeMap = new();
         
@@ -30,14 +30,14 @@ namespace NS
                 _nodeIdMap.Add(node.Id, node);
                 _nodePortsMap.Add(node.Id, new List<string>());
 
-                if (!node.IsPortalNode()) 
+                if (!node.IsEntryNode()) 
                     continue;
 
                 var hasPortalEnum = false;
                 var nodeType = node.GetType();
                 foreach (var fieldInfo in nodeType.GetFields())
                 {
-                    if (fieldInfo.GetCustomAttribute<PortalTypeAttribute>() == null)
+                    if (fieldInfo.GetCustomAttribute<EntryAttribute>() == null)
                         continue;
                     
                     hasPortalEnum = true;
@@ -70,7 +70,7 @@ namespace NS
             //Construct NodeValDependencyMap
             foreach (var node in Asset.nodes)
             {
-                if (!node.IsFlowNode())
+                if (!node.IsActionNode())
                     continue;
 
                 var valueNodeList = new List<string>();
@@ -92,7 +92,7 @@ namespace NS
                     
                         var connectPort = _portIdMap[port.connectPortId];
                         var connectNode = _nodeIdMap[connectPort.belongNodeId];
-                        if (!connectNode.IsValueNode()) 
+                        if (!connectNode.IsValueNode() && !connectNode.IsRerouteNode()) 
                             continue;
                         valueNodeList.Add(connectNode.Id);
                         _toRunNodeList.Add(connectNode.Id);

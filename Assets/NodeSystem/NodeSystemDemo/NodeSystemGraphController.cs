@@ -19,7 +19,7 @@ namespace NS
         {
             foreach (var graphRunner in _graphRunners.ToArray())
             {
-                _system.NodeObjectFactory.DestroyGraphRunner(graphRunner);
+                _system.DestroyGraphRunner(graphRunner);
             }
             _graphRunners.Clear();
         }
@@ -30,7 +30,7 @@ namespace NS
             var nodeId = runtimeData.GetPortalNodeId(typeof(DemoPortalNode), (int)demoPortalType);
             if(nodeId == null)
                 return;
-            var graphRunner = _system.NodeObjectFactory.CreateGraphRunner();
+            var graphRunner = _system.CreateGraphRunner();
             graphRunner.Init(_system, _asset, nodeId, param, OnGraphRunEnd);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);

@@ -18,7 +18,7 @@ namespace NS
     [Node("ValueEquation", "Common/Value/ValueEquation", ENodeFunctionType.Value, typeof(ValueEquationNodeRunner), CommonNodeCategory.Value)]
     public sealed class ValueEquationNode : Node
     {
-        [ExposedProp]
+        [Exposed]
         public EValueEquationType Op;
         
         [Port(EPortDirection.Input, typeof(FP), "A")]

@@ -53,22 +53,22 @@ namespace NS
     }
     
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ExposedPropAttribute:Attribute
+    public class ExposedAttribute:Attribute
     {
     }
     
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class PortalTypeAttribute:Attribute
+    public class EntryAttribute:Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class PortAttribute : Attribute
     {
-        public EPortDirection PortDirection;
-        public Type PortType;
-        public string PortName;
-        public bool IsFlowPort;
+        public readonly EPortDirection PortDirection;
+        public readonly Type PortType;
+        public readonly string PortName;
+        public readonly bool IsFlowPort;
 
         public PortAttribute(EPortDirection portDirection, Type portType, string portName = "")
         {

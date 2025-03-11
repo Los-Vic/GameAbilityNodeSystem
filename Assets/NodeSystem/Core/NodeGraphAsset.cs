@@ -20,8 +20,8 @@ namespace NS
         public List<NodePort> ports = new();
         
 #if UNITY_EDITOR
-        private Dictionary<string, Node> _nodeMap = new();
-        private Dictionary<string, NodePort> _portMap = new();
+        private readonly Dictionary<string, Node> _nodeMap = new();
+        private readonly Dictionary<string, NodePort> _portMap = new();
 
         public Node GetNode(string id) => _nodeMap.GetValueOrDefault(id);
         public NodePort GetPort(string id) => _portMap.GetValueOrDefault(id);

@@ -69,14 +69,14 @@ namespace NSEditor
                 }
 
                 //Create PortalType
-                var portalTypeAttribute = fieldInfo.GetCustomAttribute<PortalTypeAttribute>();
+                var portalTypeAttribute = fieldInfo.GetCustomAttribute<EntryAttribute>();
                 if (portalTypeAttribute != null)
                 {
                     CreatePortalTypeExtension(fieldInfo);
                 }
 
                 //Create Extensions
-                var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedPropAttribute>();
+                var exposedPropAttribute = fieldInfo.GetCustomAttribute<ExposedAttribute>();
                 if (exposedPropAttribute != null)
                 {
                     DrawField(fieldInfo);
@@ -130,7 +130,7 @@ namespace NSEditor
                     return new Color(0.7f, 0.3f, 0.7f, 1);
                 case CommonNodeCategory.Value:
                     return new Color(0, 0.5f, 0, 1);
-                case CommonNodeCategory.Portal:
+                case CommonNodeCategory.Entry:
                     return new Color(0.6f, 0, 0, 1);
                 case CommonNodeCategory.FlowControl:
                     return new Color(0.5f,0.5f,0.5f,1);
@@ -362,7 +362,7 @@ namespace NSEditor
 
         private void CheckPortalNodeIsSingle()
         {
-            if(!Node.IsPortalNode())
+            if(!Node.IsEntryNode())
                 return;
 
             if (_graphAsset.GetNodeNameCount(Node.NodeName) > 1)

@@ -7,8 +7,9 @@ namespace NS
     public enum ENodeFunctionType
     {
         Value,
-        Flow,
-        Portal,
+        Action,
+        Entry,
+        Reroute,
     }
     
     [Serializable]
@@ -19,6 +20,8 @@ namespace NS
 
         [SerializeField]
         private string nodeName;
+        [SerializeField]
+        private ENodeFunctionType nodeFunctionType;
 
         public string NodeName => nodeName;
 
@@ -28,23 +31,19 @@ namespace NS
             get => position;
             set => position = value;
         }
-
-        private readonly ENodeFunctionType _nodeFunctionType;
-        private const string Reroute = "Reroute";
         
-        public Node()
+#if UNITY_EDITOR
+
+        public void InitNode()
         {
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
             if (nodeAttribute == null) 
                 return;
-            
-#if UNITY_EDITOR
+
             nodeName = nodeAttribute.Title;
-#endif
-            _nodeFunctionType = nodeAttribute.FunctionType;
+            nodeFunctionType = nodeAttribute.FunctionType;
         }
         
-        #if UNITY_EDITOR
         public void SetNodeName(string postfix)
         {
             var nodeAttribute = GetType().GetCustomAttribute<NodeAttribute>();
@@ -53,28 +52,28 @@ namespace NS
             
             nodeName = $"{nodeAttribute.Title}_{postfix}";
         }
-        #endif
+#endif
         
         public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
         
-        public bool IsFlowNode()
+        public bool IsActionNode()
         {
-            return _nodeFunctionType == ENodeFunctionType.Flow;
+            return nodeFunctionType == ENodeFunctionType.Action;
         }
         
         public bool IsValueNode()
         {
-            return _nodeFunctionType == ENodeFunctionType.Value;
+            return nodeFunctionType == ENodeFunctionType.Value;
         }
         
-        public bool IsPortalNode()
+        public bool IsEntryNode()
         {
-            return _nodeFunctionType == ENodeFunctionType.Portal;
+            return nodeFunctionType == ENodeFunctionType.Entry;
         }
 
         public bool IsRerouteNode()
         {
-            return nodeName == Reroute;
+            return nodeFunctionType == ENodeFunctionType.Reroute;
         }
         
         public virtual string DisplayName() => nodeName;

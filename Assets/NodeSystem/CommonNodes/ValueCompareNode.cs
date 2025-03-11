@@ -16,7 +16,7 @@ namespace NS
     [Node("ValueCompare", "Common/Value/ValueCompare", ENodeFunctionType.Value, typeof(ValueCompareNodeRunner), CommonNodeCategory.Value)]
     public sealed class ValueCompareNode : Node
     {
-        [ExposedProp]
+        [Exposed]
         public EValueCompareType Op;
         
         [Port(EPortDirection.Input, typeof(FP), "A")]

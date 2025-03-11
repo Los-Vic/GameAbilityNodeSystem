@@ -20,12 +20,13 @@ namespace NS
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
         private bool _isValid;
+        
         private readonly Dictionary<string, NodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
         //Run node runner
-        private Node _portalNode;
+        private Node _entryNode;
         private FlowNodeRunner _curNodeRunner;
         private readonly Stack<string> _runningLoopNodeIds = new();
 
@@ -33,8 +34,7 @@ namespace NS
         private Action<NodeGraphRunner> _onRunnerDestroy;
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
-        public string PortalName => _portalNode?.DisplayName() ?? "";
-        public string PortalNodeId => _portalNode?.Id ?? "";
+        public string EntryName => _entryNode?.DisplayName() ?? "";
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
 
         public NodeGraphRunnerContext Context { get; private set; }
@@ -50,10 +50,10 @@ namespace NS
             _isValid = false;
             _onRunnerRunEnd = onRunnerRunEnd;
             _onRunnerDestroy = onRunnerDestroy;
-            _portalNode = GraphAssetRuntimeData.GetNodeById(portalNodeId);
+            _entryNode = GraphAssetRuntimeData.GetNodeById(portalNodeId);
             Context = context;
             
-            if (!_portalNode.IsPortalNode())
+            if (!_entryNode.IsEntryNode())
             {
                 GameLogger.LogError($"not valid portal node {portalNodeId} of {asset.name}");
                 return;
@@ -79,7 +79,7 @@ namespace NS
             
             _onRunnerRunEnd = null;
             _asset = null;
-            _portalNode = null;
+            _entryNode = null;
             _isValid = false;
             GraphAssetRuntimeData = null;
             _nodeSystem = null;
@@ -106,24 +106,24 @@ namespace NS
         {
             if (!_isValid)
             {
-                GameLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. not valid.");
+                GameLogger.LogError($"start run graph {_asset.name}, portal {_entryNode.DisplayName()} failed. not valid.");
                 return;
             }
 
             if (IsRunning())
             {
-                GameLogger.LogError($"start run graph {_asset.name}, portal {_portalNode.DisplayName()} failed. already running.");
+                GameLogger.LogError($"start run graph {_asset.name}, portal {_entryNode.DisplayName()} failed. already running.");
                 return;
             }
             
-            GameLogger.Log($"start run graph {_asset.name}, portal {_portalNode.DisplayName()}");
-            _curNodeRunner = GetNodeRunner(_portalNode.Id) as FlowNodeRunner;
+            GameLogger.Log($"start run graph {_asset.name}, portal {_entryNode.DisplayName()}");
+            _curNodeRunner = GetNodeRunner(_entryNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
         private void CompleteRunner()
         {
-            GameLogger.Log($"complete graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"complete graph {_asset.name}, portal {_entryNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
 
             Clear();
@@ -131,7 +131,7 @@ namespace NS
 
         public void CancelRunner()
         {
-            GameLogger.Log($"cancel graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"cancel graph {_asset.name}, portal {_entryNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
             
             Clear();
@@ -144,7 +144,7 @@ namespace NS
                 CompleteRunner();
                 return;
             }
-            GameLogger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_portalNode.DisplayName()}");
+            GameLogger.Log($"execute node {_curNodeRunner.GetType()}, graph {_asset.name}, portal {_entryNode.DisplayName()}");
             _curNodeRunner.Execute();
         }
 
@@ -175,7 +175,7 @@ namespace NS
                 return nodeRunner;
 
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
-            var runner = _nodeSystem.NodeObjectFactory.CreateNodeRunner(n.GetType());
+            var runner = _nodeSystem.CreateNodeRunner(n.GetType());
             runner.Init(n, this);
             _nodeRunners.Add(n.Id, runner);
             return runner;
@@ -243,7 +243,7 @@ namespace NS
         {
             foreach (var nodeRunners in _nodeRunners.Values)
             {
-                _nodeSystem.NodeObjectFactory.DestroyNodeRunner(nodeRunners);
+                _nodeSystem.DestroyNodeRunner(nodeRunners);
             }
             _nodeRunners.Clear();
         }
@@ -276,7 +276,7 @@ namespace NS
 
         public string GetRequesterDesc()
         {
-            return $"graph:{_asset.name}, portal:{_portalNode.DisplayName()}";
+            return $"graph:{_asset.name}, portal:{_entryNode.DisplayName()}";
         }
     }
 }
