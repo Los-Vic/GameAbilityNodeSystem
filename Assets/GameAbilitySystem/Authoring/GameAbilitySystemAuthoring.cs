@@ -25,7 +25,6 @@ namespace GAS.Authoring
         
         //Configs
         private readonly Dictionary<uint, AbilityConfigElement> _abilityConfigMap = new();
-        private readonly Dictionary<uint, EffectConfigElement> _effectConfigMap = new();
         private readonly Dictionary<string, List<float>> _paramMap = new();
         
         //Test
@@ -56,14 +55,6 @@ namespace GAS.Authoring
                     _abilityConfigMap.TryAdd(element.id, element);
                 }
             }
-
-            if (configHub.effectConfig)
-            {
-                foreach (var element in configHub.effectConfig.elements)
-                {
-                    _effectConfigMap.TryAdd(element.id, element);
-                }
-            }
         }
 
         private void Update()
@@ -91,23 +82,6 @@ namespace GAS.Authoring
 
             asset.Id = abilityId;
             _abilityAssetsCache.TryAdd(abilityId, asset);
-            return asset;
-        }
-
-        public EffectAsset GetEffectAsset(uint effectId)
-        {
-            if(_effectAssetCache.TryGetValue(effectId, out var asset))
-                return asset;
-            
-            if (!_effectConfigMap.TryGetValue(effectId, out var effectConfig))
-                return null;
-
-            asset = AssetDatabase.LoadAssetAtPath<EffectAsset>(effectConfig.effectAssetPath);
-            if (asset == null)
-                return null;
-
-            asset.Id = effectId;
-            _effectAssetCache.TryAdd(effectId, asset);
             return asset;
         }
 

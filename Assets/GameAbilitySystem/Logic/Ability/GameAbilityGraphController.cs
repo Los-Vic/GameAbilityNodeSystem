@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GameplayCommonLibrary;
 using NS;
 
@@ -16,34 +15,16 @@ namespace GAS.Logic
         private GameAbilitySystem _system;
         private NodeGraphAsset _asset;
         private readonly GameAbilityGraphRunnerContext _context = new();
-
+        private GraphAssetRuntimeData _runtimeData;
+        
         private readonly List<NodeGraphRunner> _graphRunners = new();
-
-        private readonly Dictionary<EGameEventType, string> _gameEventTypeNodeIdMap = new();
-        private readonly Dictionary<Type, string> _entryTypeNodeIdMap = new();
-
-        internal List<EGameEventType> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
 
         internal void Init(GameAbilitySystem system, NodeGraphAsset asset, GameAbility ability)
         {
             _system = system;
             _asset = asset;
             _context.Ability = ability;
-
-            foreach (var node in asset.nodes)
-            {
-                if (!node.IsEntryNode())
-                    continue;
-
-                if (node is GameEventEntryNode eventNode)
-                {
-                    _gameEventTypeNodeIdMap.TryAdd(eventNode.nodeEventType, node.Id);
-                }
-                else
-                {
-                    _entryTypeNodeIdMap.TryAdd(node.GetType(), node.Id);
-                }
-            }
+            _runtimeData = _system.GetGraphRuntimeData(asset);
         }
 
         internal void UnInit()
@@ -63,12 +44,13 @@ namespace GAS.Logic
             Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null,
             Action<NodeGraphRunner> customOnRunGraphDestroy = null)
         {
-            if (!_gameEventTypeNodeIdMap.TryGetValue(eventTypeType, out var nodeId))
+            var nodeId = _runtimeData.GetEntryNodeId(typeof(GameEventEntryNode), (int)eventTypeType);
+            if (nodeId == null)
             {
                 GameLogger.LogError($"Not found {eventTypeType} node in {_asset.name}!");
                 return null;
             }
-
+      
             var graphRunner = _system.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
             graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
@@ -87,13 +69,16 @@ namespace GAS.Logic
             return graphRunner;
         }
 
-        internal bool HasEntryNode(Type portalNodeType) => _entryTypeNodeIdMap.ContainsKey(portalNodeType);
+        internal List<(int, string)> GetRegisteredGameEventNodePairs()=>_runtimeData.GetEntryNodePairList(typeof(GameEventEntryNode));
+
+        internal bool HasEntryNode(Type portalNodeType) => _runtimeData.GetEntryNodeId(portalNodeType) != null;
 
         internal NodeGraphRunner RunGraph(Type portalNodeType, GameEventArg param = null,
             Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null,
             Action<NodeGraphRunner> customOnRunGraphDestroy = null)
         {
-            if (!_entryTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
+            var nodeId = _runtimeData.GetEntryNodeId(portalNodeType);
+            if (nodeId == null)
             {
                 GameLogger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
                 return null;

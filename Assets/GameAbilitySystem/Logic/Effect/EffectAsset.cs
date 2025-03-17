@@ -28,9 +28,6 @@ namespace GAS.Logic
         [ReadOnly] 
         public List<string> referencedGameCueTags = new();
         
-        //Runtime
-        public uint Id { get; set; }
-        
 #if UNITY_EDITOR
 
         /// <summary>

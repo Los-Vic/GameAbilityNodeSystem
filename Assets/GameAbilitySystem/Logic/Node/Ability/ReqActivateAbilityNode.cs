@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GAS.Logic
 {
     
-    [Node("ReqActivateAbility", "Ability/Exec/ReqActivateAbility", ENodeFunctionType.Action, typeof(ReqActivateAbilityNodeRunner), 
+    [Node("ReqActivateAbility", "Ability/Action/ReqActivateAbility", ENodeFunctionType.Action, typeof(ReqActivateAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.Ability, "Request to activate ability")]
     public sealed class ReqActivateAbilityNode:Node
     {

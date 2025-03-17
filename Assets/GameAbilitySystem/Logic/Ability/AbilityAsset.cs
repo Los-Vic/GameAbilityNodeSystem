@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary;
 using GAS.Logic.Target;
 using GAS.Logic.Value;
 using NS;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GAS.Logic
 {
@@ -44,7 +42,7 @@ namespace GAS.Logic
         
         [Title("References")] 
         [ReadOnly]
-        public List<string> referencedEffects = new();
+        public List<string> referencedAbilities = new();
         [ReadOnly] 
         public List<string> referencedGameCueTags = new();
         

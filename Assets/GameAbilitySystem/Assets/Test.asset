@@ -25,7 +25,7 @@ MonoBehaviour:
     rid: -2
   costs: []
   abilityTags: 
-  referencedEffects: []
+  referencedAbilities: []
   referencedGameCueTags: []
   references:
     version: 2
@@ -73,13 +73,13 @@ MonoBehaviour:
         guid: bb3b0169-d89f-4b1f-b87b-128aafe5820e
         position:
           serializedVersion: 2
-          x: 606.4
+          x: 556.8
           y: 356
-          width: 148
+          width: 171.20001
           height: 95.20001
         nodeName: Print
         nodeFunctionType: 1
-        Log: 
+        Log: gray
         InPortExec: 4b71eec9-10c4-4ca4-902e-2015a80a47b6
         OutPortExec: 1f1a1605-aebc-4da2-9418-4916e68c19c7
     - rid: 654239496190820409

@@ -1,7 +1,7 @@
 ﻿using System;
 namespace NS
 {
-    public enum ENodeDemoPortalType
+    public enum ENodeDemoEntryType
     {
         BeginPlay,
         EndPlay
@@ -14,14 +14,14 @@ namespace NS
         public int IntParam2;
     }
     
-    [Node("DemoPortalEvent", "Demo/Portal/DemoPortalEvent", ENodeFunctionType.Entry, typeof(EntryEntryNodeRunner), CommonNodeCategory.Entry, -1)]
+    [Node("DemoEntryEvent", "Demo/Entry/DemoEntryEvent", ENodeFunctionType.Entry, typeof(EntryEntryNodeRunner), CommonNodeCategory.Entry, -1)]
     public class DemoPortalNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
         [Entry]
-        public ENodeDemoPortalType NodeDemoPortal;
+        public ENodeDemoEntryType NodeDemoEntry;
 
         [Port(EPortDirection.Output, typeof(int), "IntParam1")]
         public string OutIntParam1;
@@ -30,7 +30,7 @@ namespace NS
 
         public override string DisplayName()
         {
-            return NodeDemoPortal.ToString();
+            return NodeDemoEntry.ToString();
         }
     }
     

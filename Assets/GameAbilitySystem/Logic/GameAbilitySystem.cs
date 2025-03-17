@@ -17,7 +17,6 @@ namespace GAS.Logic
         //Data
         internal int PlayerNums { get; private set; }
         
-        
         //Subsystem
         private readonly Dictionary<Type, GameAbilitySubsystem> _subsystems = new();
         private readonly List<GameAbilitySubsystem> _tickableSubsystems = new();

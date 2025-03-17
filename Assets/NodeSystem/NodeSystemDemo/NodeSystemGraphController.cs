@@ -24,10 +24,10 @@ namespace NS
             _graphRunners.Clear();
         }
         
-        public void RunGraph(ENodeDemoPortalType demoPortalType, NodeDemoEntryParam param)
+        public void RunGraph(ENodeDemoEntryType demoEntryType, NodeDemoEntryParam param)
         {
             var runtimeData = _system.GetGraphRuntimeData(_asset);
-            var nodeId = runtimeData.GetPortalNodeId(typeof(DemoPortalNode), (int)demoPortalType);
+            var nodeId = runtimeData.GetEntryNodeId(typeof(DemoPortalNode), (int)demoEntryType);
             if(nodeId == null)
                 return;
             var graphRunner = _system.CreateGraphRunner();

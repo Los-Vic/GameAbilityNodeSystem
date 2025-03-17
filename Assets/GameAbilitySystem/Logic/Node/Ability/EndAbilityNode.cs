@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("EndAbility", "Ability/Exec/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeNodeRunner), 
+    [Node("EndAbility", "Ability/Action/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.Ability, 
         "End ability if ability is in activated, that is either OnActivateAbility or OnActivateAbilityByEvent is running with tasks")]
     public sealed class EndAbilityNode:Node

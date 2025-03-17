@@ -15,7 +15,9 @@ namespace NS
         private readonly Dictionary<string, List<string>> _nodePortsMap = new();
         //To execute action node, we need output value of dependent value && reroute nodes
         private readonly Dictionary<string, List<string>> _nodeValDependencyMap = new();
-        private readonly Dictionary<(Type, int), string> _portalNodeMap = new();
+        
+        private readonly Dictionary<(Type, int), string> _entryNodeMap = new();
+        private readonly Dictionary<Type, List<(int, string)>> _entryTypePairListMap = new();
         
         //Transient
         private readonly List<string> _toRunNodeList = new();
@@ -42,17 +44,28 @@ namespace NS
                     
                     hasPortalEnum = true;
                     var enumVal = (int)fieldInfo.GetValue(node);
-                    if (!_portalNodeMap.TryAdd((nodeType, enumVal), node.Id))
+                    if (!_entryNodeMap.TryAdd((nodeType, enumVal), node.Id))
                     {
                         GameLogger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}, portal val: {enumVal}");
+                    }
+                    else
+                    {
+                        _entryTypePairListMap.TryAdd(nodeType, new List<(int, string)>());
+                        _entryTypePairListMap[nodeType].Add((enumVal, node.Id));
                     }
                 }
 
                 if (hasPortalEnum) 
                     continue;
-                if (!_portalNodeMap.TryAdd((nodeType, 0), node.Id))
+                
+                if (!_entryNodeMap.TryAdd((nodeType, 0), node.Id))
                 {
                     GameLogger.LogError($"Fail to add portal node to ports map. Node type: {nodeType}");
+                }
+                else
+                {
+                    _entryTypePairListMap.TryAdd(nodeType, new List<(int, string)>());
+                    _entryTypePairListMap[nodeType].Add((0, node.Id));
                 }
 
             }
@@ -107,7 +120,8 @@ namespace NS
         public NodePort GetPortById(string id) => _portIdMap.GetValueOrDefault(id);
         public List<string> GetPortIdsOfNode(string nodeId) => _nodePortsMap.GetValueOrDefault(nodeId, new List<string>());
         public List<string> GetDependentNodeIds(string nodeId) => _nodeValDependencyMap.GetValueOrDefault(nodeId, new List<string>());
-        public string GetPortalNodeId(Type nodeType, int portalVal = 0) => _portalNodeMap.GetValueOrDefault((nodeType, portalVal));
-        
+        public string GetEntryNodeId(Type nodeType, int portalVal = 0) => _entryNodeMap.GetValueOrDefault((nodeType, portalVal));
+        public List<(int, string)> GetEntryNodePairList(Type nodeType) => _entryTypePairListMap.GetValueOrDefault(nodeType);
+
     }
 }

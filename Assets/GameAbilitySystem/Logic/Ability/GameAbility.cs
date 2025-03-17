@@ -152,18 +152,29 @@ namespace GAS.Logic
             
             if(GraphController.HasEntryNode(typeof(OnAddAbilityEntryNode)))
                 GraphController.RunGraph(typeof(OnAddAbilityEntryNode));
-            foreach (var eventType in  GraphController.GetRegisteredGameEvents())
+
+            var gameEventNodeList = GraphController.GetRegisteredGameEventNodePairs();
+            if (gameEventNodeList != null)
             {
-                System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent(eventType, OnGameEventInvoked);
+                foreach (var pair in gameEventNodeList)
+                {
+                    System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                }
             }
+          
         }
 
         internal void OnRemoveAbility()
         {
             GameLogger.Log($"On remove ability: {AbilityName} of {Owner.UnitName}");
-            foreach (var eventType in  GraphController.GetRegisteredGameEvents())
+            
+            var gameEventNodeList = GraphController.GetRegisteredGameEventNodePairs();
+            if (gameEventNodeList != null)
             {
-                System.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent(eventType, OnGameEventInvoked);
+                foreach (var pair in gameEventNodeList)
+                {
+                    System.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                }
             }
             
             if(GraphController.HasEntryNode(typeof(OnRemoveAbilityEntryNode)))

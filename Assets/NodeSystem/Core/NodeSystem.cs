@@ -8,11 +8,10 @@ namespace NS
     public class NodeSystem
     {
         public INodeSystemTaskScheduler TaskScheduler { get; private set; }
-        
         public ClassObjectPoolMgr NodePoolMgr { get; private set; }
+        
         private readonly Dictionary<NodeGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
-
 
         public virtual void OnCreateSystem()
         {
@@ -64,7 +63,7 @@ namespace NS
 
         #region Node Runner
 
-        public NodeRunner CreateNodeRunner(Type type)
+        public virtual NodeRunner CreateNodeRunner(Type type)
         {
             if (!_cachedNodeToNodeRunnerTypeMap.TryGetValue(type, out var runnerType))
             {
@@ -111,6 +110,5 @@ namespace NS
         {
             NodePoolMgr.Log();
         }
-        
     }
 }

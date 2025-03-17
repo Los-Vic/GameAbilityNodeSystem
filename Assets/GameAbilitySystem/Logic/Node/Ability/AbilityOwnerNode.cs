@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("AbilityOwner", "Ability/Value/AbilityOwner", ENodeFunctionType.Value , typeof(AbilityOwnerNodeRunner), CommonNodeCategory.Value)]
+    [Node("AbilityOwner", "Ability/Value/AbilityOwner", ENodeFunctionType.Value , typeof(AbilityOwnerNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.Ability)]
     public sealed class AbilityOwnerNode:Node
     {
         [Port(EPortDirection.Output, typeof(GameUnit),"Unit")]
