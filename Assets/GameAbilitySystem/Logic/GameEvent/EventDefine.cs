@@ -23,7 +23,7 @@ namespace GAS.Logic
         public string EventString;
     }
     
-    public class GameEventArg:IPortalParam, IPoolClass, IRefCountRequester, IRefCountDisposableObj
+    public class GameEventArg:IEntryParam, IPoolClass, IRefCountRequester, IRefCountDisposableObj
     {
         public EGameEventType EventType;
         

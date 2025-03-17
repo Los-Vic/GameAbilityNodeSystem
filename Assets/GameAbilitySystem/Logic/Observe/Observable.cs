@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace GAS.Logic
 {
+    /// <summary>
+    /// 适合匿名函数的callback注册
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Observable<T>
     {
         private readonly List<object> _observers = new();
@@ -44,7 +48,7 @@ namespace GAS.Logic
             }
         }
 
-        internal void Reset()
+        internal void Clear()
         {
             _observers.Clear();
             _callbackMap.Clear();

@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 654239496190820405
+  - rid: 654239496190820408
+  ports:
+  - rid: 654239496190820406
+  - rid: 654239496190820407
+  - rid: 654239496190820409
+  - rid: 654239496190820410
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
   cooldown:
     rid: -2
@@ -26,3 +32,73 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 654239496190820405
+      type: {class: GameEventEntryNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+      data:
+        guid: 1a9d222e-18eb-47ac-980d-95c95a30b0d0
+        position:
+          serializedVersion: 2
+          x: 139.2
+          y: 356
+          width: 270.40002
+          height: 120
+        nodeName: GameEventEntry_On Post Prepare Start
+        nodeFunctionType: 2
+        OutPortExec: 41d2e855-5ec5-44d7-914a-a2e2e22f498d
+        nodeEventType: 1
+        OutParam1: 3bda1803-83fa-4df9-a9ea-c7618af373f4
+    - rid: 654239496190820406
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 41d2e855-5ec5-44d7-914a-a2e2e22f498d
+        belongNodeId: 1a9d222e-18eb-47ac-980d-95c95a30b0d0
+        connectPortId: 4b71eec9-10c4-4ca4-902e-2015a80a47b6
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 654239496190820407
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 3bda1803-83fa-4df9-a9ea-c7618af373f4
+        belongNodeId: 1a9d222e-18eb-47ac-980d-95c95a30b0d0
+        connectPortId: 
+        direction: 1
+        portType: GAS.Logic.GameEventArg, GameAbilitySystem.Logic, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        isFlowPort: 0
+    - rid: 654239496190820408
+      type: {class: DebugPrintNode, ns: NS, asm: NodeSystem}
+      data:
+        guid: bb3b0169-d89f-4b1f-b87b-128aafe5820e
+        position:
+          serializedVersion: 2
+          x: 606.4
+          y: 356
+          width: 148
+          height: 95.20001
+        nodeName: Print
+        nodeFunctionType: 1
+        Log: 
+        InPortExec: 4b71eec9-10c4-4ca4-902e-2015a80a47b6
+        OutPortExec: 1f1a1605-aebc-4da2-9418-4916e68c19c7
+    - rid: 654239496190820409
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 4b71eec9-10c4-4ca4-902e-2015a80a47b6
+        belongNodeId: bb3b0169-d89f-4b1f-b87b-128aafe5820e
+        connectPortId: 41d2e855-5ec5-44d7-914a-a2e2e22f498d
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 654239496190820410
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 1f1a1605-aebc-4da2-9418-4916e68c19c7
+        belongNodeId: bb3b0169-d89f-4b1f-b87b-128aafe5820e
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1

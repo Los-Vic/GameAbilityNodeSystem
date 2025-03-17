@@ -24,7 +24,7 @@ namespace NS
             _graphRunners.Clear();
         }
         
-        public void RunGraph(ENodeDemoPortalType demoPortalType, NodeDemoPortalParam param)
+        public void RunGraph(ENodeDemoPortalType demoPortalType, NodeDemoEntryParam param)
         {
             var runtimeData = _system.GetGraphRuntimeData(_asset);
             var nodeId = runtimeData.GetPortalNodeId(typeof(DemoPortalNode), (int)demoPortalType);

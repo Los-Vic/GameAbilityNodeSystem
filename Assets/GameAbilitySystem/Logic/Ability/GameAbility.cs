@@ -150,8 +150,8 @@ namespace GAS.Logic
             State = EAbilityState.Available;
             OnAdd?.SafeInvoke();
             
-            if(GraphController.HasPortalNode(typeof(OnAddAbilityPortalNode)))
-                GraphController.RunGraph(typeof(OnAddAbilityPortalNode));
+            if(GraphController.HasEntryNode(typeof(OnAddAbilityEntryNode)))
+                GraphController.RunGraph(typeof(OnAddAbilityEntryNode));
             foreach (var eventType in  GraphController.GetRegisteredGameEvents())
             {
                 System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent(eventType, OnGameEventInvoked);
@@ -166,8 +166,8 @@ namespace GAS.Logic
                 System.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent(eventType, OnGameEventInvoked);
             }
             
-            if(GraphController.HasPortalNode(typeof(OnRemoveAbilityPortalNode)))
-                GraphController.RunGraph(typeof(OnRemoveAbilityPortalNode));
+            if(GraphController.HasEntryNode(typeof(OnRemoveAbilityEntryNode)))
+                GraphController.RunGraph(typeof(OnRemoveAbilityEntryNode));
             OnRemove?.SafeInvoke();
             State = EAbilityState.MarkDestroy;
         }
@@ -265,41 +265,41 @@ namespace GAS.Logic
         {
             ActivatedCount++;
             
-            if(!GraphController.HasPortalNode(typeof(OnStartPreCastAbilityPortalNode)))
+            if(!GraphController.HasEntryNode(typeof(OnStartPreCastAbilityEntryNode)))
                 return;
             
             GameLogger.Log($"Activate OnStartPreCast succeeded. {AbilityName} of {Owner.UnitName}");
-            var runner = GraphController.RunGraph(typeof(OnStartPreCastAbilityPortalNode), param, OnActivateAbilityRunnerEnd);
+            var runner = GraphController.RunGraph(typeof(OnStartPreCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
         
         internal void ActivateOnStartCast(GameEventArg param)
         {
-            if(!GraphController.HasPortalNode(typeof(OnStartCastAbilityPortalNode)))
+            if(!GraphController.HasEntryNode(typeof(OnStartCastAbilityEntryNode)))
                 return;
             
             GameLogger.Log($"Activate OnStartCast succeeded. {AbilityName} of {Owner.UnitName}");
-            var runner = GraphController.RunGraph(typeof(OnStartCastAbilityPortalNode), param, OnActivateAbilityRunnerEnd);
+            var runner = GraphController.RunGraph(typeof(OnStartCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
         
         internal void ActivateOnStartPostCast(GameEventArg param)
         {
-            if(!GraphController.HasPortalNode(typeof(OnStartPostCastAbilityPortalNode)))
+            if(!GraphController.HasEntryNode(typeof(OnStartPostCastAbilityEntryNode)))
                 return;
             
             GameLogger.Log($"Activate OnStartPostCast succeeded. {AbilityName} of {Owner.UnitName}");
-            var runner = GraphController.RunGraph(typeof(OnStartPostCastAbilityPortalNode), param, OnActivateAbilityRunnerEnd);
+            var runner = GraphController.RunGraph(typeof(OnStartPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
         
         internal void ActivateOnEndPostCast(GameEventArg param)
         {
-            if(!GraphController.HasPortalNode(typeof(OnEndPostCastAbilityPortalNode)))
+            if(!GraphController.HasEntryNode(typeof(OnEndPostCastAbilityEntryNode)))
                 return;
             
             GameLogger.Log($"Activate OnEndPostCast succeeded. {AbilityName} of {Owner.UnitName}");
-            var runner = GraphController.RunGraph(typeof(OnEndPostCastAbilityPortalNode), param, OnActivateAbilityRunnerEnd);
+            var runner = GraphController.RunGraph(typeof(OnEndPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
         

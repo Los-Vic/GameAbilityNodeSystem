@@ -20,7 +20,7 @@ namespace GAS.Logic
         private readonly List<NodeGraphRunner> _graphRunners = new();
 
         private readonly Dictionary<EGameEventType, string> _gameEventTypeNodeIdMap = new();
-        private readonly Dictionary<Type, string> _portTypeNodeIdMap = new();
+        private readonly Dictionary<Type, string> _entryTypeNodeIdMap = new();
 
         internal List<EGameEventType> GetRegisteredGameEvents() => _gameEventTypeNodeIdMap.Keys.ToList();
 
@@ -35,13 +35,13 @@ namespace GAS.Logic
                 if (!node.IsEntryNode())
                     continue;
 
-                if (node is GameEventPortalNode eventNode)
+                if (node is GameEventEntryNode eventNode)
                 {
                     _gameEventTypeNodeIdMap.TryAdd(eventNode.nodeEventType, node.Id);
                 }
                 else
                 {
-                    _portTypeNodeIdMap.TryAdd(node.GetType(), node.Id);
+                    _entryTypeNodeIdMap.TryAdd(node.GetType(), node.Id);
                 }
             }
         }
@@ -87,13 +87,13 @@ namespace GAS.Logic
             return graphRunner;
         }
 
-        internal bool HasPortalNode(Type portalNodeType) => _portTypeNodeIdMap.ContainsKey(portalNodeType);
+        internal bool HasEntryNode(Type portalNodeType) => _entryTypeNodeIdMap.ContainsKey(portalNodeType);
 
         internal NodeGraphRunner RunGraph(Type portalNodeType, GameEventArg param = null,
             Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null,
             Action<NodeGraphRunner> customOnRunGraphDestroy = null)
         {
-            if (!_portTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
+            if (!_entryTypeNodeIdMap.TryGetValue(portalNodeType, out var nodeId))
             {
                 GameLogger.LogError($"Not found {portalNodeType} node in {_asset.name}!");
                 return null;

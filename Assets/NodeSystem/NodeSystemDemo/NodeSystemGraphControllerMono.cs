@@ -12,8 +12,8 @@ public class NodeSystemGraphControllerMono:MonoBehaviour
     
     [BoxGroup("Portal")]
     public ENodeDemoPortalType demoPortalType;
-    [BoxGroup("Portal")]
-    public NodeDemoPortalParam demoPortalParam;
+    [FormerlySerializedAs("demoPortalParam")] [BoxGroup("Portal")]
+    public NodeDemoEntryParam demoEntryParam;
     
     [BoxGroup("Portal")]
     [Button("RunGraphWithPortal", ButtonSizes.Large)]
@@ -22,7 +22,7 @@ public class NodeSystemGraphControllerMono:MonoBehaviour
     {
         if(!Application.isPlaying)
             return;
-        _controller.RunGraph(demoPortalType, demoPortalParam);
+        _controller.RunGraph(demoPortalType, demoEntryParam);
     }
 
     private void Start()

@@ -88,7 +88,7 @@ namespace GAS.Logic
             
             _valEquation = null;
             _simpleAttributeVals.Clear();
-            OnValChanged.Reset();
+            OnValChanged.Clear();
         }
         
         #region Pool Interface

@@ -3,22 +3,22 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    public class AbilityPortalNode : Node
+    public class AbilityEntryNode : Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
     }
     
-    [Node("OnAdd", "Ability/Portal/OnAdd", ENodeFunctionType.Entry, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnAddAbilityPortalNode:AbilityPortalNode
+    [Node("OnAdd", "Ability/Entry/OnAdd", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnAddAbilityEntryNode:AbilityEntryNode
     {
     }
-    [Node("OnRemove", "Ability/Portal/OnRemove", ENodeFunctionType.Entry, typeof(AbilityPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnRemoveAbilityPortalNode:AbilityPortalNode
+    [Node("OnRemove", "Ability/Entry/OnRemove", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnRemoveAbilityEntryNode:AbilityEntryNode
     {
     }
     
-    public class OnActivateAbilityPortalNode:Node
+    public class OnActivateAbilityEntryNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
@@ -26,40 +26,40 @@ namespace GAS.Logic
         public string OutPortParam;
     }
 
-    [Node("OnStartPreCast", "Ability/Portal/OnStartPreCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnStartPreCastAbilityPortalNode : OnActivateAbilityPortalNode
+    [Node("OnStartPreCast", "Ability/Entry/OnStartPreCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnStartPreCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnStartCast", "Ability/Portal/OnStartCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnStartCastAbilityPortalNode : OnActivateAbilityPortalNode
+    [Node("OnStartCast", "Ability/Entry/OnStartCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnStartCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnStartPostCast", "Ability/Portal/OnStartPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnStartPostCastAbilityPortalNode : OnActivateAbilityPortalNode
+    [Node("OnStartPostCast", "Ability/Entry/OnStartPostCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnStartPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnEndPostCast", "Ability/Portal/OnEndPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventPortalNodeRunner), NodeCategoryDefine.AbilityEffectPortal, NodeScopeDefine.Ability)]
-    public sealed class OnEndPostCastAbilityPortalNode : OnActivateAbilityPortalNode
+    [Node("OnEndPostCast", "Ability/Entry/OnEndPostCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    public sealed class OnEndPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
     
-    public sealed class AbilityPortalNodeRunner:PortalNodeRunner
+    public sealed class AbilityEntryNodeRunner:EntryNodeRunner
     {
         private string _nextNode;
-        private AbilityPortalNode _node;
+        private AbilityEntryNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (AbilityPortalNode)nodeAsset;
+            _node = (AbilityEntryNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -86,15 +86,15 @@ namespace GAS.Logic
         }
     }
     
-    public sealed class AbilityGameEventPortalNodeRunner:PortalNodeRunner
+    public sealed class AbilityGameEventEntryNodeRunner:EntryNodeRunner
     {
         private string _nextNode;
-        private OnActivateAbilityPortalNode _node;
+        private OnActivateAbilityEntryNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (OnActivateAbilityPortalNode)nodeAsset;
+            _node = (OnActivateAbilityEntryNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -103,7 +103,7 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetPortalParam(IPortalParam paramBase)
+        public override void SetEntryParam(IEntryParam paramBase)
         {
             if (paramBase == null)
                 return;

@@ -4,13 +4,13 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("GameEventPortal", "System/GameEvent/GameEventPortal", ENodeFunctionType.Entry, typeof(GamePortalPortalNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.System)]
-    public sealed class GameEventPortalNode:Node
+    [Node("GameEventEntry", "System/GameEvent/GameEventEntry", ENodeFunctionType.Entry, typeof(GameEventEntryNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.System)]
+    public sealed class GameEventEntryNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
 
-        [FormerlySerializedAs("nodeEventPortal")] [FormerlySerializedAs("NodePortal")] [Entry]
+        [Entry]
         public EGameEventType nodeEventType;
         
         [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]
@@ -22,15 +22,15 @@ namespace GAS.Logic
         }
     }
     
-    public sealed class GamePortalPortalNodeRunner:PortalNodeRunner
+    public sealed class GameEventEntryNodeRunner:EntryNodeRunner
     {
         private string _nextNode;
-        private GameEventPortalNode _node;
+        private GameEventEntryNode _node;
         
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (GameEventPortalNode)nodeAsset;
+            _node = (GameEventEntryNode)nodeAsset;
             var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
@@ -39,7 +39,7 @@ namespace GAS.Logic
             _nextNode = connectPort.belongNodeId;
         }
 
-        public override void SetPortalParam(IPortalParam paramBase)
+        public override void SetEntryParam(IEntryParam paramBase)
         {
             if (paramBase is not GameEventArg param) 
                 return;

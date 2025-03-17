@@ -46,7 +46,7 @@ namespace GAS.Logic
         private void UnInit()
         {
             _valDecorators = null;
-            OnValChanged.Reset();
+            OnValChanged.Clear();
         }
 
         public FP Val => _val;
