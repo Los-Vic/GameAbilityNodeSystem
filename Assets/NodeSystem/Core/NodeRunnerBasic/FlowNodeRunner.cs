@@ -1,14 +1,11 @@
-﻿namespace NS
+﻿using GameplayCommonLibrary;
+
+namespace NS
 {
     public class FlowNodeRunner:NodeRunner
     {
         private bool _dependentValNodesExecuted;
         protected INodeSystemTaskScheduler TaskScheduler => GraphRunner.TaskScheduler;
-        
-        public virtual void Reset()
-        {
-            _dependentValNodesExecuted = false;
-        }
         
         public virtual string GetNextNode()
         {
@@ -17,8 +14,7 @@
 
         protected void Complete()
         {
-            GraphRunner.MoveToNextNode();
-            GraphRunner.ExecuteRunner();
+            GraphRunner.ForwardRunner();
         }
         
         protected void ExecuteDependentValNodes(string flowNodeId)
@@ -29,8 +25,9 @@
             var nodeList = GraphRunner.GraphAssetRuntimeData.GetDependentNodeIds(flowNodeId);
             for (var i = nodeList.Count - 1; i >= 0; i--)
             {
-                var runner = GraphRunner.GetNodeRunner(nodeList[i]);
+                var runner = GraphRunner.CreateNodeRunner(nodeList[i]);
                 runner.Execute();
+                GraphRunner.DestroyNodeRunner(runner);
             }
 
             _dependentValNodesExecuted = true;
@@ -38,7 +35,8 @@
 
         public override void OnReturnToPool()
         {
-            Reset();
+            _dependentValNodesExecuted = false;
+            base.OnReturnToPool();
         }
     }
 }

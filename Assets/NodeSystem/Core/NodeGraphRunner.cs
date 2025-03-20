@@ -20,14 +20,15 @@ namespace NS
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
         private bool _isValid;
+        private bool _hasStarted;
         
-        private readonly Dictionary<string, NodeRunner> _nodeRunners = new();
         //Cache value of node output 
         private readonly Dictionary<string, object> _outPortResultCached = new();
         
         //Run node runner
         private Node _entryNode;
         private FlowNodeRunner _curNodeRunner;
+        private readonly Dictionary<string, LoopNodeRunner> _loopNodeRunnerMap = new();
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
@@ -47,7 +48,6 @@ namespace NS
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
-            _isValid = false;
             _onRunnerRunEnd = onRunnerRunEnd;
             _onRunnerDestroy = onRunnerDestroy;
             _entryNode = GraphAssetRuntimeData.GetNodeById(entryNodeId);
@@ -59,13 +59,14 @@ namespace NS
                 return;
             }
 
-            var entryNodeRunner = GetNodeRunner(entryNodeId) as EntryNodeRunner;
+            var entryNodeRunner = CreateNodeRunner(entryNodeId) as EntryNodeRunner;
             if (entryNodeRunner == null)
             {
                 GameLogger.LogError($"not valid entry node runner:{entryNodeId} of {asset.name}");
                 return;
             }
             entryNodeRunner.SetEntryParam(actionStartParam);
+            _curNodeRunner = entryNodeRunner;
             _isValid = true;
         }
 
@@ -75,31 +76,29 @@ namespace NS
             _onRunnerDestroy = null;
             
             TaskScheduler.CancelTasksOfGraphRunner(this);
-            Clear();
+
+            if (_curNodeRunner != null)
+            {
+                DestroyNodeRunner(_curNodeRunner);
+                _curNodeRunner = null;
+            }
             
+            foreach (var runner in _loopNodeRunnerMap.Values)
+            {
+                DestroyNodeRunner(runner);
+            }
+            _loopNodeRunnerMap.Clear();
+            _runningLoopNodeIds.Clear();
+            
+            _outPortResultCached.Clear();
             _onRunnerRunEnd = null;
             _asset = null;
             _entryNode = null;
             _isValid = false;
+            _hasStarted = false;
             GraphAssetRuntimeData = null;
             _nodeSystem = null;
             Context = null;
-        }
-
-        /// <summary>
-        /// 每次重跑前的清理
-        /// </summary>
-        private void Clear()
-        {
-            _curNodeRunner = null;
-            _runningLoopNodeIds.Clear();
-            _outPortResultCached.Clear();
-            DestroyRunnerInstances();
-        }
-
-        private bool IsRunning()
-        {
-            return _nodeSystem.TaskScheduler.HasTaskRunning(this);
         }
         
         public void StartRunner()
@@ -110,14 +109,20 @@ namespace NS
                 return;
             }
 
-            if (IsRunning())
+            if (_hasStarted)
             {
                 GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()} failed. already running.");
                 return;
             }
+
+            if (_curNodeRunner == null)
+            {
+                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()} failed. entry runner is null.");
+                return;
+            }
             
+            _hasStarted = true;
             GameLogger.Log($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            _curNodeRunner = GetNodeRunner(_entryNode.Id) as FlowNodeRunner;
             ExecuteRunner();
         }
         
@@ -125,19 +130,15 @@ namespace NS
         {
             GameLogger.Log($"complete graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
-
-            Clear();
         }
 
         public void CancelRunner()
         {
             GameLogger.Log($"cancel graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
-            
-            Clear();
         }
         
-        internal void ExecuteRunner()
+        private void ExecuteRunner()
         {
             if (_curNodeRunner == null)
             {
@@ -148,37 +149,50 @@ namespace NS
             _curNodeRunner.Execute();
         }
 
-        internal void MoveToNextNode()
+        internal void ForwardRunner()
         {
-            if (IsInLoop(out var loopNode) && GetNodeRunner(loopNode) != _curNodeRunner)
-            {
-                _curNodeRunner.Reset();
-            }
-                
             var nextNode = _curNodeRunner.GetNextNode();
-            if (!Node.IsValidNodeId(nextNode))
+            
+            if (IsInLoop(out var loopNode))
             {
-                if (!Node.IsValidNodeId(loopNode))
+                if (_curNodeRunner.NodeId != loopNode)
                 {
-                    _curNodeRunner = null;
-                    return;
+                    DestroyNodeRunner(_curNodeRunner);
                 }
+            }
+            else
+            {
+                DestroyNodeRunner(_curNodeRunner);
+            }
+            
+            if (!Node.IsValidNodeId(nextNode) && Node.IsValidNodeId(loopNode))
+            {
                 nextNode = loopNode;
             }
-                
-            _curNodeRunner = GetNodeRunner(nextNode) as FlowNodeRunner;
+            
+            if(Node.IsValidNodeId(nextNode))
+            {
+                _curNodeRunner = CreateNodeRunner(nextNode) as FlowNodeRunner;
+            }
+            else
+            {
+                _curNodeRunner = null;
+            }
+            
+            ExecuteRunner();
         }
         
-        public NodeRunner GetNodeRunner(string nodeId)
+        internal NodeRunner CreateNodeRunner(string nodeId)
         {
-            if (_nodeRunners.TryGetValue(nodeId, out var nodeRunner))
-                return nodeRunner;
-
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
             var runner = _nodeSystem.CreateNodeRunner(n.GetType());
             runner.Init(n, this);
-            _nodeRunners.Add(n.Id, runner);
             return runner;
+        }
+
+        internal void DestroyNodeRunner(NodeRunner runner)
+        {
+            _nodeSystem.DestroyNodeRunner(runner);
         }
         
         
@@ -219,14 +233,15 @@ namespace NS
         
         #region Loop
 
-        public void EnterLoop(string nodeId)
+        public void EnterLoop(LoopNodeRunner loopRunner)
         {
-            _runningLoopNodeIds.Push(nodeId);
+            _runningLoopNodeIds.Push(loopRunner.NodeId);
+            _loopNodeRunnerMap.Add(loopRunner.NodeId, loopRunner);
         }
         
         private bool IsInLoop(out string loopNodeId)
         {
-            loopNodeId = _runningLoopNodeIds.Count == 0 ? default : _runningLoopNodeIds.Peek();
+            loopNodeId = _runningLoopNodeIds.Count == 0 ? null : _runningLoopNodeIds.Peek();
             return _runningLoopNodeIds.Count != 0;
         }
 
@@ -234,19 +249,19 @@ namespace NS
         {
             if(_runningLoopNodeIds.Count == 0)
                 return;
-            _runningLoopNodeIds.Pop();
+            var nodeId = _runningLoopNodeIds.Pop();
+            _loopNodeRunnerMap.Remove(nodeId);
+        }
+
+        public LoopNodeRunner GetCurLoopNode()
+        {
+            if (!IsInLoop(out var loopNodeId)) 
+                return null;
+            
+            return _loopNodeRunnerMap.GetValueOrDefault(loopNodeId);
         }
 
         #endregion
-
-        private void DestroyRunnerInstances()
-        {
-            foreach (var nodeRunners in _nodeRunners.Values)
-            {
-                _nodeSystem.DestroyNodeRunner(nodeRunners);
-            }
-            _nodeRunners.Clear();
-        }
         
         #region Pool Object
 

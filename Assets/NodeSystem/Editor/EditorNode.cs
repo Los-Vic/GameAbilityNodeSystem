@@ -86,10 +86,18 @@ namespace NSEditor
             CheckPortalNodeIsSingle();
         }
 
-        public void RefreshRerouteNode(Edge changeEdge, bool isAdd)
+        public void RefreshDynamicPortNode(Edge changeEdge, bool isAdd)
         {
-            if(!Node.IsRerouteNode())
+            //Reroute node
+            if (Node.IsRerouteNode())
+            {
+                RefreshRerouteNode(changeEdge, isAdd);
                 return;
+            }
+        }
+
+        private void RefreshRerouteNode(Edge changeEdge, bool isAdd)
+        {
             var connections = new List<Edge>();
             foreach (var port in NodePortToViewPort.Values)
             {

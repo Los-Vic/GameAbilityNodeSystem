@@ -47,23 +47,17 @@ namespace GameplayCommonLibrary
 
         public void Release(IPoolClass obj)
         {
+            if (_poolObjectType != obj.GetType())
+            {
+                GameLogger.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
+                return;
+            }
+            
             if (_activePoolObjects.Remove(obj))
             {
                 obj.OnReturnToPool();
                 _pool.Release(obj);
             }
-            else
-            {
-                if (_poolObjectType != obj.GetType())
-                {
-                    GameLogger.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
-                }
-                else
-                {
-                    GameLogger.LogError($"[ObjectPool]destroy object failed: object is already destroyed");
-                }
-            }
-           
         }
         
         public void Clear()

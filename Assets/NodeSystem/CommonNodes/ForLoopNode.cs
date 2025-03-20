@@ -19,7 +19,7 @@
         public string OutForEachExecPort;
     }
     
-    public sealed class ForLoopFlowNodeRunner:FlowNodeRunner
+    public sealed class ForLoopFlowNodeRunner:LoopNodeRunner
     {
         private ForLoopNode _node;
         private bool _started;
@@ -33,22 +33,13 @@
             base.Init(nodeAsset, graphRunner);
             _node = (ForLoopNode)nodeAsset;
         }
-
-        public override void Reset()
-        {
-            base.Reset();
-            _startIndex = 0;
-            _curIndex = 0;
-            _endIndex = 0;
-            _started = false;
-        }
-
+        
         public override void Execute()
         {
             if (!_started)
             {
                 ExecuteDependentValNodes(_node.Id);
-                GraphRunner.EnterLoop(_node.Id);
+                GraphRunner.EnterLoop(this);
                 _started = true;
                 _startIndex = GraphRunner.GetInPortVal<int>(_node.InStartIndex);
                 _endIndex = GraphRunner.GetInPortVal<int>(_node.InEndIndex);
@@ -58,6 +49,11 @@
 
             _curIndex++;
             if (_curIndex > _endIndex)
+            {
+                IsLoopEnd = true;
+            }
+            
+            if (IsLoopEnd)
             {
                 _outPortId = _node.OutCompleteExecPort;
                 GraphRunner.ExitLoop();
@@ -82,8 +78,12 @@
         
         public override void OnReturnToPool()
         {
-            base.OnReturnToPool();
+            _startIndex = 0;
+            _curIndex = 0;
+            _endIndex = 0;
+            _started = false;
             _node = null;
+            base.OnReturnToPool();
         }
     }
 }
