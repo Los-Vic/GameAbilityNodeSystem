@@ -1,6 +1,14 @@
-﻿namespace GAS.Logic.Cue
+﻿using System;
+
+namespace GAS.Logic.Cue
 {
-    public class GameCue
+    [Serializable]
+    public class GameCueCfg
+    {
+        
+    }
+    
+    public class GameCueRuntime
     {
         
     }
