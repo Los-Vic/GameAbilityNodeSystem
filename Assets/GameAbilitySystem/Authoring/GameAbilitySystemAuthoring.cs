@@ -1,15 +1,13 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using GameplayCommonLibrary;
 using GAS.Logic;
 using MissQ;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-namespace GAS.Authoring
+namespace GAS
 {
     /// <summary>
     /// A simple example, only run in editor. Use AssetDatabase load assets.
@@ -116,7 +114,11 @@ namespace GAS.Authoring
                 PlayerIndex = 0
             };
             _testUnit = _system.CreateGameUnit(ref param);
-            _testUnit.GrantAbility(0, 1);
+            _testUnit.AddAbility(new AbilityCreateParam()
+            {
+                Id = 0,
+                Lv = 1,
+            });
             
             _system.PostGameEvent(new GameEventInitParam()
             {

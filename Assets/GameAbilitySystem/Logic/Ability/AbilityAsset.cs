@@ -40,12 +40,6 @@ namespace GAS.Logic
         [BoxGroup("AbilityTag")]
         public List<EAbilityTag> abilityTags = new();
         
-        [Title("References")] 
-        [ReadOnly]
-        public List<string> referencedAbilities = new();
-        [ReadOnly] 
-        public List<string> referencedGameCueTags = new();
-        
         //Runtime
         public uint Id { get; set; }
         

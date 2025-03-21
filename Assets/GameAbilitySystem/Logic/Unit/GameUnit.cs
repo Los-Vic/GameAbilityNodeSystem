@@ -77,6 +77,12 @@ namespace GAS.Logic
             }
             GameAbilities.Clear();
             //Clear Effects
+            foreach (var effect in GameEffects)
+            {
+                effect.OnRemoveEffect();
+                Sys.GetSubsystem<EffectInstanceSubsystem>().DestroyEffect(effect);
+            }
+            GameEffects.Clear();
         }
         
         #region Attributes
@@ -135,9 +141,9 @@ namespace GAS.Logic
 
         #region Abilities
 
-        public void GrantAbility(uint abilityId, uint lv)
+        public void AddAbility(AbilityCreateParam param)
         {
-            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(abilityId, lv);
+            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(ref param);
             if (ability == null)
                 return;
             GameAbilities.Add(ability);
@@ -159,6 +165,25 @@ namespace GAS.Logic
         {
             ability.OnRemoveAbility();
             Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
+        }
+
+        #endregion
+
+        #region Effects
+
+        public void AddEffect(EffectCreateParam param)
+        {
+            var effect = Sys.GetSubsystem<EffectInstanceSubsystem>().CreateEffect(ref param);
+            if(effect == null)
+                return;
+            GameEffects.Add(effect);
+            effect.OnAddEffect(this);
+        }
+
+        public void RemoveEffect(GameEffect effect)
+        {
+            effect.OnRemoveEffect();
+            Sys.GetSubsystem<EffectInstanceSubsystem>().DestroyEffect(effect);
         }
 
         #endregion

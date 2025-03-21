@@ -1,4 +1,5 @@
-﻿using MissQ;
+﻿using GameplayCommonLibrary;
+using MissQ;
 using NS;
 
 namespace GAS.Logic
@@ -27,9 +28,31 @@ namespace GAS.Logic
         public string OutFlowPort;
     }
     
-    //todo:
     public sealed class GrantEffectNodeRunner : FlowNodeRunner
     {
-        
+        private GrantEffectForUnitNode _node;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            _node = (GrantEffectForUnitNode)nodeAsset;
+        }
+
+        public override void Execute()
+        {
+            var unit = GraphRunner.GetInPortVal<GameUnit>(_node.InUnitPort);
+            if (unit == null)
+            {
+                GameLogger.LogWarning("grant effect failed, unit is null.");
+                return;
+            }
+            
+            
+        }
+
+        public override void OnReturnToPool()
+        {
+            _node = null;
+            base.OnReturnToPool();
+        }
     }
 }

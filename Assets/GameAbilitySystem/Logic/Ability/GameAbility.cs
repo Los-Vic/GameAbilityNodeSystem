@@ -10,8 +10,10 @@ namespace GAS.Logic
     public struct AbilityCreateParam
     {
         public uint Id;
-        public AbilityAsset Asset;
         public uint Lv;
+        public FP SignalVal1;
+        public FP SignalVal2;
+        public FP SignalVal3;
     }
 
     public enum ECheckAbilityResult
@@ -67,10 +69,10 @@ namespace GAS.Logic
         
         public string AbilityName => Asset?.abilityName ?? string.Empty;
         
-        internal void Init(GameAbilitySystem sys, ref AbilityCreateParam param)
+        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityCreateParam param)
         {
             ID = param.Id;
-            Asset = param.Asset;
+            Asset = asset;
             GraphController.Init(sys, Asset, this);
             Lv = param.Lv;
             

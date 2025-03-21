@@ -39,6 +39,7 @@ namespace GAS.Logic
             AddSubsystem<AttributeInstanceSubsystem>(false);
             AddSubsystem<AbilityInstanceSubsystem>(true);
             AddSubsystem<UnitInstanceSubsystem>(false);
+            AddSubsystem<EffectInstanceSubsystem>(false);
             
             var abilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
             abilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
@@ -114,7 +115,6 @@ namespace GAS.Logic
 
         #endregion
         
-        
         #region GameUnit
 
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param)
@@ -128,8 +128,7 @@ namespace GAS.Logic
         }
 
         #endregion
-
-    
+        
         public override void DumpObjectPool()
         {
             GameLogger.Log("----------Dump ObjectPools Start----------");
@@ -144,10 +143,10 @@ namespace GAS.Logic
         {
             var poolMgr = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr;
 
-            var list = poolMgr.GetActiveObjects(typeof(GameEventArg));
-            if (list != null)
+            var listGameEvent = poolMgr.GetActiveObjects(typeof(GameEventArg));
+            if (listGameEvent != null)
             {
-                foreach (var arg in list)
+                foreach (var arg in listGameEvent)
                 {
                     var a = (GameEventArg)arg;
                     var logList = a.GetRefCountDisposableComponent().GetRefLog();
@@ -158,6 +157,33 @@ namespace GAS.Logic
                 }
             }
             
+            var listGameAbility = poolMgr.GetActiveObjects(typeof(GameAbility));
+            if (listGameAbility != null)
+            {
+                foreach (var arg in listGameAbility)
+                {
+                    var a = (GameAbility)arg;
+                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
+                    foreach (var log in logList)
+                    {
+                        GameLogger.Log(log);
+                    }
+                }
+            }
+            
+            var listGameEffect = poolMgr.GetActiveObjects(typeof(GameEffect));
+            if (listGameEffect != null)
+            {
+                foreach (var arg in listGameEffect)
+                {
+                    var a = (GameEffect)arg;
+                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
+                    foreach (var log in logList)
+                    {
+                        GameLogger.Log(log);
+                    }
+                }
+            }
         }
     }
 }

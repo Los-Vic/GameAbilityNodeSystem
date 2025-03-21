@@ -25,24 +25,17 @@ namespace GAS.Logic
             }
         }
 
-        internal GameAbility CreateAbility(uint id, uint lv)
+        internal GameAbility CreateAbility(ref AbilityCreateParam param)
         {
-            var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(id);
+            var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(param.Id);
             if (abilityAsset == null)
             {
-                GameLogger.LogError($"Fail to get ActiveAbilityAsset of {id}");
+                GameLogger.LogError($"Fail to get ActiveAbilityAsset of {param.Id}");
                 return null;
             }
             
             var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
-            var param = new AbilityCreateParam()
-            {
-                Id = id,
-                Asset = abilityAsset,
-                Lv = lv
-            };
-            
-            ability.Init(System, ref param);
+            ability.Init(System, abilityAsset, ref param);
             return ability;
         }
         internal void DestroyAbility(GameAbility ability)
