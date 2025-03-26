@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NS
 {
@@ -78,6 +79,4 @@ namespace NS
             IsFlowPort = typeof(BaseFlowPort).IsAssignableFrom(portType);
         }
     }
-    
-    
 }

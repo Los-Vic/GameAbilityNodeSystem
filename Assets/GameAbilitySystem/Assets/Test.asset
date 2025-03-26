@@ -16,13 +16,13 @@ MonoBehaviour:
   ports: []
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
   cooldown:
-    rid: -2
+    rid: 654239701515894887
   costs: []
-  abilityTags: 
-  referencedAbilities: []
-  referencedGameCueTags: []
+  abilityTags: 10000000
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 654239701515894887
+      type: {class: ValuePickerParam, ns: GAS.Logic.Value, asm: GameAbilitySystem.Logic}
+      data:
+        paramName: 

@@ -10,7 +10,7 @@ namespace GAS.Logic
 {
     public enum EAbilityTag
     {
-        Aura
+        Aura,
     }
     
     [Serializable]

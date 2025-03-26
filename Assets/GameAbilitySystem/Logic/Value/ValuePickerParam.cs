@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NS;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -13,7 +14,8 @@ namespace GAS.Logic.Value
     public class ValuePickerParam:ValuePickerBase
     {
         [Header("参数")]
-        [ValueDropdown(nameof(GetAllParams))]
+        [ValueDropdown(nameof(GetAllParams))] //odin draw in inspector
+        [EnumString("Assets/GameAbilitySystem/Assets/Configs/AbilityEffectParamConfig.asset")]// custom draw in node editor
         public string paramName;
         
         public static List<string> GetAllParams()

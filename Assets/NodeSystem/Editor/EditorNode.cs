@@ -269,7 +269,8 @@ namespace NSEditor
             var prop = _serializedNode.FindPropertyRelative(fieldInfo.Name);
             var field = new PropertyField(prop);
             field.BindProperty(prop);
-           // field.bindingPath = prop.propertyPath;
+            
+            // field.bindingPath = prop.propertyPath;
             extensionContainer.Add(field);
             
             //create dropdown field to select instance
