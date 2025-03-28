@@ -9,7 +9,6 @@ namespace NS
         Value,
         Action,
         Entry,
-        Reroute,
     }
     
     [Serializable]
@@ -69,11 +68,6 @@ namespace NS
         public bool IsEntryNode()
         {
             return nodeFunctionType == ENodeFunctionType.Entry;
-        }
-
-        public bool IsRerouteNode()
-        {
-            return nodeFunctionType == ENodeFunctionType.Reroute;
         }
         
         public virtual string DisplayName() => nodeName;

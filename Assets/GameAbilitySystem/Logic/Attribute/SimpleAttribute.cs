@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
-using NS;
 
 namespace GAS.Logic
 {
@@ -23,7 +21,6 @@ namespace GAS.Logic
     public class SimpleAttribute:IPoolClass
     {
         public ESimpleAttributeType Type { get; private set; }
-        
         private FP _val;
         private List<IValueDecorator> _valDecorators;
         public readonly Observable<AttributeChangeMsg> OnValChanged = new();

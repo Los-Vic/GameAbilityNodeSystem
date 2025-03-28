@@ -15,6 +15,9 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(GameUnit), "Unit")]
         public string InPortUnit;
         
+        [Port(EPortDirection.Input, typeof(FP), "Lv(opt)")]
+        public string InPortLv;
+        
         [Port(EPortDirection.Output, typeof(FP),"Val")]
         public string OutPortVal;
     }
@@ -34,7 +37,8 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            GraphRunner.SetOutPortVal(_node.OutPortVal, ValuePickerUtility.GetValue(_node.Config, _unit));
+            var lv = GraphRunner.GetInPortVal<FP>(_node.InPortLv);
+            GraphRunner.SetOutPortVal(_node.OutPortVal, ValuePickerUtility.GetValue(_node.Config, _unit, (uint)lv));
         }
 
         public override void OnReturnToPool()

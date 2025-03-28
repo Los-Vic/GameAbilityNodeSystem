@@ -1,4 +1,4 @@
-﻿using System;
+﻿using GameplayCommonLibrary;
 using MissQ;
 
 namespace GAS.Logic
@@ -18,13 +18,21 @@ namespace GAS.Logic
             var oldVal = attribute.Val;
             if(newVal.Equals(oldVal))
                 return;
+            
             attribute.SetVal(newVal);
-            attribute.OnValChanged.NotifyObservers(new AttributeChangeMsg()
+
+            GameLogger.Log($"DefaultAttributeValSetter set val, unit {unit.UnitName}, attribute {attribute.Type}, inNewVal {newVal}, " +
+                           $"res {oldVal}->{attribute.Val}, changedByEffect {changedByEffect?.EffectName ?? ""}");
+            
+            if (attribute.Val != oldVal)
             {
-                OldVal = oldVal,
-                NewVal = newVal,
-                ChangedByEffect = changedByEffect
-            });
+                attribute.OnValChanged.NotifyObservers(new AttributeChangeMsg()
+                {
+                    OldVal = oldVal,
+                    NewVal = attribute.Val,
+                    ChangedByEffect = changedByEffect
+                });
+            }
         }
     }
 }

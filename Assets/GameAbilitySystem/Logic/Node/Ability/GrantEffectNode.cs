@@ -5,7 +5,7 @@ using NS;
 namespace GAS.Logic
 {
     [Node("GrantEffectForUnit", "Ability/Action/GrantEffectForUnit", ENodeFunctionType.Action, typeof(GrantEffectNodeRunner),
-        CommonNodeCategory.Action, NodeScopeDefine.Ability)]
+        NodeCategoryDefine.EffectNode, NodeScopeDefine.Ability)]
     public sealed class GrantEffectForUnitNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
@@ -20,9 +20,6 @@ namespace GAS.Logic
         public string SignalVal2;
         [Port(EPortDirection.Input, typeof(FP), "SignalVal3")]
         public string SignalVal3;
-        
-        [Exposed] 
-        public EffectAsset Effect;
         
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutFlowPort;

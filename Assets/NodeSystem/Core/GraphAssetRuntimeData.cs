@@ -105,7 +105,7 @@ namespace NS
                     
                         var connectPort = _portIdMap[port.connectPortId];
                         var connectNode = _nodeIdMap[connectPort.belongNodeId];
-                        if (!connectNode.IsValueNode() && !connectNode.IsRerouteNode()) 
+                        if (!connectNode.IsValueNode()) 
                             continue;
                         valueNodeList.Add(connectNode.Id);
                         _toRunNodeList.Add(connectNode.Id);

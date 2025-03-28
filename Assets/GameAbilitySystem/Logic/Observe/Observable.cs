@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
@@ -43,8 +44,7 @@ namespace GAS.Logic
         {
             foreach (var observer in _observers)
             {
-                //maybe exception needed here?
-                _callbackMap[observer]?.Invoke(msg);
+                _callbackMap[observer]?.SafeInvoke(msg);
             }
         }
 

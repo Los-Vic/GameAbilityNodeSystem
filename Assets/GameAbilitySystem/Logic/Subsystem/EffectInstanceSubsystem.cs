@@ -1,14 +1,15 @@
 ﻿
+
 namespace GAS.Logic
 {
     public class EffectInstanceSubsystem:GameAbilitySubsystem
     {
         #region Effect Instance Create/Destroy
 
-        internal GameEffect CreateEffect(ref EffectCreateParam param)
+        internal GameEffect CreateEffect<T>(string effectName) where T : GameEffect, new()
         {
-            var effect = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameEffect>();
-            effect.Init(System, ref param);
+            var effect = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<T>();
+            effect.Init(effectName);
             return effect;
         }
         

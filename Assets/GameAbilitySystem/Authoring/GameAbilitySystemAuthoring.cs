@@ -19,7 +19,6 @@ namespace GAS
         
         //Assets
         private readonly Dictionary<uint, AbilityAsset> _abilityAssetsCache = new();
-        private readonly Dictionary<uint, EffectAsset> _effectAssetCache = new();
         
         //Configs
         private readonly Dictionary<uint, AbilityConfigElement> _abilityConfigMap = new();
@@ -114,6 +113,11 @@ namespace GAS
                 PlayerIndex = 0
             };
             _testUnit = _system.CreateGameUnit(ref param);
+            _testUnit.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionMana,
+            });
+            
             _testUnit.AddAbility(new AbilityCreateParam()
             {
                 Id = 0,

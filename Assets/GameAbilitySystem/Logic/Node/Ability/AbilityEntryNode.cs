@@ -9,11 +9,11 @@ namespace GAS.Logic
         public string OutPortExec;
     }
     
-    [Node("OnAdd", "Ability/Entry/OnAdd", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    [Node("OnAdd", "Ability/Entry/OnAdd", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnAddAbilityEntryNode:AbilityEntryNode
     {
     }
-    [Node("OnRemove", "Ability/Entry/OnRemove", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+    [Node("OnRemove", "Ability/Entry/OnRemove", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnRemoveAbilityEntryNode:AbilityEntryNode
     {
     }
@@ -27,25 +27,25 @@ namespace GAS.Logic
     }
 
     [Node("OnStartPreCast", "Ability/Entry/OnStartPreCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnStartPreCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
     [Node("OnStartCast", "Ability/Entry/OnStartCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnStartCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
     [Node("OnStartPostCast", "Ability/Entry/OnStartPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnStartPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
     [Node("OnEndPostCast", "Ability/Entry/OnEndPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEffectEntry, NodeScopeDefine.Ability)]
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
     public sealed class OnEndPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }

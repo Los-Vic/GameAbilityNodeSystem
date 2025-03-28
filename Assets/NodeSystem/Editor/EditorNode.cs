@@ -89,10 +89,13 @@ namespace NSEditor
         public void RefreshDynamicPortNode(Edge changeEdge, bool isAdd)
         {
             //Reroute node
-            if (Node.IsRerouteNode())
+            if (Node is RerouteNode)
             {
                 RefreshRerouteNode(changeEdge, isAdd);
-                return;
+            }
+            else if (Node is ForEachNode forEachNode)
+            {
+                RefreshForeachNode(forEachNode, changeEdge, isAdd);
             }
         }
 
@@ -126,6 +129,41 @@ namespace NSEditor
                 port.tooltip = port.portType.Name;
             }
         }
+        
+        private void RefreshForeachNode(ForEachNode forEachNode, Edge edge, bool isAdd)
+        {
+            Type portType = null;
+            if (ViewPortToNodePort.TryGetValue(edge.input, out var inPort) && inPort == forEachNode.InEnumerable)
+            {
+                var t = edge.output.portType;
+                var args = t.GetGenericArguments();
+                if (args is { Length: > 0 })
+                {
+                    portType = args[0];
+                }
+            }
+            if (ViewPortToNodePort.TryGetValue(edge.output, out var outPort) && outPort == forEachNode.InEnumerable)
+            {
+                var t = edge.input.portType;
+                var args = t.GetGenericArguments();
+                if (args is { Length: > 0 })
+                {
+                    portType = args[0];
+                }
+            }
+
+            if (portType == null)
+                return;
+            
+            portType = isAdd ? portType : typeof(object);
+
+            if (!NodePortToViewPort.TryGetValue(forEachNode.OutElement, out var elemPort)) 
+                return;
+            elemPort.portType = portType;
+            elemPort.portColor = GetPortColor(elemPort.portType);
+            elemPort.portName = elemPort.portType.Name;
+            elemPort.tooltip = elemPort.portType.Name;
+        }
 
         protected virtual Color GetNodeColor(int nodeCategory)
         {
@@ -153,7 +191,7 @@ namespace NSEditor
         
         protected virtual void ConstructTitle(Type type, NodeAttribute attribute)
         {
-            if (Node.IsRerouteNode())
+            if (Node is RerouteNode)
             {
                 titleContainer.RemoveFromHierarchy();
                 return;

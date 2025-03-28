@@ -63,12 +63,10 @@ namespace GAS.Logic
                 var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr
                     .Get<AbilityActivationReqJob>();
 
-                var lv = (uint)context.Ability.Owner.GetSimpleAttributeVal(ESimpleAttributeType.Level);
-
-                var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, lv);
-                var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, lv);
-                var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, lv);
-                var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner, lv);
+                var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, context.Ability.Lv);
+                var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, context.Ability.Lv);
+                var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, context.Ability.Lv);
+                var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner, context.Ability.Lv);
 
                 var total = preCast + cast + postCast;
                 if (clamp > 0 && total > clamp)

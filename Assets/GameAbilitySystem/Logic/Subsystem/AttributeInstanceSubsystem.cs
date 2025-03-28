@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 using MissQ;
 
 namespace GAS.Logic
@@ -17,8 +18,15 @@ namespace GAS.Logic
             _attributeValSetters.TryAdd(type, setter);
         }
         
-        public void SetAttributeVal(GameUnit unit, SimpleAttribute attribute, FP newVal, GameEffect effect = null)
+        public void SetAttributeVal(GameUnit unit, ESimpleAttributeType type, FP newVal, GameEffect effect = null)
         {
+            var attribute = unit.GetSimpleAttribute(type);
+            if (attribute == null)
+            {
+                GameLogger.LogError($"fail to find simple attribute {type} of {unit.UnitName}");
+                return;
+            }
+            
             var setter = _attributeValSetters.TryGetValue(attribute.Type, out var s)
                 ? s : DefaultAttributeValSetter.Instance;
             

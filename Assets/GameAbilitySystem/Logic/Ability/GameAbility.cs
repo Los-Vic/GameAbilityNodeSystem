@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
 using GAS.Logic.Value;
 using MissQ;
@@ -40,14 +39,16 @@ namespace GAS.Logic
         public GameUnit Owner { get; private set; }
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }
-
-        internal Action OnAdd;
-        internal Action OnRemove;
         
         //Cooldown
         internal bool IsInCooldown;
         internal FP CooldownDuration;
         internal FP CooldownCounter;
+        
+        //SignalVal
+        internal FP SignalVal1;
+        internal FP SignalVal2;
+        internal FP SignalVal3;
         
         private bool IsAvailable => State == EAbilityState.Available;
         private readonly List<NodeGraphRunner> _activateAbilityRunners = new();
@@ -78,6 +79,10 @@ namespace GAS.Logic
             
             State = EAbilityState.Initialized;
             System = sys;
+            
+            SignalVal1 = param.SignalVal1;
+            SignalVal2 = param.SignalVal2;
+            SignalVal3 = param.SignalVal3;
         }
 
         private void UnInit()
@@ -150,7 +155,6 @@ namespace GAS.Logic
             Owner = owner;
             GameLogger.Log($"On add ability: {AbilityName} of {Owner.UnitName}");
             State = EAbilityState.Available;
-            OnAdd?.SafeInvoke();
             
             if(GraphController.HasEntryNode(typeof(OnAddAbilityEntryNode)))
                 GraphController.RunGraph(typeof(OnAddAbilityEntryNode));
@@ -181,7 +185,6 @@ namespace GAS.Logic
             
             if(GraphController.HasEntryNode(typeof(OnRemoveAbilityEntryNode)))
                 GraphController.RunGraph(typeof(OnRemoveAbilityEntryNode));
-            OnRemove?.SafeInvoke();
             State = EAbilityState.MarkDestroy;
         }
 
@@ -222,7 +225,7 @@ namespace GAS.Logic
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
                 var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, attribute, newVal);
+                Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, costElement.attributeType, newVal);
             }
         }
         

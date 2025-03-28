@@ -5,7 +5,6 @@
         //public const int Common = 0;
         public const int System = 1;
         public const int Ability = 2;
-        public const int Effect = 3;
     }
     
     public static class NodeCategoryDefine
@@ -22,6 +21,7 @@
         //     public const int Reroute = 6;                   //reroute
         // }
         
-        public const int AbilityEffectEntry = 7;
+        public const int AbilityEntry = 7;
+        public const int EffectNode = 8;
     }
 }

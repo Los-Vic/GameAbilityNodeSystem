@@ -87,13 +87,13 @@ namespace GAS.Logic
         
         #region Attributes
 
-        internal void AddSimpleAttribute(ref SimpleAttributeCreateParam param)
+        public void AddSimpleAttribute(SimpleAttributeCreateParam param)
         {
             var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
         }
 
-        internal void RemoveSimpleAttribute(ESimpleAttributeType type)
+        public void RemoveSimpleAttribute(ESimpleAttributeType type)
         {
             if (SimpleAttributes.Remove(type, out var attribute))
             {
@@ -101,24 +101,24 @@ namespace GAS.Logic
             }
         }
 
-        internal SimpleAttribute GetSimpleAttribute(ESimpleAttributeType type)
+        public SimpleAttribute GetSimpleAttribute(ESimpleAttributeType type)
         {
             return SimpleAttributes.GetValueOrDefault(type);
         }
 
-        internal FP GetSimpleAttributeVal(ESimpleAttributeType type)
+        public FP GetSimpleAttributeVal(ESimpleAttributeType type)
         {
             var attribute = GetSimpleAttribute(type);
             return attribute?.Val ?? 0;
         }
 
-        internal void AddCompositeAttribute(ref CompositeAttributeCreateParam param)
+        public void AddCompositeAttribute(CompositeAttributeCreateParam param)
         {
             var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
         }
 
-        internal void RemoveCompositeAttribute(ECompositeAttributeType type)
+        public void RemoveCompositeAttribute(ECompositeAttributeType type)
         {
             if (CompositeAttributes.Remove(type, out var attribute))
             {
@@ -126,12 +126,12 @@ namespace GAS.Logic
             }
         }
 
-        internal CompositeAttribute GetCompositeAttribute(ECompositeAttributeType type)
+        public CompositeAttribute GetCompositeAttribute(ECompositeAttributeType type)
         {
             return CompositeAttributes.GetValueOrDefault(type);
         }
 
-        internal FP GetCompositeAttributeVal(ECompositeAttributeType type)
+        public FP GetCompositeAttributeVal(ECompositeAttributeType type)
         {
             var attribute = GetCompositeAttribute(type);
             return attribute?.Val ?? 0;
@@ -171,11 +171,8 @@ namespace GAS.Logic
 
         #region Effects
 
-        public void AddEffect(EffectCreateParam param)
+        public void AddEffect(GameEffect effect)
         {
-            var effect = Sys.GetSubsystem<EffectInstanceSubsystem>().CreateEffect(ref param);
-            if(effect == null)
-                return;
             GameEffects.Add(effect);
             effect.OnAddEffect(this);
         }
@@ -184,6 +181,22 @@ namespace GAS.Logic
         {
             effect.OnRemoveEffect();
             Sys.GetSubsystem<EffectInstanceSubsystem>().DestroyEffect(effect);
+        }
+
+        public void RemoveEffectByName(string effectName)
+        {
+            var pendingRemoveEffects = new List<GameEffect>();
+            foreach (var e in GameEffects)
+            {
+                if(e.EffectName != effectName)
+                    continue;
+                pendingRemoveEffects.Add(e);
+            }
+
+            foreach (var e in pendingRemoveEffects)
+            {
+                RemoveEffect(e);
+            }
         }
 
         #endregion
