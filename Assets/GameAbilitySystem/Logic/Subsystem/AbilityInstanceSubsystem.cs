@@ -21,7 +21,7 @@ namespace GAS.Logic
 
             foreach (var a in _traverseAbilityCache)
             {
-                a.OnTick(deltaTime);
+                a.OnTick();
             }
         }
 

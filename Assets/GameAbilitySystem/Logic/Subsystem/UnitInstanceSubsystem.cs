@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
+﻿using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
@@ -26,9 +25,11 @@ namespace GAS.Logic
             return unit;
         }
 
-        internal void DestroyGameUnit(GameUnit unit)
+        internal void DestroyGameUnit(GameUnit unit, EDestroyUnitReason reason = EDestroyUnitReason.Code)
         {
-            GameLogger.Log($"Destroy unit:{unit.UnitName}!");
+            GameLogger.Log($"Destroy unit:{unit.UnitName}, reason:{reason}");
+            unit.DestroyReason = reason;
+            unit.OnUnitDestroyed.NotifyObservers(reason);
             unit.GetRefCountDisposableComponent().MarkForDispose();
         }
 

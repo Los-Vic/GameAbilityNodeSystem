@@ -17,6 +17,17 @@ namespace GAS.Logic
     public sealed class OnRemoveAbilityEntryNode:AbilityEntryNode
     {
     }
+
+    [Node("OnTick","Ability/Entry/OnTick", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    public sealed class OnTickAbilityEntryNode : AbilityEntryNode
+    {
+    }
+
+    [Node("OnInstigatorDestroy","Ability/Entry/OnInstigatorDestroy", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    public sealed class OnInstigatorDestroyNode : AbilityEntryNode
+    {
+        
+    }
     
     public class OnActivateAbilityEntryNode:Node
     {

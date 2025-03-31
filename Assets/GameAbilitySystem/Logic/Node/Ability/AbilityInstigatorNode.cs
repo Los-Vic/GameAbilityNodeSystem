@@ -2,28 +2,28 @@
 
 namespace GAS.Logic
 {
-    [Node("Owner", "Ability/Value/Owner", ENodeFunctionType.Value , typeof(AbilityOwnerNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.Ability)]
-    public sealed class AbilityOwnerNode:Node
+    [Node("Instigator", "Ability/Value/Instigator", ENodeFunctionType.Value , typeof(AbilityInstigatorNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.Ability)]
+    public sealed class AbilityInstigatorNode:Node
     {
         [Port(EPortDirection.Output, typeof(GameUnit),"Unit")]
         public string OutPortUnit;
     }
     
-    public sealed class AbilityOwnerNodeRunner:NodeRunner
+    public sealed class AbilityInstigatorNodeRunner:NodeRunner
     {
-        private AbilityOwnerNode _node;
+        private AbilityInstigatorNode _node;
 
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (AbilityOwnerNode)nodeAsset;
+            _node = (AbilityInstigatorNode)nodeAsset;
         }
 
         public override void Execute()
         {
             if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
             {
-                GraphRunner.SetOutPortVal(_node.OutPortUnit, context.Ability.Owner);
+                GraphRunner.SetOutPortVal(_node.OutPortUnit, context.Ability.Instigator);
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using GameplayCommonLibrary;
+using MissQ;
 using NS;
 
 namespace GAS.Logic
@@ -16,6 +17,7 @@ namespace GAS.Logic
     {
         //Data
         internal int PlayerNums { get; private set; }
+        internal FP DeltaTime { get; private set; }
         
         //Subsystem
         private readonly Dictionary<Type, GameAbilitySubsystem> _subsystems = new();
@@ -67,6 +69,7 @@ namespace GAS.Logic
 
         public override void UpdateSystem(float dt)
         {
+            DeltaTime = dt;
             base.UpdateSystem(dt);
             foreach (var subsystem in _tickableSubsystems)
             {

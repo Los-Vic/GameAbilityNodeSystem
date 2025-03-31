@@ -10,6 +10,11 @@ namespace GAS.Logic
         public string UnitName;
         public int PlayerIndex;
     }
+
+    public enum EDestroyUnitReason
+    {
+        Code = 0,
+    }
     
     /// <summary>
     /// GameUnit：
@@ -33,6 +38,8 @@ namespace GAS.Logic
         
         internal string UnitName => _unitName;
         
+        internal EDestroyUnitReason DestroyReason { get; set; }
+        public readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new Observable<EDestroyUnitReason>();
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
         internal readonly Dictionary<ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
@@ -54,6 +61,7 @@ namespace GAS.Logic
 
         private void UnInit()
         {
+            OnUnitDestroyed.Clear();
             Sys.GetSubsystem<AbilityActivationReqSubsystem>().RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;
             //Clear Attributes

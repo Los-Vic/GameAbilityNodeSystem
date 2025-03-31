@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using NS;
@@ -6,7 +7,6 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UIElements.Image;
 using Node = NS.Node;
@@ -34,7 +34,8 @@ namespace NSEditor
             { typeof(bool), new Color(0.8f, 0f, 0f, 1) },
             { typeof(BaseFlowPort), new Color(0.8f, 0.8f, 0.8f, 1) },
             { typeof(string), new Color(0.8f,0,0.8f)},
-            { typeof(object), new Color(0.3f, 0.3f, 0.3f, 1)}
+            { typeof(object), new Color(0.3f, 0.3f, 0.3f, 1)},
+            { typeof(IEnumerable), new Color(0.3f, 0.3f, 0.3f, 1)}
         };
         
         public virtual void Draw(Node node, SerializedObject graphAssetObject)
@@ -133,6 +134,7 @@ namespace NSEditor
         private void RefreshForeachNode(ForEachNode forEachNode, Edge edge, bool isAdd)
         {
             Type portType = null;
+            Port enumerablePort = null;
             if (ViewPortToNodePort.TryGetValue(edge.input, out var inPort) && inPort == forEachNode.InEnumerable)
             {
                 var t = edge.output.portType;
@@ -141,6 +143,8 @@ namespace NSEditor
                 {
                     portType = args[0];
                 }
+
+                enumerablePort = edge.input;
             }
             if (ViewPortToNodePort.TryGetValue(edge.output, out var outPort) && outPort == forEachNode.InEnumerable)
             {
@@ -150,12 +154,16 @@ namespace NSEditor
                 {
                     portType = args[0];
                 }
+
+                enumerablePort = edge.output;
             }
 
             if (portType == null)
                 return;
             
             portType = isAdd ? portType : typeof(object);
+            
+            enumerablePort.portColor = GetPortColor(portType);
 
             if (!NodePortToViewPort.TryGetValue(forEachNode.OutElement, out var elemPort)) 
                 return;

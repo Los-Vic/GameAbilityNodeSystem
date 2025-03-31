@@ -13,6 +13,7 @@ namespace GAS.Logic
         public FP SignalVal1;
         public FP SignalVal2;
         public FP SignalVal3;
+        public GameUnit Instigator;
     }
 
     public enum ECheckAbilityResult
@@ -31,12 +32,15 @@ namespace GAS.Logic
         UnInitialized,
     }
     
-    public class GameAbility :IPoolClass, ITickable, IRefCountDisposableObj
+    public class GameAbility :IPoolClass, IRefCountDisposableObj
     {
         internal AbilityAsset Asset { get; private set; }
         internal readonly GameAbilityGraphController GraphController = new();
         internal uint Lv { get; private set; }
         public GameUnit Owner { get; private set; }
+        
+        private GameUnit _instigator;
+        public GameUnit Instigator => _instigator ?? Owner;
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }
         
@@ -60,7 +64,8 @@ namespace GAS.Logic
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
         private ClassObjectPool _pool;
-
+        private bool _hasOnTickEntry;
+        
         /// <summary>
         /// 技能生效次数
         /// </summary>
@@ -74,8 +79,10 @@ namespace GAS.Logic
         {
             ID = param.Id;
             Asset = asset;
-            GraphController.Init(sys, Asset, this);
+            _instigator = param.Instigator;
             Lv = param.Lv;
+            
+            GraphController.Init(sys, Asset, this);
             
             State = EAbilityState.Initialized;
             System = sys;
@@ -83,6 +90,8 @@ namespace GAS.Logic
             SignalVal1 = param.SignalVal1;
             SignalVal2 = param.SignalVal2;
             SignalVal3 = param.SignalVal3;
+            
+            _instigator?.OnUnitDestroyed.RegisterObserver(this, OnInstigatorDestroy);
         }
 
         private void UnInit()
@@ -94,6 +103,10 @@ namespace GAS.Logic
             GraphController.UnInit();
             State = EAbilityState.UnInitialized;
             Owner = null;
+            _hasOnTickEntry = false;
+            _instigator?.OnUnitDestroyed.UnRegisterObserver(this);
+            _instigator = null;
+            Asset = null;
         }
         
         #region Object Pool
@@ -122,18 +135,22 @@ namespace GAS.Logic
 
         #region Tick
         
-        public void OnTick(float deltaTime)
+        public void OnTick()
         {
-            var needTick = true;
-            
-            CooldownCounter += deltaTime;
-            if (CooldownCounter >= CooldownDuration)
+            if (IsInCooldown)
             {
-                needTick = false;
-                ResetCooldown();
+                CooldownCounter += System.DeltaTime;
+                if (CooldownCounter >= CooldownDuration)
+                {
+                    ResetCooldown();
+                }
             }
-
-            if (!needTick)
+            
+            if (_hasOnTickEntry)
+            {
+                GraphController.RunGraph(typeof(OnTickAbilityEntryNode));
+            }
+            else if (!IsInCooldown)
             {
                 System.GetSubsystem<AbilityInstanceSubsystem>().RemoveFromTickList(this);
             }
@@ -167,7 +184,12 @@ namespace GAS.Logic
                     System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
-          
+
+            _hasOnTickEntry = GraphController.HasEntryNode(typeof(OnTickAbilityEntryNode));
+            if (_hasOnTickEntry)
+            {
+                System.GetSubsystem<AbilityInstanceSubsystem>().AddToTickList(this);
+            }
         }
 
         internal void OnRemoveAbility()
@@ -380,5 +402,14 @@ namespace GAS.Logic
 
         #endregion
         
+        
+        private void OnInstigatorDestroy(EDestroyUnitReason reason)
+        {
+            if(!GraphController.HasEntryNode(typeof(OnInstigatorDestroyNode)))
+                return;
+            
+            GameLogger.Log($"On instigator destroy. {AbilityName} of {Owner.UnitName}");
+            GraphController.RunGraph(typeof(OnInstigatorDestroyNode));
+        }
     }
 }
