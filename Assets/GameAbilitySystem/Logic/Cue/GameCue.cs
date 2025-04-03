@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GAS.Logic.Cue
+namespace GAS.Logic
 {
     [Serializable]
     public class GameCueCfg

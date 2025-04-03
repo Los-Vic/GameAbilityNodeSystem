@@ -14,6 +14,7 @@
             var loopNode = GraphRunner.GetCurLoopNode();
             if (loopNode != null)
                 loopNode.IsLoopEnd = true;
+            Complete();
         }
 
         public override string GetNextNode()

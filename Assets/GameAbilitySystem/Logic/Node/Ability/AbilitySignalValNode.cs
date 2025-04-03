@@ -32,17 +32,15 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var val = _node.SignalVal switch
             {
-                var val = _node.SignalVal switch
-                {
-                    EAbilitySignalVal.SignalVal1 => context.Ability.SignalVal1,
-                    EAbilitySignalVal.SignalVal2 => context.Ability.SignalVal2,
-                    EAbilitySignalVal.SignalVal3 => context.Ability.SignalVal3,
-                    _ => 0
-                };
-                GraphRunner.SetOutPortVal(_node.OutPortVal, val);
-            }
+                EAbilitySignalVal.SignalVal1 => context.Ability.SignalVal1,
+                EAbilitySignalVal.SignalVal2 => context.Ability.SignalVal2,
+                EAbilitySignalVal.SignalVal3 => context.Ability.SignalVal3,
+                _ => 0
+            };
+            GraphRunner.SetOutPortVal(_node.OutPortVal, val);
         }
 
         public override void OnReturnToPool()

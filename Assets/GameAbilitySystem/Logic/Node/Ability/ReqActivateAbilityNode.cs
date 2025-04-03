@@ -57,41 +57,42 @@ namespace GAS.Logic
         public override void Execute()
         {
             ExecuteDependentValNodes(_node.Id);
-            
-            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
+
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+
+            var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr
+                .Get<AbilityActivationReqJob>();
+
+            var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, context.Ability.Lv);
+            var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, context.Ability.Lv);
+            var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, context.Ability.Lv);
+            var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner,
+                context.Ability.Lv);
+
+            var total = preCast + cast + postCast;
+            if (clamp > 0 && total > clamp)
             {
-                var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr
-                    .Get<AbilityActivationReqJob>();
-
-                var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, context.Ability.Lv);
-                var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, context.Ability.Lv);
-                var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, context.Ability.Lv);
-                var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner, context.Ability.Lv);
-
-                var total = preCast + cast + postCast;
-                if (clamp > 0 && total > clamp)
-                {
-                    var ratio = clamp / total;
-                    preCast *= ratio;
-                    cast *= ratio;
-                    postCast *= ratio;
-                }
-                
-                job.InitJob(new AbilityActivationReq()
-                {
-                    Ability = context.Ability,
-                    CastCfg = new AbilityCastCfg()
-                    {
-                        PreCastTime = preCast,
-                        CastTime = cast,
-                        PostCastTime = postCast,
-                    },
-                    EventArgs =  GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal),
-                    QueueType = _node.QueueType
-                });
-                
-                context.Ability.AddActivationReqJob(job);
+                var ratio = clamp / total;
+                preCast *= ratio;
+                cast *= ratio;
+                postCast *= ratio;
             }
+
+            job.InitJob(new AbilityActivationReq()
+            {
+                Ability = context.Ability,
+                CastCfg = new AbilityCastCfg()
+                {
+                    PreCastTime = preCast,
+                    CastTime = cast,
+                    PostCastTime = postCast,
+                },
+                EventArgs = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal),
+                QueueType = _node.QueueType
+            });
+
+            context.Ability.AddActivationReqJob(job);
+
             Complete();
         }
 

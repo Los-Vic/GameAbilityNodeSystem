@@ -8,6 +8,11 @@ namespace GAS.Logic
     {
         private readonly Dictionary<ESimpleAttributeType, IAttributeValSetter> _attributeValSetters = new();
 
+        public override void Init()
+        {
+           
+        }
+
         public override void UnInit()
         {
             _attributeValSetters.Clear();
@@ -23,7 +28,7 @@ namespace GAS.Logic
             var attribute = unit.GetSimpleAttribute(type);
             if (attribute == null)
             {
-                GameLogger.LogError($"fail to find simple attribute {type} of {unit.UnitName}");
+                GameLogger.LogError($"Fail to find simple attribute {type} of {unit.UnitName}");
                 return;
             }
             
@@ -39,11 +44,13 @@ namespace GAS.Logic
         {
             var attribute = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<SimpleAttribute>();
             attribute.Init(ref param);
+            GameLogger.Log($"Create simple attribute {param.Type}, default val {param.DefaultVal}");
             return attribute;
         }
 
         internal void DestroySimpleAttribute(SimpleAttribute attribute)
         {
+            GameLogger.Log($"Destroy simple attribute {attribute.Type}, val {attribute.Val}");
             System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(attribute);
         }
 
@@ -51,11 +58,13 @@ namespace GAS.Logic
         {
             var attribute = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<CompositeAttribute>();
             attribute.Init(ref param);
+            GameLogger.Log($"Create composite attribute {param.Type}");
             return attribute;
         }
 
         internal void DestroyCompositeAttribute(CompositeAttribute attribute)
         {
+            GameLogger.Log($"Destroy composite attribute {attribute.Type}");
             System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Release(attribute);
         }
 

@@ -21,10 +21,8 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
-            {
-                GraphRunner.SetOutPortVal(_node.OutPortUnit, context.Ability.Owner);
-            }
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            GraphRunner.SetOutPortVal(_node.OutPortUnit, context.Ability.Owner);
         }
 
         public override void OnReturnToPool()

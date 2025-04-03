@@ -22,10 +22,8 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
-            {
-                GraphRunner.SetOutPortVal(_node.OutPortCount, (FP)context.Ability.ActivatedCount);
-            }
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            GraphRunner.SetOutPortVal(_node.OutPortCount, (FP)context.Ability.ActivatedCount);
         }
 
         public override void OnReturnToPool()

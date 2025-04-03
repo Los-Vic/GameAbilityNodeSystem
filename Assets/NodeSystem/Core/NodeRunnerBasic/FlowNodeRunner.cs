@@ -1,6 +1,4 @@
-﻿using GameplayCommonLibrary;
-
-namespace NS
+﻿namespace NS
 {
     public class FlowNodeRunner:NodeRunner
     {
@@ -15,6 +13,11 @@ namespace NS
         protected void Complete()
         {
             GraphRunner.ForwardRunner();
+        }
+
+        protected void Abort()
+        {
+            GraphRunner.AbortRunner();
         }
         
         protected void ExecuteDependentValNodes(string flowNodeId)

@@ -35,4 +35,29 @@ namespace GAS.Logic
             }
         }
     }
+    
+    public class DefaultAttributeNoLogValSetter : IAttributeValSetter
+    {
+        public static readonly DefaultAttributeNoLogValSetter Instance = new();
+        private DefaultAttributeNoLogValSetter(){}
+        
+        public void SetAttributeVal(GameUnit unit, SimpleAttribute attribute, FP newVal, GameEffect changedByEffect = null)
+        {
+            var oldVal = attribute.Val;
+            if(newVal.Equals(oldVal))
+                return;
+            
+            attribute.SetVal(newVal);
+            if (attribute.Val != oldVal)
+            {
+                attribute.OnValChanged.NotifyObservers(new AttributeChangeMsg()
+                {
+                    OldVal = oldVal,
+                    NewVal = attribute.Val,
+                    ChangedByEffect = changedByEffect
+                });
+            }
+        }
+    }
+    
 }

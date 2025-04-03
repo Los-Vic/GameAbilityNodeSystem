@@ -8,6 +8,7 @@ namespace NS
     {
         Completed,
         Canceled,
+        Aborted,
         UnInit,
     }
     
@@ -136,6 +137,12 @@ namespace NS
         {
             GameLogger.Log($"cancel graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
             _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
+        }
+
+        public void AbortRunner()
+        {
+            GameLogger.Log($"abort graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
+            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Aborted);
         }
         
         private void ExecuteRunner()

@@ -48,7 +48,7 @@ namespace NS
                 if (_enumerable == null)
                 {
                     GameLogger.LogError("foreach node failed. input is not valid.");
-                    Complete();
+                    Abort();
                     return;
                 }
                 

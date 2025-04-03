@@ -22,10 +22,9 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            if (GraphRunner.Context is GameAbilityGraphRunnerContext context)
-            {
-                context.Ability.EndAbility();
-            }
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            context.Ability.EndAbility();
+            Complete();
         }
 
         public override void OnReturnToPool()
