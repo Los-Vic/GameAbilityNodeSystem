@@ -1,4 +1,5 @@
-﻿using GameplayCommonLibrary;
+﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 using MissQ;
 using UnityEngine;
 
@@ -37,10 +38,12 @@ namespace GAS.Logic
         public EModifierOp ModifierOp;
         public FP ModifierVal;
         public EModifyRollbackPolicy RollbackPolicy;
+        public bool NotInstant;
         public FP LifetimeVal;
         public bool UseLifetimeVal;
         public bool LifeWithInstigator;
         public EGameEventType DeadEvent;
+        public List<EGameEventFilter> EventFilters;
     }
     
     public struct GameEffectCreateParam
@@ -62,6 +65,7 @@ namespace GAS.Logic
         public GameEffectCfg EffectCfg { get; private set; }
 
         private FP _modifyDiffVal;
+        private FP _lifeTimeCounter;
         
         internal void Init(ref GameEffectCreateParam param)
         {
@@ -72,9 +76,23 @@ namespace GAS.Logic
         
         private void UnInit()
         {
+            _lifeTimeCounter = 0;
             _modifyDiffVal = 0;
             Owner = null;
             EffectName = string.Empty;
+            EffectCfg = default;
+        }
+
+        internal void OnTick()
+        {
+            if (!EffectCfg.UseLifetimeVal) 
+                return;
+            _lifeTimeCounter += Owner.Sys.DeltaTime;
+
+            if (_lifeTimeCounter < EffectCfg.LifetimeVal) 
+                return;
+            
+            Owner.RemoveEffect(this);
         }
         
         internal void OnAddEffect(GameUnit owner)
@@ -86,12 +104,30 @@ namespace GAS.Logic
             var modifyOutputVal = GetModifyOutputVal(owner, EffectCfg.AttributeType, EffectCfg.ModifierOp, EffectCfg.ModifierVal);
             owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(owner, EffectCfg.AttributeType, modifyOutputVal, this);
             _modifyDiffVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - oldAttributeVal;
+
+            if (EffectCfg.NotInstant)
+            {
+                if (EffectCfg.UseLifetimeVal)
+                {
+                    owner.Sys.GetSubsystem<EffectInstanceSubsystem>().AddToTickList(this);
+                }
+
+                if (EffectCfg.LifeWithInstigator)
+                {
+                    Instigator.OnUnitDestroyed.RegisterObserver(this, (EDestroyUnitReason reason)=> Owner.RemoveEffect(this));
+                }
+                
+                if (EffectCfg.DeadEvent != EGameEventType.None)
+                {
+                    owner.Sys.GetSubsystem<GameEventSubsystem>().RegisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
+                }
+            }
         }
 
         internal void OnRemoveEffect()
         {
             GameLogger.Log($"On remove effect: {EffectName} of {Owner.UnitName}");
-
+            
             switch (EffectCfg.RollbackPolicy)
             {
                 case EModifyRollbackPolicy.ByVal:
@@ -110,6 +146,24 @@ namespace GAS.Logic
                     var modifierOutput =  GetModifyOutputVal(Owner, EffectCfg.AttributeType, rollbackOp, EffectCfg.ModifierVal);
                     Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, EffectCfg.AttributeType, modifierOutput, this);
                     break;
+            }
+            
+            if (EffectCfg.NotInstant)
+            {
+                if (EffectCfg.UseLifetimeVal || EffectCfg.LifeWithInstigator)
+                {
+                    Owner.Sys.GetSubsystem<EffectInstanceSubsystem>().RemoveFromTickList(this);
+                }
+
+                if (EffectCfg.LifeWithInstigator)
+                {
+                    Instigator.OnUnitDestroyed.UnRegisterObserver(this);
+                }
+                
+                if (EffectCfg.DeadEvent != EGameEventType.None)
+                {
+                    Owner.Sys.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
+                }
             }
         }
         
@@ -130,6 +184,14 @@ namespace GAS.Logic
                     return modifierVal;
             }
             return attributeVal;
+        }
+        
+        private void OnDeadEventCall(GameEventArg arg)
+        {
+            if(!GameEventSubsystem.CheckEventFilters(Owner, arg, EffectCfg.EventFilters))
+                return;
+            
+            Owner.RemoveEffect(this);
         }
         
         #region Object Pool

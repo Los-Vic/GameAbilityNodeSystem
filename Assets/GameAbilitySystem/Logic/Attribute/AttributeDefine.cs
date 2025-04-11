@@ -13,6 +13,10 @@ namespace GAS.Logic
         Level = 1,
         [InspectorName("ID")]
         ID = 2,
+        [InspectorName("玩家ID")]
+        PlayerID = 3,
+        [InspectorName("玩家阵营ID")]
+        PlayerCampID = 4,
         
         //随从
         [InspectorName("随从/魔力")]

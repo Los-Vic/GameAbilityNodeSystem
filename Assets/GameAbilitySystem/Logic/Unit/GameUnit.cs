@@ -25,7 +25,7 @@ namespace GAS.Logic
     /// 5、技能前后摇，技能施放队列管理
     /// 6、单位标签
     /// </summary>
-    public class GameUnit: IPoolClass, IRefCountDisposableObj
+    public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
     {
         internal GameAbilitySystem Sys { get;private set; }
         public int PlayerIndex { get; private set; }
@@ -49,6 +49,9 @@ namespace GAS.Logic
         
         //Effects
         internal readonly List<GameEffect> GameEffects = new();
+        
+        //Tag
+        private TagContainer _tagContainer;
         
         internal void Init(ref GameUnitCreateParam param)
         {
@@ -254,6 +257,20 @@ namespace GAS.Logic
         {
             GameLogger.Log($"Release Unit: {UnitName}");
             _pool.Release(this);
+        }
+
+        #endregion
+
+        #region Tag
+
+        public TagContainer GetTagContainer()
+        {
+            return _tagContainer ??= new TagContainer(this);
+        }
+
+        public bool HasTag(EGameTag t)
+        {
+            return GetTagContainer().Tags.ContainsKey(t);
         }
 
         #endregion

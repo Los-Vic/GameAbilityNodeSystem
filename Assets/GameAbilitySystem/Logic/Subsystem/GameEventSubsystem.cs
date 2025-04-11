@@ -96,6 +96,53 @@ namespace GAS.Logic
             
             return true;
         }
+
+        internal static bool CheckEventFilters(GameUnit owner, GameEventArg arg, List<EGameEventFilter> filters)
+        {
+            if (filters == null || filters.Count == 0)
+                return true;
+            
+            var src = arg.EventSrcUnit;
+            foreach (var f in filters)
+            {
+                switch (f)
+                {
+                    case EGameEventFilter.SrcIsOwner:
+                        if (owner != src)
+                            return false;
+                        break;
+                    case EGameEventFilter.SrcIsNotOwner:
+                        if (owner == src)
+                            return false;
+                        break;
+                    case EGameEventFilter.SrcIsSelfUnits:
+                        if (owner.GetSimpleAttribute(ESimpleAttributeType.PlayerID) !=
+                            src.GetSimpleAttribute(ESimpleAttributeType.PlayerID))
+                            return false;
+                        break;
+                    case EGameEventFilter.SrcIsAllyUnits:
+                        if (owner.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID) !=
+                            src.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID))
+                            return false;
+                        if (owner.GetSimpleAttribute(ESimpleAttributeType.PlayerID) ==
+                            src.GetSimpleAttribute(ESimpleAttributeType.PlayerID))
+                            return false;
+                        break;
+                    case EGameEventFilter.SrcIsSelfAllyUnits:
+                        if (owner.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID) !=
+                            src.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID))
+                            return false;
+                        break;
+                    case EGameEventFilter.SrcIsRivalUnits:
+                        if (owner.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID) ==
+                            src.GetSimpleAttribute(ESimpleAttributeType.PlayerCampID))
+                            return false;
+                        break;
+                }
+            }
+
+            return true;
+        }
         
     }
 }

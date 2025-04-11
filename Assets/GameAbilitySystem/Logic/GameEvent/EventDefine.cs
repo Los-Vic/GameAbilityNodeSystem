@@ -10,6 +10,17 @@ namespace GAS.Logic
        OnPostPrepareStart,
     }
 
+    public enum EGameEventFilter
+    {
+        None = 0,
+        SrcIsOwner = 1,
+        SrcIsNotOwner = 2,
+        SrcIsSelfUnits = 3,
+        SrcIsAllyUnits = 4,
+        SrcIsSelfAllyUnits = 5,
+        SrcIsRivalUnits = 6
+    }
+    
     public struct GameEventInitParam
     {
         public EGameEventType EventType;

@@ -1,4 +1,5 @@
-﻿using GameplayCommonLibrary;
+﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 using MissQ;
 using NS;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(FP), "ModifierVal")]
         public string InModifierValPort;
         
-        [Port(EPortDirection.Input, typeof(FP), "LifetimeVal")]
+        [Port(EPortDirection.Input, typeof(FP), "LifetimeVal(op)")]
         public string InLifetimeValPort;
         
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
@@ -45,6 +46,8 @@ namespace GAS.Logic
         public bool LifeWithInstigator;
         [Exposed]
         public EGameEventType DeadEvent;
+        [Exposed]
+        public List<EGameEventFilter> EventFilters;
         
     }
     
@@ -83,10 +86,12 @@ namespace GAS.Logic
                     ModifierOp = _node.ModifierType,
                     LifeWithInstigator = _node.LifeWithInstigator,
                     DeadEvent = _node.DeadEvent,
+                    EventFilters = _node.EventFilters,
                     ModifierVal = modiferVal,
                     LifetimeVal = lifetimeVal,
                     UseLifetimeVal = _node.UseLifetimeVal,
                     RollbackPolicy = _node.RollbackPolicy,
+                    NotInstant = _node.NotInstant
                 }
             };
             
