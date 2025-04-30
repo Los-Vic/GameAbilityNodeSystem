@@ -289,6 +289,7 @@ namespace GAS.Logic
             CancelAllActivationReqJobs();
         }
 
+        //结束Ability
         internal void EndAbility()
         {
             Owner.RemoveAbility(this);

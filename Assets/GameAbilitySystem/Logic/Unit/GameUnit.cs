@@ -51,7 +51,7 @@ namespace GAS.Logic
         internal readonly List<GameEffect> GameEffects = new();
         
         //Tag
-        private TagContainer _tagContainer;
+        private TagContainerComponent _tagContainerComponent;
         public readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
         public readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
@@ -265,14 +265,29 @@ namespace GAS.Logic
 
         #region Tag
 
-        public TagContainer GetTagContainer()
+        public TagContainerComponent GetTagContainer()
         {
-            return _tagContainer ??= new TagContainer(this);
+            return _tagContainerComponent ??= new TagContainerComponent(this);
+        }
+        
+        public void AddTag(EGameTag t)
+        {
+            if (GetTagContainer().HasTag(t))
+            {
+                GameLogger.Log($"{UnitName} already has tag {t}");
+                return;
+            }
+            Sys.GetSubsystem<GameTagSubsystem>().AddGameTag(this, t);
         }
 
-        public bool HasTag(EGameTag t)
+        public void RemoveTag(EGameTag t)
         {
-            return GetTagContainer().Tags.ContainsKey(t);
+            if (!GetTagContainer().HasTag(t))
+            {
+                GameLogger.Log($"{UnitName} not has tag {t}");
+                return;
+            }
+            Sys.GetSubsystem<GameTagSubsystem>().RemoveGameTag(this, t);
         }
         
         #endregion

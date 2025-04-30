@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("GetTargetFromAbilityNode", "AbilitySystem/Action/GetTargetFromAbility", ENodeFunctionType.Action, typeof(GetTargetFromAbilityNodeRunner),
+    [Node("GetTargetNode", "AbilitySystem/Action/GetTarget", ENodeFunctionType.Action, typeof(GetTargetNodeRunner),
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
-    public sealed class GetTargetFromAbilityNode:Node
+    public sealed class GetTargetNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InFlowPort;
@@ -23,9 +23,9 @@ namespace GAS.Logic
         public string OutUnit;
     }
     
-    [Node("GetTargetsFromAbilityNode", "AbilitySystem/Action/GetTargetsFromAbility", ENodeFunctionType.Action, typeof(GetTargetsFromAbilityNodeRunner),
+    [Node("GetTargetsNode", "AbilitySystem/Action/GetTargets", ENodeFunctionType.Action, typeof(GetTargetsNodeRunner),
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
-    public sealed class GetTargetsFromAbilityNode:Node
+    public sealed class GetTargetsNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InFlowPort;
@@ -41,12 +41,12 @@ namespace GAS.Logic
         public string OutUnitList;
     }
 
-    public sealed class GetTargetFromAbilityNodeRunner : FlowNodeRunner
+    public sealed class GetTargetNodeRunner : FlowNodeRunner
     {
         
     }
     
-    public sealed class GetTargetsFromAbilityNodeRunner : FlowNodeRunner
+    public sealed class GetTargetsNodeRunner : FlowNodeRunner
     {
         
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 
 namespace GAS.Logic
@@ -9,7 +10,7 @@ namespace GAS.Logic
     {
         [TableColumnWidth(100, Resizable = false)]
         public uint id;
-        [FilePath]
+        [Sirenix.OdinInspector.FilePath]
         public string abilityAssetPath;
     }
     
@@ -19,5 +20,18 @@ namespace GAS.Logic
         [Searchable]
         [TableList(ShowIndexLabels = true)]
         public List<AbilityConfigElement> elements = new();
+        
+        #if UNITY_EDITOR
+        [Button("RefreshAbilityAssetId", ButtonSizes.Large)]
+        private void RefreshAbilityAssetId()
+        {
+            foreach (var element in elements)
+            {
+                var obj = AssetDatabase.LoadAssetAtPath<AbilityAsset>(element.abilityAssetPath);
+                obj.id = element.id;
+            }
+        }
+        
+        #endif
     }
 }

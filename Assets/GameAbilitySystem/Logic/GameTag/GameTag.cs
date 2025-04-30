@@ -2,21 +2,24 @@
 
 namespace GAS.Logic
 {
-    public class TagContainer
+    public class TagContainerComponent
     {
-        internal readonly Dictionary<EGameTag, GameTag> Tags = new();
+        private readonly HashSet<EGameTag> _tags = new();
         internal readonly ITagOwner Owner;
 
-        public TagContainer(ITagOwner o)
+        public TagContainerComponent(ITagOwner o)
         {
             Owner = o;
         }
+        
+        public bool HasTag(EGameTag t) => _tags.Contains(t);
+        public void AddTag(EGameTag t) => _tags.Add(t);
+        public void RemoveTag(EGameTag t) => _tags.Remove(t);
     }
     
     public interface ITagOwner
     {
-        TagContainer GetTagContainer();
-        bool HasTag(EGameTag t);
+        TagContainerComponent GetTagContainer();
     }
     
     public class GameTag

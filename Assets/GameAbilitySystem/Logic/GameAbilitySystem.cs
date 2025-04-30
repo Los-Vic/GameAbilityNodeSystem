@@ -38,6 +38,7 @@ namespace GAS.Logic
             
             AddSubsystem<ClassObjectPoolSubsystem>(false);
             AddSubsystem<GameEventSubsystem>(false);
+            AddSubsystem<GameTagSubsystem>(false);
             AddSubsystem<AttributeInstanceSubsystem>(false);
             AddSubsystem<AbilityInstanceSubsystem>(true);
             AddSubsystem<UnitInstanceSubsystem>(false);

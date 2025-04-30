@@ -76,8 +76,7 @@ namespace GAS
             var asset = AssetDatabase.LoadAssetAtPath<AbilityAsset>(abilityConfig.abilityAssetPath);
             if (asset == null)
                 return null;
-
-            asset.Id = abilityId;
+            
             _abilityAssetsCache.TryAdd(abilityId, asset);
             return asset;
         }

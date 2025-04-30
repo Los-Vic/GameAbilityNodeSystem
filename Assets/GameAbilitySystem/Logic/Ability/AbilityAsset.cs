@@ -29,6 +29,8 @@ namespace GAS.Logic
     {
         [Title("Ability")]
         public string abilityName;
+        [ReadOnly]
+        public uint id;
         
         [BoxGroup("Resource")]
         [SerializeReference]
@@ -39,9 +41,6 @@ namespace GAS.Logic
 
         [BoxGroup("AbilityTag")]
         public List<EAbilityTag> abilityTags = new();
-        
-        //Runtime
-        public uint Id { get; set; }
         
 #if UNITY_EDITOR
         

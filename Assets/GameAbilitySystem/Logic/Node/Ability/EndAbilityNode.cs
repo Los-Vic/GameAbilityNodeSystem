@@ -4,7 +4,7 @@ namespace GAS.Logic
 {
     [Node("EndAbility", "AbilitySystem/Action/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem, 
-        "End ability if ability is in activated, that is either OnActivateAbility or OnActivateAbilityByEvent is running with tasks")]
+        "End ability will kill ability and remove it from owner")]
     public sealed class EndAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
