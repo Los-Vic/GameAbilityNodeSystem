@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddEffect", "Ability/Action/AddEffect", ENodeFunctionType.Action, typeof(AddEffectNodeRunner),
-        NodeCategoryDefine.EffectNode, NodeScopeDefine.Ability)]
+    [Node("AddEffect", "AbilitySystem/Action/AddEffect", ENodeFunctionType.Action, typeof(AddEffectNodeRunner),
+        NodeCategoryDefine.EffectNode, NodeScopeDefine.AbilitySystem)]
     public sealed class AddEffectNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

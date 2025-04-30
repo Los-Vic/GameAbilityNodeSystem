@@ -11,7 +11,7 @@ namespace GAS.Editor
             var provider = CreateInstance<NodeSearchProvider>();
             provider.SetScopeList(new List<int>()
             {
-                0, NodeScopeDefine.System, NodeScopeDefine.Ability
+                0, NodeScopeDefine.AbilitySystem
             });
 
             return provider;

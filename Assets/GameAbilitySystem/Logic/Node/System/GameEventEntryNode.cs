@@ -1,10 +1,9 @@
 ﻿using NS;
-using UnityEngine.Serialization;
 using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("GameEventEntry", "System/GameEvent/GameEventEntry", ENodeFunctionType.Entry, typeof(GameEventEntryNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.System)]
+    [Node("GameEventEntry", "AbilitySystem/GameEvent/GameEventEntry", ENodeFunctionType.Entry, typeof(GameEventEntryNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.AbilitySystem)]
     public sealed class GameEventEntryNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]

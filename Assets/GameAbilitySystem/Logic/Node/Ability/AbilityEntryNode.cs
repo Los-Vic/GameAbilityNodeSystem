@@ -9,21 +9,21 @@ namespace GAS.Logic
         public string OutPortExec;
     }
     
-    [Node("OnAdd", "Ability/Entry/OnAdd", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnAdd", "AbilitySystem/Entry/OnAdd", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnAddAbilityEntryNode:AbilityEntryNode
     {
     }
-    [Node("OnRemove", "Ability/Entry/OnRemove", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnRemove", "AbilitySystem/Entry/OnRemove", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnRemoveAbilityEntryNode:AbilityEntryNode
     {
     }
 
-    [Node("OnTick","Ability/Entry/OnTick", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnTick","AbilitySystem/Entry/OnTick", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnTickAbilityEntryNode : AbilityEntryNode
     {
     }
 
-    [Node("OnInstigatorDestroy","Ability/Entry/OnInstigatorDestroy", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnInstigatorDestroy","AbilitySystem/Entry/OnInstigatorDestroy", ENodeFunctionType.Entry, typeof(AbilityEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnInstigatorDestroyNode : AbilityEntryNode
     {
         
@@ -37,26 +37,26 @@ namespace GAS.Logic
         public string OutPortParam;
     }
 
-    [Node("OnStartPreCast", "Ability/Entry/OnStartPreCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnStartPreCast", "AbilitySystem/Entry/OnStartPreCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnStartPreCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnStartCast", "Ability/Entry/OnStartCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnStartCast", "AbilitySystem/Entry/OnStartCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnStartCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnStartPostCast", "Ability/Entry/OnStartPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnStartPostCast", "AbilitySystem/Entry/OnStartPostCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnStartPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }
     
-    [Node("OnEndPostCast", "Ability/Entry/OnEndPostCast", ENodeFunctionType.Entry,
-        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.Ability)]
+    [Node("OnEndPostCast", "AbilitySystem/Entry/OnEndPostCast", ENodeFunctionType.Entry,
+        typeof(AbilityGameEventEntryNodeRunner), NodeCategoryDefine.AbilityEntry, NodeScopeDefine.AbilitySystem)]
     public sealed class OnEndPostCastAbilityEntryNode : OnActivateAbilityEntryNode
     {
     }

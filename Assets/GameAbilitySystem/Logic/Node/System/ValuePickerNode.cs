@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("ValuePicker", "System/Value/ValuePicker", ENodeFunctionType.Value , typeof(ValuePickerNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.System)]
+    [Node("ValuePicker", "AbilitySystem/Value/ValuePicker", ENodeFunctionType.Value , typeof(ValuePickerNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class ValuePickerNode:Node
     {
         [Exposed]

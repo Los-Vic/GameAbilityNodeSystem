@@ -2,8 +2,8 @@
 
 namespace GAS.Logic
 {
-    [Node("CancelAbility", "Ability/Action/CancelAbility", ENodeFunctionType.Action, typeof(CancelAbilityNodeNodeRunner), 
-        CommonNodeCategory.Action, NodeScopeDefine.Ability, 
+    [Node("CancelAbility", "AbilitySystem/Action/CancelAbility", ENodeFunctionType.Action, typeof(CancelAbilityNodeNodeRunner), 
+        CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem, 
         "Cancel ability if ability is in activated, will stop all tasks and cast processes.")]
     public sealed class CancelAbilityNode:Node
     {

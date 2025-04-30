@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("GetTargetFromAbilityNode", "Ability/Action/GetTargetFromAbility", ENodeFunctionType.Action, typeof(GetTargetFromAbilityNodeRunner),
-        CommonNodeCategory.Action, NodeScopeDefine.Ability)]
+    [Node("GetTargetFromAbilityNode", "AbilitySystem/Action/GetTargetFromAbility", ENodeFunctionType.Action, typeof(GetTargetFromAbilityNodeRunner),
+        CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class GetTargetFromAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
@@ -23,8 +23,8 @@ namespace GAS.Logic
         public string OutUnit;
     }
     
-    [Node("GetTargetsFromAbilityNode", "Ability/Action/GetTargetsFromAbility", ENodeFunctionType.Action, typeof(GetTargetsFromAbilityNodeRunner),
-        CommonNodeCategory.Action, NodeScopeDefine.Ability)]
+    [Node("GetTargetsFromAbilityNode", "AbilitySystem/Action/GetTargetsFromAbility", ENodeFunctionType.Action, typeof(GetTargetsFromAbilityNodeRunner),
+        CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class GetTargetsFromAbilityNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

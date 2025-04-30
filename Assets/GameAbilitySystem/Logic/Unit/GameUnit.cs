@@ -52,6 +52,8 @@ namespace GAS.Logic
         
         //Tag
         private TagContainer _tagContainer;
+        public readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
+        public readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
         internal void Init(ref GameUnitCreateParam param)
         {
@@ -272,7 +274,7 @@ namespace GAS.Logic
         {
             return GetTagContainer().Tags.ContainsKey(t);
         }
-
+        
         #endregion
     }
 }
