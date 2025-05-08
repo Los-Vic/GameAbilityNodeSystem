@@ -36,7 +36,7 @@ namespace GAS.Logic
         private RefCountDisposableComponent _refCountDisposableComponent;
         private bool _isActive;
         
-        internal string UnitName => _unitName;
+        public string UnitName => _unitName;
         
         internal EDestroyUnitReason DestroyReason { get; set; }
         public readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new Observable<EDestroyUnitReason>();
@@ -45,10 +45,10 @@ namespace GAS.Logic
         internal readonly Dictionary<ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
 
         //Abilities
-        internal readonly List<GameAbility> GameAbilities = new();
+        public readonly List<GameAbility> GameAbilities = new();
         
         //Effects
-        internal readonly List<GameEffect> GameEffects = new();
+        public readonly List<GameEffect> GameEffects = new();
         
         //Tag
         private TagContainerComponent _tagContainerComponent;
@@ -119,6 +119,15 @@ namespace GAS.Logic
             return SimpleAttributes.GetValueOrDefault(type);
         }
 
+        public void GetAllSimpleAttributes(ref List<SimpleAttribute> attributes)
+        {
+            attributes.Clear();
+            foreach (var attribute in SimpleAttributes.Values)
+            {
+                attributes.Add(attribute);
+            }
+        }
+
         public FP GetSimpleAttributeVal(ESimpleAttributeType type)
         {
             var attribute = GetSimpleAttribute(type);
@@ -142,6 +151,15 @@ namespace GAS.Logic
         public CompositeAttribute GetCompositeAttribute(ECompositeAttributeType type)
         {
             return CompositeAttributes.GetValueOrDefault(type);
+        }
+        
+        public void GetAllCompositeAttributes(ref List<CompositeAttribute> attributes)
+        {
+            attributes.Clear();
+            foreach (var attribute in CompositeAttributes.Values)
+            {
+                attributes.Add(attribute);
+            }
         }
 
         public FP GetCompositeAttributeVal(ECompositeAttributeType type)

@@ -21,6 +21,8 @@ namespace GAS.Logic
         //随从
         [InspectorName("随从/魔力")]
         MinionMana = 100,
+        [InspectorName("随从/攻击")]
+        MinionAttack = 101,
         
     }
 

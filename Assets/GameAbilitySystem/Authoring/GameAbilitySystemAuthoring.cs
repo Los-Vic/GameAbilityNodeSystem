@@ -15,6 +15,8 @@ namespace GAS
     public class GameAbilitySystemAuthoring:MonoBehaviour, IAssetConfigProvider
     {
         private GameAbilitySystem _system;
+        public GameAbilitySystem System => _system;
+        
         public ConfigHub configHub;
         
         //Assets
@@ -25,7 +27,9 @@ namespace GAS
         private readonly Dictionary<string, List<float>> _paramMap = new();
         
         //Test
-        private GameUnit _testUnit;
+        private GameUnit _unitApple;
+        private GameUnit _unitBanana;
+        private GameUnit _unitCherry;
         
         private void Start()
         {
@@ -101,32 +105,75 @@ namespace GAS
             if(!Application.isPlaying)
                 return;
             
-            if(_testUnit != null)
-                _system.DestroyGameUnit(_testUnit);
+            if(_unitApple != null)
+                _system.DestroyGameUnit(_unitApple);
             
             //Creat a test unit
             var param = new GameUnitCreateParam()
             {
                 AbilitySystem = _system,
-                UnitName = "TestUnit",
+                UnitName = "Apple",
                 PlayerIndex = 0
             };
-            _testUnit = _system.CreateGameUnit(ref param);
-            _testUnit.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            _unitApple = _system.CreateGameUnit(ref param);
+            _unitApple.AddSimpleAttribute(new SimpleAttributeCreateParam()
             {
                 Type = ESimpleAttributeType.MinionMana,
             });
-            
-            _testUnit.AddAbility(new AbilityCreateParam()
+            _unitApple.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionAttack,
+                DefaultVal = 5
+            });
+            _unitApple.AddAbility(new AbilityCreateParam()
             {
                 Id = 0,
                 Lv = 1,
             });
+            _unitApple.AddTag(EGameTag.Minion);
+
+
+            param = new GameUnitCreateParam()
+            {
+                AbilitySystem = _system,
+                UnitName = "Banana",
+                PlayerIndex = 0
+            };
+            _unitBanana = _system.CreateGameUnit(ref param);
+            _unitBanana.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionMana,
+            });
+            _unitBanana.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionAttack,
+                DefaultVal = 10
+            });
+            _unitBanana.AddTag(EGameTag.Minion);
+            
+            param = new GameUnitCreateParam()
+            {
+                AbilitySystem = _system,
+                UnitName = "Cherry",
+                PlayerIndex = 0
+            };
+            _unitCherry = _system.CreateGameUnit(ref param);
+            _unitCherry.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionMana,
+                DefaultVal = 10,
+            });
+            _unitCherry.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.MinionAttack,
+                DefaultVal = 1
+            });
+            _unitCherry.AddTag(EGameTag.Minion);
             
             _system.PostGameEvent(new GameEventInitParam()
             {
                 EventType = EGameEventType.OnPostPrepareStart,
-                EventSrcUnit = _testUnit,
+                EventSrcUnit = _unitApple,
             });
         }
 

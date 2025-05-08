@@ -131,6 +131,22 @@ namespace GAS.Logic
             GetSubsystem<UnitInstanceSubsystem>().DestroyGameUnit(gameUnit);
         }
 
+        public void GetGameUnits(ref List<GameUnit> unitList)
+        {
+            var units = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
+            unitList.Clear();
+            
+            if(units == null)
+                return;
+            foreach (var u in units)
+            {
+                if (u is GameUnit gameUnit)
+                {
+                    unitList.Add(gameUnit);
+                }
+            }
+        }
+
         #endregion
         
         public override void DumpObjectPool()

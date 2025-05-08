@@ -15,6 +15,12 @@ namespace GAS.Logic
         public bool HasTag(EGameTag t) => _tags.Contains(t);
         public void AddTag(EGameTag t) => _tags.Add(t);
         public void RemoveTag(EGameTag t) => _tags.Remove(t);
+
+        public void GetAllTag(ref List<EGameTag> tags)
+        {
+            tags.Clear();
+            tags.AddRange(_tags);
+        }
     }
     
     public interface ITagOwner

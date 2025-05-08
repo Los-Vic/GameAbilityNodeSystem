@@ -57,7 +57,7 @@ namespace GAS.Logic
     {
         public GameUnit Owner { get; private set; }
         public GameUnit Instigator { get; private set; }
-        public string EffectName;
+        public string EffectName { get; private set; }
         
         private RefCountDisposableComponent _refCountDisposableComponent;
         private bool _isActive;

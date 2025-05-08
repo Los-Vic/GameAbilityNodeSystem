@@ -2,7 +2,8 @@
 {
     public enum EGameTag
     {
-        None = 0
+        None = 0,
         //这里添加标签
+        Minion = 1
     }
 }
