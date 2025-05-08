@@ -47,7 +47,7 @@ namespace GAS
         private List<GameUnit> _unitCache = new List<GameUnit>();
         
         [ShowInInspector]
-        private string _introduction = "Functions work only in editor play mode!";
+        public const string Introduction = "Functions work only in editor play mode!";
         
         [BoxGroup("CreateUnit")]
         public CreateUnitContext createUnitContext;
@@ -135,6 +135,18 @@ namespace GAS
             }
         }
         
+        [BoxGroup("PostEvent")]
+        public EGameEventType gameEventType;
+
+        [BoxGroup("PostEvent")]
+        [Button("Post Event")]
+        public void PostEvent()
+        {
+            System?.PostGameEvent(new GameEventInitParam()
+            {
+                EventType = gameEventType,
+            });
+        }
         
         [Button("DumpObjectPool")]
         private void DumpObjectPool()

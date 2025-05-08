@@ -37,7 +37,7 @@ namespace GAS.Logic
             eventArg.Init(ref param);
             
             _eventStack.Push(eventArg);
-            GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit.UnitName}, stack depth:{_eventStack.Count}");
+            GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit?.UnitName}, stack depth:{_eventStack.Count}");
             
             var gameEvent = GetGameEvent(param.EventType);
             gameEvent.OnEvent(eventArg);
@@ -72,6 +72,9 @@ namespace GAS.Logic
 
             foreach (var arg in _eventStack)
             {
+                if(arg.EventSrcUnit == null || newParam.EventSrcUnit == null)
+                    continue;
+                
                 if(arg.EventSrcUnit != newParam.EventSrcUnit)
                     continue;
 
@@ -103,6 +106,9 @@ namespace GAS.Logic
                 return true;
             
             var src = arg.EventSrcUnit;
+            if (src == null && filters.Count > 0)
+                return false;
+            
             foreach (var f in filters)
             {
                 switch (f)

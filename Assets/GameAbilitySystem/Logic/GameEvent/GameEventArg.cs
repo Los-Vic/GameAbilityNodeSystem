@@ -8,7 +8,7 @@ namespace GAS.Logic
     {
         public EGameEventType EventType;
         
-        public GameUnit EventSrcUnit; //not null
+        public GameUnit EventSrcUnit; //nullable
         public GameAbility EventSrcAbility; //nullable
         public GameEffect EventSrcEffect;  //nullable
         public GameUnit EventTargetUnit;   //nullable

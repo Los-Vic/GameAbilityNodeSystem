@@ -5,7 +5,10 @@ namespace GAS.Logic
     public enum EGameEventType
     {
        None,
+       
+       OnPrepareStart,
        OnPostPrepareStart,
+       OnBattleStart,
     }
 
     public enum EGameEventFilter
@@ -22,7 +25,7 @@ namespace GAS.Logic
     public struct GameEventInitParam
     {
         public EGameEventType EventType;
-        public GameUnit EventSrcUnit; //not null
+        public GameUnit EventSrcUnit; //nullable
         public GameAbility EventSrcAbility; //nullable
         public GameEffect EventSrcEffect;  //nullable
         public GameUnit EventTargetUnit;   //nullable

@@ -106,10 +106,10 @@ namespace GAS.Logic
 
         #region GameEvent
 
-        public GameplayEvent<GameEventArg> GetGameEvent(EGameEventType type)
-        {
-            return GetSubsystem<GameEventSubsystem>().GetGameEvent(type);
-        }
+        // public GameplayEvent<GameEventArg> GetGameEvent(EGameEventType type)
+        // {
+        //     return GetSubsystem<GameEventSubsystem>().GetGameEvent(type);
+        // }
 
         public void PostGameEvent(GameEventInitParam param)
         {

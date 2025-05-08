@@ -191,6 +191,7 @@ MonoBehaviour:
     signal1: 0
     signal2: 0
     signal3: 0
+  gameEventType: 0
 --- !u!1 &582616532
 GameObject:
   m_ObjectHideFlags: 0
