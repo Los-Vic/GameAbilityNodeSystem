@@ -7,29 +7,30 @@ namespace GAS.Logic
     public enum ESimpleAttributeType
     {
         //通用
-        [InspectorName("无")]
         None = 0,
-        [InspectorName("等级")]
+        [InspectorName("Common/Level")]
         Level = 1,
-        [InspectorName("ID")]
+        [InspectorName("Common/ID")]
         ID = 2,
-        [InspectorName("玩家ID")]
+        [InspectorName("Common/PlayerID")]
         PlayerID = 3,
-        [InspectorName("玩家阵营ID")]
+        [InspectorName("Common/PlayerCampID")]
         PlayerCampID = 4,
         
-        //随从
-        [InspectorName("随从/魔力")]
-        MinionMana = 100,
-        [InspectorName("随从/攻击")]
-        MinionAttack = 101,
+        //单位
+        [InspectorName("Unit/Mana")]
+        Mana = 100,
+        [InspectorName("Unit/AttackBase")]
+        AttackBase = 101,
+        [InspectorName("Unit/AttackAdd")]
+        AttackAdd = 102,
         
     }
-
+    
     [DrawWithUnity]
     public enum ECompositeAttributeType
     {
-        [InspectorName("无")]
         None = 0,
+        Attack = 1, 
     }
 }

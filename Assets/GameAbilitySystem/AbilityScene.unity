@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 78773729}
   - component: {fileID: 78773730}
+  - component: {fileID: 78773731}
   m_Layer: 0
   m_Name: AbilitySystem
   m_TagString: Untagged
@@ -164,6 +165,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configHub: {fileID: 11400000, guid: 47cb8310280d5d14d89d1d67dcf8a016, type: 2}
+--- !u!114 &78773731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78773728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f2af1fc31c4c34ba4a98aed5e02f0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  createUnitContext:
+    name: 
+    playerIndex: 0
+  setAttributeValContext:
+    unitInstanceID: 0
+    type: 0
+    newVal: 0
+  addAbilityContext:
+    unitInstanceID: 0
+    abilityID: 0
+    lv: 0
+    signal1: 0
+    signal2: 0
+    signal3: 0
 --- !u!1 &582616532
 GameObject:
   m_ObjectHideFlags: 0

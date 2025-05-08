@@ -131,7 +131,7 @@ namespace GAS.Logic
             GetSubsystem<UnitInstanceSubsystem>().DestroyGameUnit(gameUnit);
         }
 
-        public void GetGameUnits(ref List<GameUnit> unitList)
+        public void GetAllGameUnits(ref List<GameUnit> unitList)
         {
             var units = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
             unitList.Clear();

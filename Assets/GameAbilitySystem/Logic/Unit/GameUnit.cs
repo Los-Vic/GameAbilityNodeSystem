@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
 
@@ -27,6 +28,9 @@ namespace GAS.Logic
     /// </summary>
     public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
     {
+        private static int _instanceIdCounter;
+        public int InstanceID { get; private set; }
+        
         internal GameAbilitySystem Sys { get;private set; }
         public int PlayerIndex { get; private set; }
 
@@ -235,6 +239,8 @@ namespace GAS.Logic
         #region Object Pool
         public void OnCreateFromPool(ClassObjectPool pool)
         {
+            _instanceIdCounter++;
+            InstanceID = _instanceIdCounter;
             _pool = pool;
         }
 

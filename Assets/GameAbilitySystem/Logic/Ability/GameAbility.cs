@@ -36,7 +36,7 @@ namespace GAS.Logic
     {
         internal AbilityAsset Asset { get; private set; }
         internal readonly GameAbilityGraphController GraphController = new();
-        internal uint Lv { get; private set; }
+        public uint Lv { get; private set; }
         public GameUnit Owner { get; private set; }
         
         private GameUnit _instigator;

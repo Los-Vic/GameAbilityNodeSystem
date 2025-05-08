@@ -13,15 +13,5 @@ namespace GAS.Logic.Target
         {
             return false;
         }
-        
-        public static bool GetTargetFromEffect(GameEffect effect, TargetSelectSingleBase cfg, GameUnit targets)
-        {
-            return false;
-        }
-        
-        public static bool GetTargetsFromEffect(GameEffect effect, TargetSelectMultipleBase cfg, ref List<GameUnit> targets)
-        {
-            return false;
-        }
     }
 }

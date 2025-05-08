@@ -40,7 +40,7 @@ namespace GAS.Logic
         
         public void Init(ref CompositeAttributeCreateParam param)
         {
-            if(_simpleAttributes == null)
+            if(param.SimpleAttributes == null)
                 return;
             
             Type = param.Type;

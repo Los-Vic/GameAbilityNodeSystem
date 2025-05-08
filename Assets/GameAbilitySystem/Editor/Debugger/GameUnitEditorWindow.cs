@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using GAS.Logic;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
-using Sirenix.Utilities;
-using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,6 +29,7 @@ namespace GAS.Editor
     public class GameUnitEditorAbility
     {
         [ReadOnly] public string name;
+        [ReadOnly] public uint lv;
     }
     
     [Serializable]
@@ -45,6 +44,10 @@ namespace GAS.Editor
         [BoxGroup("Unit")]
         [ReadOnly]
         public string name;
+
+        [BoxGroup("Unit")]
+        [ReadOnly]
+        public int instanceId;
         
         [BoxGroup("Unit")]
         [LabelText("Attributes")]
@@ -104,15 +107,15 @@ namespace GAS.Editor
         private void BuildUnitList()
         {
             unitsTable.Clear();
-            var systemAuthoring = FindAnyObjectByType<GameAbilitySystemAuthoring>();
-            if (systemAuthoring?.System == null)
+            var systemDebugger = FindAnyObjectByType<GameAbilitySystemDebugger>();
+            if (systemDebugger?.System == null)
             {
                 Debug.LogWarning("Can not find a game ability system instance !");
                 return;
             }
 
             var unitList = new List<GameUnit>();
-            systemAuthoring.System.GetGameUnits(ref unitList);
+            systemDebugger.System.GetAllGameUnits(ref unitList);
             
             var simpleAttributes = new List<SimpleAttribute>();
             var compositeAttributes = new List<CompositeAttribute>();
@@ -123,6 +126,7 @@ namespace GAS.Editor
                 var editorObj = new GameUnitEditorObj
                 {
                     name = unit.UnitName,
+                    instanceId = unit.InstanceID,
                     attributes = new List<GameUnitEditorAttribute>(),
                     effects = new List<GameUnitEditorEffect>(),
                     abilities = new List<GameUnitEditorAbility>(),
@@ -155,7 +159,8 @@ namespace GAS.Editor
                 {
                     editorObj.abilities.Add(new GameUnitEditorAbility()
                     {
-                        name = ability.AbilityName
+                        name = ability.AbilityName,
+                        lv = ability.Lv
                     });
                 }
 

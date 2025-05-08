@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using GAS.Logic;
 using MissQ;
-using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace GAS
     public class GameAbilitySystemAuthoring:MonoBehaviour, IAssetConfigProvider
     {
         private GameAbilitySystem _system;
-        public GameAbilitySystem System => _system;
+        private GameAbilitySystemDebugger _debugger;
         
         public ConfigHub configHub;
         
@@ -25,12 +24,12 @@ namespace GAS
         //Configs
         private readonly Dictionary<uint, AbilityConfigElement> _abilityConfigMap = new();
         private readonly Dictionary<string, List<float>> _paramMap = new();
-        
-        //Test
-        private GameUnit _unitApple;
-        private GameUnit _unitBanana;
-        private GameUnit _unitCherry;
-        
+
+        private void Awake()
+        {
+            _debugger = GetComponent<GameAbilitySystemDebugger>();
+        }
+
         private void Start()
         {
             _system = new GameAbilitySystem(new GameAbilitySystemCreateParam()
@@ -40,7 +39,8 @@ namespace GAS
             });
             _system.OnCreateSystem();
             _system.InitSystem();
-
+            _debugger.System = _system;
+            
             if (configHub.abilityEffectParamConfig)
             {
                 foreach (var element in configHub.abilityEffectParamConfig.paramElements)
@@ -96,106 +96,6 @@ namespace GAS
             var id = (int)Math.Clamp(lv, 0, paramVals.Count - 1);
             return paramVals[id];
         }
-
-        #region Test
-
-        [Button("CreateTestUnit")]
-        private void CreateTestUnit()
-        {
-            if(!Application.isPlaying)
-                return;
-            
-            if(_unitApple != null)
-                _system.DestroyGameUnit(_unitApple);
-            
-            //Creat a test unit
-            var param = new GameUnitCreateParam()
-            {
-                AbilitySystem = _system,
-                UnitName = "Apple",
-                PlayerIndex = 0
-            };
-            _unitApple = _system.CreateGameUnit(ref param);
-            _unitApple.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionMana,
-            });
-            _unitApple.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionAttack,
-                DefaultVal = 5
-            });
-            _unitApple.AddAbility(new AbilityCreateParam()
-            {
-                Id = 0,
-                Lv = 1,
-            });
-            _unitApple.AddTag(EGameTag.Minion);
-
-
-            param = new GameUnitCreateParam()
-            {
-                AbilitySystem = _system,
-                UnitName = "Banana",
-                PlayerIndex = 0
-            };
-            _unitBanana = _system.CreateGameUnit(ref param);
-            _unitBanana.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionMana,
-            });
-            _unitBanana.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionAttack,
-                DefaultVal = 10
-            });
-            _unitBanana.AddTag(EGameTag.Minion);
-            
-            param = new GameUnitCreateParam()
-            {
-                AbilitySystem = _system,
-                UnitName = "Cherry",
-                PlayerIndex = 0
-            };
-            _unitCherry = _system.CreateGameUnit(ref param);
-            _unitCherry.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionMana,
-                DefaultVal = 10,
-            });
-            _unitCherry.AddSimpleAttribute(new SimpleAttributeCreateParam()
-            {
-                Type = ESimpleAttributeType.MinionAttack,
-                DefaultVal = 1
-            });
-            _unitCherry.AddTag(EGameTag.Minion);
-            
-            _system.PostGameEvent(new GameEventInitParam()
-            {
-                EventType = EGameEventType.OnPostPrepareStart,
-                EventSrcUnit = _unitApple,
-            });
-        }
-
-        [Button("DumpObjectPool")]
-        private void DumpObjectPool()
-        {
-            if(!Application.isPlaying)
-                return;
-            
-            _system.DumpObjectPool();
-        }
-
-        [Button("DumpRefCounterObjects")]
-        private void DumpRefCounterObjects()
-        {
-            if(!Application.isPlaying)
-                return;
-            _system.DumpRefCounterObjects();
-        }
-        
-        #endregion
-        
     }
 }
 #endif
