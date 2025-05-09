@@ -18,6 +18,9 @@ namespace GAS
     {
         public string name;
         public int playerIndex;
+        public int mana;
+        public int attackBase;
+        public List<uint> abilities;
     }
     
     [Serializable]
@@ -39,7 +42,7 @@ namespace GAS
         public float signal3;
     }
     
-    public partial class GameAbilitySystemDebugger:MonoBehaviour
+    public partial class GameAbilitySystemDebugger
     {
         //Need inject
         public GameAbilitySystem System;
@@ -48,6 +51,22 @@ namespace GAS
         
         [ShowInInspector]
         public const string Introduction = "Functions work only in editor play mode!";
+
+        [BoxGroup("CreateUnitsByTemplate")]
+        public DebugCreateUnitsTemplate template;
+
+        [BoxGroup("CreateUnitsByTemplate")]
+        [Button("Create Units By Template")]
+        private void CreateUnitsByTemplate()
+        {
+            if (template is null || System == null)
+                return;
+
+            foreach (var ctx in template.unitContexts)
+            {
+                CreateUnitByContext(ctx);
+            }
+        }
         
         [BoxGroup("CreateUnit")]
         public CreateUnitContext createUnitContext;
@@ -59,21 +78,27 @@ namespace GAS
             if(System == null)
                 return;
 
+            CreateUnitByContext(createUnitContext);
+        }
+
+        private void CreateUnitByContext(CreateUnitContext context)
+        {
             var param = new GameUnitCreateParam()
             {
                 AbilitySystem = System,
-                UnitName = createUnitContext.name,
+                UnitName = context.name,
                 PlayerIndex = createUnitContext.playerIndex
             };
             var unit = System.CreateGameUnit(ref param);
             unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
             {
                 Type = ESimpleAttributeType.Mana,
+                DefaultVal = context.mana
             });
             unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
             {
                 Type = ESimpleAttributeType.AttackBase,
-                DefaultVal = 5
+                DefaultVal = context.attackBase
             });
             unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
             {
@@ -90,6 +115,16 @@ namespace GAS
                 ValEquation = valList => valList[0] + valList[1]
             });
             unit.AddTag(EGameTag.Unit);
+
+            foreach (var ability in context.abilities)
+            {
+                unit.AddAbility(new AbilityCreateParam()
+                {
+                    Id = ability,
+                    Lv = 1,
+                    Instigator = unit,
+                });
+            }
         }
 
         [BoxGroup("SetAttributeVal")]
