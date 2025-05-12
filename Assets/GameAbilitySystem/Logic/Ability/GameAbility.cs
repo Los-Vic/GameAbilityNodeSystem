@@ -34,6 +34,8 @@ namespace GAS.Logic
     
     public class GameAbility :IPoolClass, IRefCountDisposableObj
     {
+        private static int _instanceIdCounter;
+        public int InstanceID { get; private set; }
         internal AbilityAsset Asset { get; private set; }
         internal readonly GameAbilityGraphController GraphController = new();
         public uint Lv { get; private set; }
@@ -122,6 +124,8 @@ namespace GAS.Logic
         public void OnTakeFromPool()
         {
             _isActive = true;
+            _instanceIdCounter++;
+            InstanceID = _instanceIdCounter;
         }
 
         public void OnReturnToPool()

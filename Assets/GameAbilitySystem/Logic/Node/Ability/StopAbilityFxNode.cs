@@ -2,30 +2,39 @@
 
 namespace GAS.Logic
 {
-    [Node("CancelAbility", "AbilitySystem/Action/CancelAbility", ENodeFunctionType.Action, typeof(CancelAbilityNodeRunner), 
-        CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem, 
-        "Cancel ability if ability is in activated, will stop all tasks and cast processes.")]
-    public sealed class CancelAbilityNode:Node
+    [Node("StopAbilityFx", "AbilitySystem/Action/StopAbilityFx", ENodeFunctionType.Action, typeof(StopAbilityFxNodeRunner), 
+        CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
+    public sealed class StopAbilityFxNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
+
+        [Exposed] 
+        public string CueName;
     }
     
-    public sealed class CancelAbilityNodeRunner : FlowNodeRunner
+    public sealed class StopAbilityFxNodeRunner : FlowNodeRunner
     {
-        private CancelAbilityNode _node;
+        private StopAbilityFxNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (CancelAbilityNode)nodeAsset;
+            _node = (StopAbilityFxNode)nodeAsset;
         }
 
         public override void Execute()
         {
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            context.Ability.CancelAbility();
+            var stopContext = new StopAbilityFxCueContext()
+            {
+                UnitInstanceID = context.Ability.Owner.InstanceID,
+                AbilityInstanceID = context.Ability.InstanceID,
+                GameCueName = _node.CueName,
+            };
+           
+            context.Ability.System.GetSubsystem<GameCueSubsystem>().StopAbilityFxCue(ref stopContext);
             Complete();
         }
 

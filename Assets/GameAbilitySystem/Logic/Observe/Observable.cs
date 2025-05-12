@@ -26,9 +26,9 @@ namespace GAS.Logic
             _observers.Sort((x, y) =>
             {
                 if (_priorityMap[x] > _priorityMap[y])
-                    return 1;
-                if (_priorityMap[x] < _priorityMap[y])
                     return -1;
+                if (_priorityMap[x] < _priorityMap[y])
+                    return 1;
                 return 0;
             });
         }

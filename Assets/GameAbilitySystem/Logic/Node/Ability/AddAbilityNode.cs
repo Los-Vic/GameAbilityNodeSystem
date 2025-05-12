@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddAbility", "AbilitySystem/Action/AddAbility", ENodeFunctionType.Value, typeof(AddAbilityNodeNodeRunner), 
+    [Node("AddAbility", "AbilitySystem/Action/AddAbility", ENodeFunctionType.Value, typeof(AddAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class AddAbilityNode: Node
     {
@@ -35,7 +35,7 @@ namespace GAS.Logic
         public AbilityAsset AbilityAsset;
     }
     
-    public sealed class AddAbilityNodeNodeRunner : FlowNodeRunner
+    public sealed class AddAbilityNodeRunner : FlowNodeRunner
     {
         private AddAbilityNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

@@ -3,7 +3,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    [Node("GetActivatedCount", "AbilitySystem/Value/GetActivatedCount", ENodeFunctionType.Action, typeof(GetActivatedCountNodeNodeRunner), 
+    [Node("GetActivatedCount", "AbilitySystem/Value/GetActivatedCount", ENodeFunctionType.Action, typeof(GetActivatedCountNodeRunner), 
         CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class GetActivatedCountNode:Node
     {
@@ -11,7 +11,7 @@ namespace GAS.Logic
         public string OutPortCount;
     }
     
-    public sealed class GetActivatedCountNodeNodeRunner : FlowNodeRunner
+    public sealed class GetActivatedCountNodeRunner : FlowNodeRunner
     {
         private GetActivatedCountNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

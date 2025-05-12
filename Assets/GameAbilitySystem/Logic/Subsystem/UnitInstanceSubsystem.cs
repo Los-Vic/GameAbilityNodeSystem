@@ -1,11 +1,15 @@
-﻿using GameplayCommonLibrary;
+﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 
 namespace GAS.Logic
 {
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
+        private readonly Dictionary<int, GameUnit> _unitInstanceLookUp = new();
+        
         public override void UnInit()
         {
+            _unitInstanceLookUp.Clear();
             var units = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
             if(units == null)
                 return;
@@ -21,17 +25,23 @@ namespace GAS.Logic
         {
             var unit = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameUnit>();
             unit.Init(ref param);
-            GameLogger.Log($"Create unit:{param.UnitName}!");
+            _unitInstanceLookUp.Add(unit.InstanceID, unit);
+            unit.CreateReason = param.Reason;
+            unit.OnUnitCreated.NotifyObservers(param.Reason);
+            GameLogger.Log($"Create unit:{param.UnitName}, reason:{param.Reason}");
             return unit;
         }
 
-        internal void DestroyGameUnit(GameUnit unit, EDestroyUnitReason reason = EDestroyUnitReason.Code)
+        internal void DestroyGameUnit(GameUnit unit, EDestroyUnitReason reason = EDestroyUnitReason.None)
         {
             GameLogger.Log($"Destroy unit:{unit.UnitName}, reason:{reason}");
+            _unitInstanceLookUp.Remove(unit.InstanceID);
             unit.DestroyReason = reason;
             unit.OnUnitDestroyed.NotifyObservers(reason);
             unit.GetRefCountDisposableComponent().MarkForDispose();
         }
+
+        internal GameUnit GetGameUnitByInstanceID(int unitInstanceID) => _unitInstanceLookUp.GetValueOrDefault(unitInstanceID);
 
         #endregion
     }

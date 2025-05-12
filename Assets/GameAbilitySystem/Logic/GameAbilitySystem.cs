@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using GameplayCommonLibrary;
 using MissQ;
 using NS;
@@ -43,6 +42,7 @@ namespace GAS.Logic
             AddSubsystem<AbilityInstanceSubsystem>(true);
             AddSubsystem<UnitInstanceSubsystem>(false);
             AddSubsystem<EffectInstanceSubsystem>(false);
+            AddSubsystem<GameCueSubsystem>(false);
             
             var abilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
             abilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
@@ -145,6 +145,22 @@ namespace GAS.Logic
                     unitList.Add(gameUnit);
                 }
             }
+        }
+
+        public GameUnit GetGameUnitByInstanceID(int instanceID)
+        {
+            var unitSubsystem = GetSubsystem<UnitInstanceSubsystem>();
+            return unitSubsystem.GetGameUnitByInstanceID(instanceID);
+        }
+
+        #endregion
+
+        #region GameAbility
+
+        public GameAbility GetGameAbilityByInstanceID(int instanceID)
+        {
+            var subsystem = GetSubsystem<AbilityInstanceSubsystem>();
+            return subsystem.GetAbilityByInstanceID(instanceID);
         }
 
         #endregion

@@ -30,7 +30,7 @@ namespace GAS.Logic
             Type = param.Type;
             _valDecorators = param.Decorators;
             _val = param.DefaultVal;
-
+            
             if (_valDecorators == null) 
                 return;
             

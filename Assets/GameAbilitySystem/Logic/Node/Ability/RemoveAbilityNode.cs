@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("RemoveAbility", "AbilitySystem/Action/RemoveAbility", ENodeFunctionType.Value, typeof(RemoveAbilityNodeNodeRunner), 
+    [Node("RemoveAbility", "AbilitySystem/Action/RemoveAbility", ENodeFunctionType.Value, typeof(RemoveAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class RemoveAbilityNode: Node
     {
@@ -23,7 +23,7 @@ namespace GAS.Logic
         public AbilityAsset AbilityAsset;
     }
 
-    public sealed class RemoveAbilityNodeNodeRunner : FlowNodeRunner
+    public sealed class RemoveAbilityNodeRunner : FlowNodeRunner
     {
         private RemoveAbilityNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

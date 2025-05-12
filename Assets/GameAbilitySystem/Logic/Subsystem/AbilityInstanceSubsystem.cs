@@ -7,7 +7,14 @@ namespace GAS.Logic
     {
         private readonly List<GameAbility> _needTickAbilities = new();
         private readonly List<GameAbility> _traverseAbilityCache = new();
-        
+        private readonly Dictionary<int, GameAbility> _abilityInstanceLookUp = new();
+
+        public override void UnInit()
+        {
+            _abilityInstanceLookUp.Clear();
+            base.UnInit();
+        }
+
         public override void Update(float deltaTime)
         {
             if(_needTickAbilities.Count == 0)
@@ -36,10 +43,12 @@ namespace GAS.Logic
             
             var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
             ability.Init(System, abilityAsset, ref param);
+            _abilityInstanceLookUp.Add(ability.InstanceID, ability);
             return ability;
         }
         internal void DestroyAbility(GameAbility ability)
         {
+            _abilityInstanceLookUp.Remove(ability.InstanceID);
             RemoveFromTickList(ability);
             ability.GetRefCountDisposableComponent().MarkForDispose();
         }
@@ -56,5 +65,8 @@ namespace GAS.Logic
         {
             _needTickAbilities.Remove(ability);
         }
+
+        internal GameAbility GetAbilityByInstanceID(int instanceID) =>
+            _abilityInstanceLookUp.GetValueOrDefault(instanceID);
     }
 }

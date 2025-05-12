@@ -34,10 +34,10 @@ namespace GameplayCommonLibrary
             _callbackList.Sort((x, y) =>
             {
                 if (_callbackPriorityMap[x] > _callbackPriorityMap[y])
-                    return 1;
+                    return -1;
 
                 if (_callbackPriorityMap[x] < _callbackPriorityMap[y])
-                    return -1;
+                    return 1;
                 return 0;
             });
         }
@@ -100,10 +100,10 @@ namespace GameplayCommonLibrary
             _callbackList.Sort((x, y) =>
             {
                 if (_callbackPriorityMap[x] > _callbackPriorityMap[y])
-                    return 1;
+                    return -1;
 
                 if (_callbackPriorityMap[x] < _callbackPriorityMap[y])
-                    return -1;
+                    return 1;
                 return 0;
             });
         }
@@ -166,10 +166,10 @@ namespace GameplayCommonLibrary
             _callbackList.Sort((x, y) =>
             {
                 if (_callbackPriorityMap[x] > _callbackPriorityMap[y])
-                    return 1;
+                    return -1;
 
                 if (_callbackPriorityMap[x] < _callbackPriorityMap[y])
-                    return -1;
+                    return 1;
                 return 0;
             });
         }

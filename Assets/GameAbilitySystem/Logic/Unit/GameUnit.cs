@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
 
@@ -10,11 +9,17 @@ namespace GAS.Logic
         public GameAbilitySystem AbilitySystem;
         public string UnitName;
         public int PlayerIndex;
+        public ECreateUnitReason Reason;
     }
 
+    public enum ECreateUnitReason
+    {
+        None = 0,
+    }
+    
     public enum EDestroyUnitReason
     {
-        Code = 0,
+        None = 0,
     }
     
     /// <summary>
@@ -42,8 +47,11 @@ namespace GAS.Logic
         
         public string UnitName => _unitName;
         
+        internal ECreateUnitReason CreateReason { get; set; }
+        public readonly Observable<ECreateUnitReason> OnUnitCreated = new Observable<ECreateUnitReason>(); 
         internal EDestroyUnitReason DestroyReason { get; set; }
         public readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new Observable<EDestroyUnitReason>();
+        
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
         internal readonly Dictionary<ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
@@ -65,11 +73,13 @@ namespace GAS.Logic
             PlayerIndex = param.PlayerIndex;
             _unitName = param.UnitName;
             
+            
             Sys.GetSubsystem<AbilityActivationReqSubsystem>().CreateGameUnitQueue(this);
         }
 
         private void UnInit()
         {
+            OnUnitCreated.Clear();
             OnUnitDestroyed.Clear();
             Sys.GetSubsystem<AbilityActivationReqSubsystem>().RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;
@@ -108,6 +118,17 @@ namespace GAS.Logic
         {
             var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
+            attribute.OnValChanged.RegisterObserver(attribute, (msg) =>
+            {
+                var playCueContext = new PlayAttributeValChangeCueContext()
+                {
+                    AttributeType = attribute.Type,
+                    UnitInstanceID = InstanceID,
+                    OldVal = msg.OldVal,
+                    NewVal = msg.NewVal,
+                };
+                Sys.GetSubsystem<GameCueSubsystem>().PlayAttributeValChangeCue(ref playCueContext);
+            }, 1);
         }
 
         public void RemoveSimpleAttribute(ESimpleAttributeType type)
@@ -142,6 +163,18 @@ namespace GAS.Logic
         {
             var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
+            
+            attribute.OnValChanged.RegisterObserver(attribute, (msg) =>
+            {
+                var playCueContext = new PlayAttributeValChangeCueContext()
+                {
+                    CompositeAttributeType = attribute.Type,
+                    UnitInstanceID = InstanceID,
+                    OldVal = msg.OldVal,
+                    NewVal = msg.NewVal,
+                };
+                Sys.GetSubsystem<GameCueSubsystem>().PlayAttributeValChangeCue(ref playCueContext);
+            }, 1);
         }
 
         public void RemoveCompositeAttribute(ECompositeAttributeType type)
@@ -239,14 +272,14 @@ namespace GAS.Logic
         #region Object Pool
         public void OnCreateFromPool(ClassObjectPool pool)
         {
-            _instanceIdCounter++;
-            InstanceID = _instanceIdCounter;
             _pool = pool;
         }
 
         public void OnTakeFromPool()
         {
             _isActive = true;
+            _instanceIdCounter++;
+            InstanceID = _instanceIdCounter;
         }
 
         public void OnReturnToPool()

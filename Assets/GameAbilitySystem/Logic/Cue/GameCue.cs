@@ -1,15 +1,29 @@
-﻿using System;
+﻿using MissQ;
 
 namespace GAS.Logic
 {
-    [Serializable]
-    public class GameCueCfg
+    public struct PlayAttributeValChangeCueContext
     {
-        
+        public int UnitInstanceID;
+        public ESimpleAttributeType AttributeType;
+        public ECompositeAttributeType CompositeAttributeType;
+        public FP OldVal;
+        public FP NewVal;
     }
     
-    public class GameCueRuntime
+    public struct PlayAbilityFxCueContext
     {
-        
+        public string GameCueName;
+        public int UnitInstanceID;
+        public int AbilityInstanceID;
+        public FP Param;
+        public int SubUnitInstanceID;
+    }
+
+    public struct StopAbilityFxCueContext
+    {
+        public string GameCueName;
+        public int UnitInstanceID;
+        public int AbilityInstanceID;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("EndAbility", "AbilitySystem/Action/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeNodeRunner), 
+    [Node("EndAbility", "AbilitySystem/Action/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem, 
         "End ability will kill ability and remove it from owner")]
     public sealed class EndAbilityNode:Node
@@ -11,7 +11,7 @@ namespace GAS.Logic
         public string InPortExec;
     }
     
-    public sealed class EndAbilityNodeNodeRunner : FlowNodeRunner
+    public sealed class EndAbilityNodeRunner : FlowNodeRunner
     {
         private EndAbilityNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

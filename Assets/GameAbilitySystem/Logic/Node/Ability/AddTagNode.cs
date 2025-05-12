@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddTag", "AbilitySystem/Action/AddTag", ENodeFunctionType.Value, typeof(AddTagNodeNodeRunner), 
+    [Node("AddTag", "AbilitySystem/Action/AddTag", ENodeFunctionType.Value, typeof(AddTagNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class AddTagNode:Node
     {
@@ -22,7 +22,7 @@ namespace GAS.Logic
         public EGameTag Tag;
     }
 
-    public sealed class AddTagNodeNodeRunner : FlowNodeRunner
+    public sealed class AddTagNodeRunner : FlowNodeRunner
     {
         private AddTagNode _node;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)

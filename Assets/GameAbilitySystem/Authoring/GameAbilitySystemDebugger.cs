@@ -134,15 +134,11 @@ namespace GAS
         [Button("Set Attribute Val")]
         public void SetAttributeVal()
         {
-            System?.GetAllGameUnits(ref _unitCache);
-            foreach (var u in _unitCache)
-            {
-                if (u.InstanceID != setAttributeValContext.unitInstanceID) 
-                    continue;
-                System?.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(u, setAttributeValContext.type,
-                    setAttributeValContext.newVal);
-                break;
-            }
+            var u = System?.GetGameUnitByInstanceID(setAttributeValContext.unitInstanceID);
+            if (u == null)
+                return;
+            System?.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(u, setAttributeValContext.type,
+                setAttributeValContext.newVal);
         }
         
         [BoxGroup("AddAbility")]
@@ -152,22 +148,18 @@ namespace GAS
         [Button("Add Ability")]
         public void AddAbility()
         {
-            System?.GetAllGameUnits(ref _unitCache);
-            foreach (var u in _unitCache)
+            var u = System?.GetGameUnitByInstanceID(addAbilityContext.unitInstanceID);
+            if (u == null)
+                return;
+            u.AddAbility(new AbilityCreateParam()
             {
-                if (u.InstanceID != addAbilityContext.unitInstanceID) 
-                    continue;
-                u.AddAbility(new AbilityCreateParam()
-                {
-                    Id = addAbilityContext.abilityID,
-                    Lv = addAbilityContext.lv,
-                    Instigator = u,
-                    SignalVal1 = addAbilityContext.signal1,
-                    SignalVal2 = addAbilityContext.signal2,
-                    SignalVal3 = addAbilityContext.signal3,
-                });
-                break;
-            }
+                Id = addAbilityContext.abilityID,
+                Lv = addAbilityContext.lv,
+                Instigator = u,
+                SignalVal1 = addAbilityContext.signal1,
+                SignalVal2 = addAbilityContext.signal2,
+                SignalVal3 = addAbilityContext.signal3,
+            });
         }
         
         [BoxGroup("PostEvent")]

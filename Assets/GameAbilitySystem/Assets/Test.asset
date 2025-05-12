@@ -15,6 +15,7 @@ MonoBehaviour:
   nodes: []
   ports: []
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
+  id: 0
   cooldown:
     rid: -2
   costs: []
