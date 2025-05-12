@@ -1,16 +1,15 @@
 ﻿using MissQ;
-using UnityEngine;
 
 namespace NS
 {
     public enum EValueCompareType
     {
-        [InspectorName("等于")]
         EqualTo,
-        [InspectorName("大于")]
         GreaterThan,
-        [InspectorName("大等于")]
         GreaterThanOrEqualTo,
+        NotEqualTo,
+        LessThan,
+        LessThanOrEqualTo,
     }
     
     [Node("ValueCompare", "Common/Value/ValueCompare", ENodeFunctionType.Value, typeof(ValueCompareNodeRunner), CommonNodeCategory.Value)]
@@ -55,6 +54,15 @@ namespace NS
                     break;
                 case EValueCompareType.GreaterThanOrEqualTo:
                     res = a >= b;
+                    break;
+                case EValueCompareType.NotEqualTo:
+                    res = a != b;
+                    break;
+                case EValueCompareType.LessThan:
+                    res = a < b;
+                    break;
+                case EValueCompareType.LessThanOrEqualTo:
+                    res = a <= b;
                     break;
             }
             GraphRunner.SetOutPortVal(_node.OutPortVal, res);

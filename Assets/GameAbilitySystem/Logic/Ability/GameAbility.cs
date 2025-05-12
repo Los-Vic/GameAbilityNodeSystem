@@ -49,10 +49,13 @@ namespace GAS.Logic
         internal FP CooldownDuration;
         internal FP CooldownCounter;
         
-        //SignalVal
+        //SignalVal, used for passing value between abilities
         internal FP SignalVal1;
         internal FP SignalVal2;
         internal FP SignalVal3;
+        
+        //CustomVal
+        internal FP CustomVal;
         
         private bool IsAvailable => State == EAbilityState.Available;
         private readonly List<NodeGraphRunner> _activateAbilityRunners = new();

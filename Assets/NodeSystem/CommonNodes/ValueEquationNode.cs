@@ -1,18 +1,14 @@
 ﻿using MissQ;
-using UnityEngine;
 
 namespace NS
 {
     public enum EValueEquationType
     {
-        [InspectorName("加")]
         Add,
-        [InspectorName("乘")]
         Multiply,
-        [InspectorName("减")]
         Minus,
-        [InspectorName("除")]
-        Divide,
+        DividedBy,
+        Distance
     }
     
     [Node("ValueEquation", "Common/Value/ValueEquation", ENodeFunctionType.Value, typeof(ValueEquationNodeRunner), CommonNodeCategory.Value)]
@@ -58,8 +54,11 @@ namespace NS
                case EValueEquationType.Minus:
                    res = a - b;
                    break;
-               case EValueEquationType.Divide:
+               case EValueEquationType.DividedBy:
                    res = a / b;
+                   break;
+               case EValueEquationType.Distance:
+                   res = FP.Abs(a - b);
                    break;
             }
             GraphRunner.SetOutPortVal(_node.OutPortVal, res);

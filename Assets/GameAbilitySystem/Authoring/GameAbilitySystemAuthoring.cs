@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using System;
+﻿using System;
 using System.Collections.Generic;
 using GAS.Logic;
 using MissQ;
@@ -8,10 +7,16 @@ using UnityEngine;
 
 namespace GAS
 {
+    public partial class GameAbilitySystemAuthoring:MonoBehaviour
+    {
+        
+    }
+    
+#if UNITY_EDITOR
     /// <summary>
     /// A simple example, only run in editor. Use AssetDatabase load assets.
     /// </summary>
-    public class GameAbilitySystemAuthoring:MonoBehaviour, IAssetConfigProvider
+    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider
     {
         private GameAbilitySystem _system;
         private GameAbilitySystemDebugger _debugger;

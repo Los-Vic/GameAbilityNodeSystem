@@ -10,8 +10,8 @@ namespace GAS.Logic
         SignalVal3,
     }
     
-    [Node("AbilitySignalVal", "AbilitySystem/Value/AbilitySignalVal", ENodeFunctionType.Value , typeof(AbilitySignalValNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
-    public sealed class AbilitySignalValNode:Node
+    [Node("GetAbilitySignalValNode", "AbilitySystem/Value/GetAbilitySignalValNode", ENodeFunctionType.Value , typeof(GetAbilitySignalValNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
+    public sealed class GetAbilitySignalValNode:Node
     {
         [Exposed]
         public EAbilitySignalVal SignalVal;
@@ -20,14 +20,14 @@ namespace GAS.Logic
         public string OutPortVal;
     }
 
-    public sealed class AbilitySignalValNodeRunner : NodeRunner
+    public sealed class GetAbilitySignalValNodeRunner : NodeRunner
     {
-        private AbilitySignalValNode _node;
+        private GetAbilitySignalValNode _node;
 
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
-            _node = (AbilitySignalValNode)nodeAsset;
+            _node = (GetAbilitySignalValNode)nodeAsset;
         }
 
         public override void Execute()
