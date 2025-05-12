@@ -28,6 +28,11 @@ namespace GAS.Logic
             _unitInstanceLookUp.Add(unit.InstanceID, unit);
             unit.CreateReason = param.Reason;
             unit.OnUnitCreated.NotifyObservers(param.Reason);
+            var context = new UnitCreateCueContext()
+            {
+                UnitInstanceID = unit.InstanceID
+            };
+            System.GetSubsystem<GameCueSubsystem>().PlayUnitCreateCue(ref context);
             GameLogger.Log($"Create unit:{param.UnitName}, reason:{param.Reason}");
             return unit;
         }
@@ -37,6 +42,11 @@ namespace GAS.Logic
             GameLogger.Log($"Destroy unit:{unit.UnitName}, reason:{reason}");
             _unitInstanceLookUp.Remove(unit.InstanceID);
             unit.DestroyReason = reason;
+            var context = new UnitDestroyCueContext()
+            {
+                UnitInstanceID = unit.InstanceID
+            };
+            System.GetSubsystem<GameCueSubsystem>().PlayUnitDestroyCue(ref context);
             unit.OnUnitDestroyed.NotifyObservers(reason);
             unit.GetRefCountDisposableComponent().MarkForDispose();
         }

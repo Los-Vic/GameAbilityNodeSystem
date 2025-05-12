@@ -26,4 +26,14 @@ namespace GAS.Logic
         public int UnitInstanceID;
         public int AbilityInstanceID;
     }
+
+    public struct UnitCreateCueContext
+    {
+        public int UnitInstanceID;
+    }
+    
+    public struct UnitDestroyCueContext
+    {
+        public int UnitInstanceID;
+    }
 }
