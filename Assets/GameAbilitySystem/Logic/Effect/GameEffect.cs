@@ -44,6 +44,7 @@ namespace GAS.Logic
         public bool LifeWithInstigator;
         public EGameEventType DeadEvent;
         public List<EGameEventFilter> EventFilters;
+        public string CueName;
     }
     
     public struct GameEffectCreateParam
@@ -55,6 +56,8 @@ namespace GAS.Logic
     //修改单位属性
     public class GameEffect:IPoolClass, IRefCountDisposableObj
     {
+        private static int _instanceIdCounter;
+        public int InstanceID { get; private set; }
         public GameUnit Owner { get; private set; }
         public GameUnit Instigator { get; private set; }
         public string EffectName { get; private set; }
@@ -122,6 +125,18 @@ namespace GAS.Logic
                     owner.Sys.GetSubsystem<GameEventSubsystem>().RegisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
                 }
             }
+
+            if (!string.IsNullOrEmpty(EffectCfg.CueName))
+            {
+                var cueContext = new PlayEffectFxCueContext()
+                {
+                    EffectInstanceID = InstanceID,
+                    GameCueName = EffectCfg.CueName,
+                    UnitInstanceID = owner.InstanceID
+                };
+                owner.Sys.GetSubsystem<GameCueSubsystem>().PlayEffectCue(ref cueContext);
+            }
+          
         }
 
         internal void OnRemoveEffect()
@@ -146,6 +161,17 @@ namespace GAS.Logic
                     var modifierOutput =  GetModifyOutputVal(Owner, EffectCfg.AttributeType, rollbackOp, EffectCfg.ModifierVal);
                     Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, EffectCfg.AttributeType, modifierOutput, this);
                     break;
+            }
+            
+            if (!string.IsNullOrEmpty(EffectCfg.CueName))
+            {
+                var cueContext = new StopEffectFxCueContext()
+                {
+                    EffectInstanceID = InstanceID,
+                    GameCueName = EffectCfg.CueName,
+                    UnitInstanceID = Owner.InstanceID
+                };
+                Owner.Sys.GetSubsystem<GameCueSubsystem>().StopEffectCue(ref cueContext);
             }
             
             if (EffectCfg.NotInstant)
@@ -204,6 +230,8 @@ namespace GAS.Logic
         public void OnTakeFromPool()
         {
             _isActive = true;
+            _instanceIdCounter++;
+            InstanceID = _instanceIdCounter;
         }
 
         public void OnReturnToPool()

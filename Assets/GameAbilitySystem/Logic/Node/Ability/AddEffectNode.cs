@@ -48,7 +48,10 @@ namespace GAS.Logic
         public EGameEventType DeadEvent;
         [Exposed]
         public List<EGameEventFilter> EventFilters;
-        
+
+        [Header("Cue")] 
+        [Exposed]
+        public string CueName;
     }
     
     public sealed class AddEffectNodeRunner : FlowNodeRunner
@@ -91,7 +94,8 @@ namespace GAS.Logic
                     LifetimeVal = lifetimeVal,
                     UseLifetimeVal = _node.UseLifetimeVal,
                     RollbackPolicy = _node.RollbackPolicy,
-                    NotInstant = _node.NotInstant
+                    NotInstant = _node.NotInstant,
+                    CueName = _node.CueName
                 }
             };
             

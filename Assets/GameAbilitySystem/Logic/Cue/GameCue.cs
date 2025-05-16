@@ -26,6 +26,20 @@ namespace GAS.Logic
         public int UnitInstanceID;
         public int AbilityInstanceID;
     }
+    
+    public struct PlayEffectFxCueContext
+    {
+        public string GameCueName;
+        public int UnitInstanceID;
+        public int EffectInstanceID;
+    }
+
+    public struct StopEffectFxCueContext
+    {
+        public string GameCueName;
+        public int UnitInstanceID;
+        public int EffectInstanceID;
+    }
 
     public struct UnitCreateCueContext
     {

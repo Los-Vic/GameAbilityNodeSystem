@@ -18,8 +18,18 @@ namespace GAS
                 OnPlayAbilityCue = OnPlayAbilityCue,
                 OnStopAbilityCue = OnStopAbilityCue,
                 OnUnitCreate = OnPlayUnitCreateCue,
-                OnUnitDestroy = OnPlayUnitDestroyCue
+                OnUnitDestroy = OnPlayUnitDestroyCue,
+                OnPlayEffectCue = OnPlayEffectCue,
+                OnStopEffectCue = OnStopEffectCue,
             });
+        }
+
+        private void OnStopEffectCue(StopEffectFxCueContext obj)
+        {
+        }
+
+        private void OnPlayEffectCue(PlayEffectFxCueContext obj)
+        {
         }
 
         public void UnInit()
