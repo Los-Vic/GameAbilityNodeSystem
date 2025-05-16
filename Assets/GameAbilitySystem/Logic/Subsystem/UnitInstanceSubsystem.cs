@@ -27,7 +27,11 @@ namespace GAS.Logic
             unit.Init(ref param);
             _unitInstanceLookUp.Add(unit.InstanceID, unit);
             unit.CreateReason = param.Reason;
-            unit.OnUnitCreated.NotifyObservers(param.Reason);
+            System.OnUnitCreated.NotifyObservers(new GameUnitCreateObserve()
+            {
+                Reason = param.Reason,
+                Unit = unit
+            });
             var context = new UnitCreateCueContext()
             {
                 UnitInstanceID = unit.InstanceID
@@ -48,6 +52,11 @@ namespace GAS.Logic
             };
             System.GetSubsystem<GameCueSubsystem>().PlayUnitDestroyCue(ref context);
             unit.OnUnitDestroyed.NotifyObservers(reason);
+            System.OnUnitDestroyed.NotifyObservers(new GameUnitDestroyObserve()
+            {
+                Reason = reason,
+                Unit = unit
+            });
             unit.GetRefCountDisposableComponent().MarkForDispose();
         }
 

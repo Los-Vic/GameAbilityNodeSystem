@@ -16,7 +16,7 @@ namespace GAS
     /// <summary>
     /// A simple example, only run in editor. Use AssetDatabase load assets.
     /// </summary>
-    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider
+    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider, ICommandDelegator
     {
         private GameAbilitySystem _system;
         private GameAbilitySystemDebugger _debugger;
@@ -40,7 +40,8 @@ namespace GAS
             _system = new GameAbilitySystem(new GameAbilitySystemCreateParam()
             {
                 PlayerNums = 1,
-                AssetConfigProvider = this
+                AssetConfigProvider = this,
+                CommandDelegator = this,
             });
             _system.OnCreateSystem();
             _system.InitSystem();
@@ -100,6 +101,41 @@ namespace GAS
             
             var id = (int)Math.Clamp(lv, 0, paramVals.Count - 1);
             return paramVals[id];
+        }
+
+        public GameUnit SpawnUnit(string unitName, int playerIndex)
+        {
+            var param = new GameUnitCreateParam()
+            {
+                AbilitySystem = _system,
+                UnitName = unitName,
+                PlayerIndex = playerIndex
+            };
+            var unit = _system.CreateGameUnit(ref param);
+            unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.Mana,
+            });
+            unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.AttackBase,
+            });
+            unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
+            {
+                Type = ESimpleAttributeType.AttackAdd
+            });
+            unit.AddCompositeAttribute(new CompositeAttributeCreateParam()
+            {
+                Type = ECompositeAttributeType.Attack,
+                SimpleAttributes = new List<SimpleAttribute>()
+                {
+                    unit.GetSimpleAttribute(ESimpleAttributeType.AttackBase),
+                    unit.GetSimpleAttribute(ESimpleAttributeType.AttackAdd)
+                },
+                ValEquation = valList => valList[0] + valList[1]
+            });
+            unit.AddTag(EGameTag.Unit);
+            return unit;
         }
     }
 }

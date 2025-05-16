@@ -3,13 +3,27 @@ using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
 using NS;
+using UnityEngine.Assertions;
 
 namespace GAS.Logic
 {
     public struct GameAbilitySystemCreateParam
     {
         public IAssetConfigProvider AssetConfigProvider;
+        public ICommandDelegator CommandDelegator;
         public int PlayerNums;
+    }
+
+    public struct GameUnitCreateObserve
+    {
+        public ECreateUnitReason Reason;
+        public GameUnit Unit;
+    }
+    
+    public struct GameUnitDestroyObserve
+    {
+        public EDestroyUnitReason Reason;
+        public GameUnit Unit;
     }
     
     public class GameAbilitySystem:NodeSystem
@@ -25,10 +39,21 @@ namespace GAS.Logic
         //Provider
         internal IAssetConfigProvider AssetConfigProvider { get; private set; }
         
+        //Command Delegator
+        internal ICommandDelegator CommandDelegator { get; private set; }
+        
+        //Observable
+        public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
+        public readonly Observable<GameUnitDestroyObserve> OnUnitDestroyed = new ();
+        
         public GameAbilitySystem(GameAbilitySystemCreateParam param)
         {
             PlayerNums = param.PlayerNums;
             AssetConfigProvider = param.AssetConfigProvider;
+            CommandDelegator = param.CommandDelegator;
+
+            Assert.IsNotNull(AssetConfigProvider);
+            Assert.IsNotNull(CommandDelegator);
         }
 
         public override void OnCreateSystem()
@@ -51,8 +76,8 @@ namespace GAS.Logic
         public override void InitSystem()
         {
             base.InitSystem();
-
-            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
+            
+            foreach (var subsystem in _subsystems.Values)
             {
                 subsystem.Init();
             }
@@ -60,7 +85,10 @@ namespace GAS.Logic
 
         public override void UnInitSystem()
         {
-            foreach (GameAbilitySubsystem subsystem in _subsystems.Values)
+            OnUnitCreated.Clear();
+            OnUnitDestroyed.Clear();
+            
+            foreach (var subsystem in _subsystems.Values)
             {
                 subsystem.UnInit();
             }

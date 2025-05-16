@@ -48,9 +48,9 @@ namespace GAS.Logic
         public string UnitName => _unitName;
         
         internal ECreateUnitReason CreateReason { get; set; }
-        public readonly Observable<ECreateUnitReason> OnUnitCreated = new Observable<ECreateUnitReason>(); 
         internal EDestroyUnitReason DestroyReason { get; set; }
-        public readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new Observable<EDestroyUnitReason>();
+
+        internal readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new();
         
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
@@ -79,7 +79,6 @@ namespace GAS.Logic
 
         private void UnInit()
         {
-            OnUnitCreated.Clear();
             OnUnitDestroyed.Clear();
             Sys.GetSubsystem<AbilityActivationReqSubsystem>().RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;

@@ -34,7 +34,7 @@ namespace NS
             _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
             GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.EntryName}");
             
-            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, StartTask, CompleteTask, CancelTask, UpdateTask);
+            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, OnStartTask, OnCompleteTask, OnCancelTask, OnUpdateTask);
             TaskScheduler.StartTask(task);
         }
         
@@ -47,7 +47,7 @@ namespace NS
             return connectPort.belongNodeId;
         }
         
-        private ETaskStatus UpdateTask(float dt)
+        private ETaskStatus OnUpdateTask(float dt)
         {
             _elapsedTime += dt;
             if (_elapsedTime >= _delay)
@@ -56,16 +56,16 @@ namespace NS
             return ETaskStatus.Running;
         }
 
-        private void CancelTask()
+        private void OnCancelTask()
         {
         }
 
-        private void CompleteTask()
+        private void OnCompleteTask()
         {
            Complete();
         }
 
-        private ETaskStatus StartTask()
+        private ETaskStatus OnStartTask()
         {
             _elapsedTime = 0;
             return ETaskStatus.Running;
