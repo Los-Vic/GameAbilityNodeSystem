@@ -40,7 +40,7 @@ namespace GAS.Logic
             _callbackMap.Remove(observer);
         }
         
-        internal void NotifyObservers(T msg)
+        public void NotifyObservers(T msg)
         {
             foreach (var observer in _observers)
             {
@@ -48,7 +48,7 @@ namespace GAS.Logic
             }
         }
 
-        internal void Clear()
+        public void Clear()
         {
             _observers.Clear();
             _callbackMap.Clear();

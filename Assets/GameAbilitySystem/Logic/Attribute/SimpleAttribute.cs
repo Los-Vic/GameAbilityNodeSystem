@@ -11,6 +11,12 @@ namespace GAS.Logic
         public GameEffect ChangedByEffect;
     }
 
+    public struct AttributeChangeForCue
+    {
+        public FP OldVal;
+        public FP NewVal;
+    }
+
     public struct SimpleAttributeCreateParam
     {
         public ESimpleAttributeType Type;
@@ -23,7 +29,10 @@ namespace GAS.Logic
         public ESimpleAttributeType Type { get; private set; }
         private FP _val;
         private List<IValueDecorator> _valDecorators;
+        //for game logic
         public readonly Observable<AttributeChangeMsg> OnValChanged = new();
+        //for view, UI
+        public readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
         
         public void Init(ref SimpleAttributeCreateParam param)
         {
@@ -44,6 +53,7 @@ namespace GAS.Logic
         {
             _valDecorators = null;
             OnValChanged.Clear();
+            OnPlayValChangeCue.Clear();
         }
 
         public FP Val => _val;
