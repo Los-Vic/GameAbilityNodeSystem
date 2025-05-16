@@ -164,8 +164,10 @@ namespace GAS.Logic
         }
 
         #endregion
-        
-        public override void DumpObjectPool()
+
+        #region Log
+
+         public override void DumpObjectPool()
         {
             GameLogger.Log("----------Dump ObjectPools Start----------");
             GameLogger.Log("----------NodeObjectPool------------------");
@@ -174,7 +176,6 @@ namespace GAS.Logic
             GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Log();
             GameLogger.Log("----------Dump ObjectPools End------------");
         }
-
         public void DumpRefCounterObjects()
         {
             var poolMgr = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr;
@@ -221,5 +222,21 @@ namespace GAS.Logic
                 }
             }
         }
+
+        #endregion
+
+        #region Cue
+
+        public void RegisterCueObservables(object obj, RegisterCueParam param)
+        {
+            GetSubsystem<GameCueSubsystem>().RegisterCueObservables(obj, param);
+        }
+
+        public void UnregisterCueObservables(object obj)
+        {
+            GetSubsystem<GameCueSubsystem>().UnregisterCueObservables(obj);
+        }
+
+        #endregion
     }
 }

@@ -2,6 +2,15 @@
 
 namespace GAS.Logic
 {
+    public struct RegisterCueParam
+    {
+        public Action<PlayAttributeValChangeCueContext> OnAttributeChange;
+        public Action<PlayAbilityFxCueContext> OnPlayAbilityCue;
+        public Action<StopAbilityFxCueContext> OnStopAbilityCue;
+        public Action<UnitCreateCueContext> OnUnitCreate;
+        public Action<UnitDestroyCueContext> OnUnitDestroy;
+    }
+    
     public class GameCueSubsystem:GameAbilitySubsystem
     {
         private readonly Observable<PlayAttributeValChangeCueContext> _playAttributeValChangeCueObservable = new();
@@ -20,37 +29,27 @@ namespace GAS.Logic
             base.UnInit();
         }
 
-        #region Attribute Val Change
-
-        public void RegisterPlayAttributeValChange(object obj, Action<PlayAttributeValChangeCueContext> onChange)
+        internal void RegisterCueObservables(object obj, RegisterCueParam param)
         {
-            _playAttributeValChangeCueObservable.RegisterObserver(obj, onChange);
+            _playAttributeValChangeCueObservable.RegisterObserver(obj, param.OnAttributeChange);
+            _playAbilityFxCueObservable.RegisterObserver(obj, param.OnPlayAbilityCue);
+            _stopAbilityFxCueObservable.RegisterObserver(obj, param.OnStopAbilityCue);
+            _unitCreateCueObservable.RegisterObserver(obj, param.OnUnitCreate);
+            _unitDestroyCueObservable.RegisterObserver(obj, param.OnUnitDestroy);
         }
 
-        public void UnregisterPlayAttributeValChange(object obj)
+        internal void UnregisterCueObservables(object obj)
         {
             _playAttributeValChangeCueObservable.UnRegisterObserver(obj);
+            _playAbilityFxCueObservable.UnRegisterObserver(obj);
+            _stopAbilityFxCueObservable.UnRegisterObserver(obj);
+            _unitCreateCueObservable.UnRegisterObserver(obj);
+            _unitDestroyCueObservable.UnRegisterObserver(obj);
         }
-
+        
         internal void PlayAttributeValChangeCue(ref PlayAttributeValChangeCueContext context)
         {
             _playAttributeValChangeCueObservable.NotifyObservers(context);
-        }
-
-        #endregion
-
-        #region Ability Fx
-
-        public void RegisterAbilityFxObservables(object obj, Action<PlayAbilityFxCueContext> onPlay, Action<StopAbilityFxCueContext> onStop)
-        {
-            _playAbilityFxCueObservable.RegisterObserver(obj, onPlay);
-            _stopAbilityFxCueObservable.RegisterObserver(obj, onStop);
-        }
-
-        public void UnregisterAbilityFxObservables(object obj)
-        {
-            _playAbilityFxCueObservable.UnRegisterObserver(obj);
-            _stopAbilityFxCueObservable.UnRegisterObserver(obj);
         }
 
         public void PlayAbilityFxCue(ref PlayAbilityFxCueContext context)
@@ -63,22 +62,6 @@ namespace GAS.Logic
             _stopAbilityFxCueObservable.NotifyObservers(context);
         }
 
-        #endregion
-
-        #region Unit Create/Destroy
-
-        public void RegisterUnitCreateDestroyObservables(object obj, Action<UnitCreateCueContext> onCreate, Action<UnitDestroyCueContext> onDestroy)
-        {
-            _unitCreateCueObservable.RegisterObserver(obj, onCreate);
-            _unitDestroyCueObservable.RegisterObserver(obj, onDestroy);
-        }
-
-        public void UnregisterUnitCreateDestroyObservables(object obj)
-        {
-            _unitCreateCueObservable.UnRegisterObserver(obj);
-            _unitDestroyCueObservable.UnRegisterObserver(obj);
-        }
-
         public void PlayUnitCreateCue(ref UnitCreateCueContext context)
         {
             _unitCreateCueObservable.NotifyObservers(context);
@@ -88,8 +71,5 @@ namespace GAS.Logic
         {
             _unitDestroyCueObservable.NotifyObservers(context);
         }
-
-        #endregion
-      
     }
 }
