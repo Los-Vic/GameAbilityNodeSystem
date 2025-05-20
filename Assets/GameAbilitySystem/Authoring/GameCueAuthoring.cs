@@ -23,15 +23,7 @@ namespace GAS
                 OnStopEffectCue = OnStopEffectCue,
             });
         }
-
-        private void OnStopEffectCue(StopEffectFxCueContext obj)
-        {
-        }
-
-        private void OnPlayEffectCue(PlayEffectFxCueContext obj)
-        {
-        }
-
+        
         public void UnInit()
         {
             _gameAbilitySystem.UnregisterCueObservables(this);
@@ -76,5 +68,14 @@ namespace GAS
                 });
             }
         }
+        
+        private void OnStopEffectCue(StopEffectFxCueContext obj)
+        {
+        }
+
+        private void OnPlayEffectCue(PlayEffectFxCueContext obj)
+        {
+        }
+
     }
 }
