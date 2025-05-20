@@ -7,11 +7,26 @@ namespace NS
 {
     public class NodeSystem
     {
+        #region Class Reference
+
         public INodeSystemTaskScheduler TaskScheduler { get; private set; }
         public ClassObjectPoolMgr NodePoolMgr { get; private set; }
+
+        #endregion
         
+        
+        #region Essential States
+
+        #endregion
+     
+        
+        #region Accidental States
+
         private readonly Dictionary<NodeGraphAsset, GraphAssetRuntimeData> _graphAssetRuntimeDataMap = new();
         private readonly Dictionary<Type, Type> _cachedNodeToNodeRunnerTypeMap = new();
+
+        #endregion
+        
 
         public virtual void OnCreateSystem()
         {

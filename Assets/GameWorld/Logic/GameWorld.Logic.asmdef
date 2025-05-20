@@ -1,0 +1,18 @@
+{
+    "name": "GameWorld.Logic",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9211b54bab341cb47ae2fb64d0129850",
+        "GUID:298dff7fd453955449dc9e26ac2623e6",
+        "GUID:0d49cbbc2fccff8428f6578b639d237c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

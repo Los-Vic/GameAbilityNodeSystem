@@ -1,0 +1,17 @@
+{
+    "name": "GameWorld",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e789221ce12f87d4f952c854e2700f0e",
+        "GUID:0d49cbbc2fccff8428f6578b639d237c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
