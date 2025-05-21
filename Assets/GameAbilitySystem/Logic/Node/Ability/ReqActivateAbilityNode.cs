@@ -56,8 +56,7 @@ namespace GAS.Logic
         
         public override void Execute()
         {
-            ExecuteDependentValNodes(_node.Id);
-
+            base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
 
             var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr

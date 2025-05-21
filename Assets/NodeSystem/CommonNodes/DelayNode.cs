@@ -30,7 +30,7 @@ namespace NS
 
         public override void Execute()
         {
-            ExecuteDependentValNodes(_node.Id);
+            base.Execute();
             _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
             GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.EntryName}");
             

@@ -46,7 +46,7 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            ExecuteDependentValNodes(NodeId);
+            base.Execute();
 
             if (_node.AbilityAsset == null)
             {

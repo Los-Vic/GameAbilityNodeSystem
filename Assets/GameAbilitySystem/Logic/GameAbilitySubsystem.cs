@@ -21,10 +21,5 @@
         {
             
         }
-
-        public virtual void OnDestroy()
-        {
-            
-        }
     }
 }

@@ -19,8 +19,13 @@
         {
             GraphRunner.AbortRunner();
         }
-        
-        protected void ExecuteDependentValNodes(string flowNodeId)
+
+        public override void Execute()
+        {
+            ExecuteDependentValNodes(NodeId);
+        }
+
+        private void ExecuteDependentValNodes(string flowNodeId)
         {
             if(_dependentValNodesExecuted)
                 return;

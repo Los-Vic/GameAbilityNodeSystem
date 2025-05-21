@@ -40,9 +40,9 @@ namespace NS
 
         public override void Execute()
         {
+            base.Execute();
             if (!_started)
             {
-                ExecuteDependentValNodes(_node.Id);
                 _started = true;
                 _enumerable = GraphRunner.GetInPortVal<IEnumerable>(_node.InEnumerable);
                 if (_enumerable == null)

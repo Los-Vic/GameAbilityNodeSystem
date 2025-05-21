@@ -29,7 +29,7 @@
 
         public override void Execute()
         {
-            ExecuteDependentValNodes(_node.Id);
+            base.Execute();
             _condition = GraphRunner.GetInPortVal<bool>(_node.InPortBool);
             Complete();
         }

@@ -36,9 +36,9 @@
         
         public override void Execute()
         {
+            base.Execute();
             if (!_started)
             {
-                ExecuteDependentValNodes(_node.Id);
                 GraphRunner.EnterLoop(this);
                 _started = true;
                 _startIndex = GraphRunner.GetInPortVal<int>(_node.InStartIndex);

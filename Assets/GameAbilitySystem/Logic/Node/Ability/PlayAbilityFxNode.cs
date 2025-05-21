@@ -31,7 +31,7 @@ namespace GAS.Logic
 
         public override void Execute()
         {
-            ExecuteDependentValNodes(NodeId);
+            base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var playContext = new PlayAbilityFxCueContext
             {

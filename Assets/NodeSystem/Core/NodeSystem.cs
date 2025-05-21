@@ -51,11 +51,6 @@ namespace NS
         {
             TaskScheduler.UpdateScheduler(dt);
         }
-
-        public virtual void OnDestroySystem()
-        {
-            
-        }
         
         protected virtual INodeSystemTaskScheduler CreateTaskScheduler()
         {

@@ -72,7 +72,6 @@ namespace GAS
         private void OnDestroy()
         {
             _system.UnInitSystem();
-            _system.OnDestroySystem();
         }
 
         public AbilityAsset GetAbilityAsset(uint abilityId)

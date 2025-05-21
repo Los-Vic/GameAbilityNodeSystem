@@ -32,8 +32,11 @@ namespace NS
         private readonly Dictionary<string, LoopNodeRunner> _loopNodeRunnerMap = new();
         private readonly Stack<string> _runningLoopNodeIds = new();
 
+        //Hook
         private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
         private Action<NodeGraphRunner> _onRunnerDestroy;
+        
+        
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string EntryName => _entryNode?.DisplayName() ?? "";

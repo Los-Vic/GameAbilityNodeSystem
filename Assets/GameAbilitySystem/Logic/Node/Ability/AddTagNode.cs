@@ -33,7 +33,7 @@ namespace GAS.Logic
         
         public override void Execute()
         {
-            ExecuteDependentValNodes(NodeId);
+            base.Execute();
             
             var target = GraphRunner.GetInPortVal<GameUnit>(_node.InPortTarget);
             if (target == null)

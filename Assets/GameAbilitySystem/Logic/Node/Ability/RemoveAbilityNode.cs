@@ -34,9 +34,8 @@ namespace GAS.Logic
         
         public override void Execute()
         {
-            ExecuteDependentValNodes(NodeId);
-
-            if (_node.AbilityAsset == null)
+            base.Execute();
+            if (!_node.AbilityAsset)
             {
                 GameLogger.LogWarning("Remove ability failed, ability asset is null.");
                 Abort();

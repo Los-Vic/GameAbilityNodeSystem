@@ -32,8 +32,7 @@ namespace GAS.Logic.Command
 
         public override void Execute()
         {
-            ExecuteDependentValNodes(NodeId);
-            
+            base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var unit = context.Ability.System.CommandDelegator.SpawnUnit(_node.UnitName, _node.PlayerIndex);
             GraphRunner.SetOutPortVal(_node.OutPortUnit, unit);
