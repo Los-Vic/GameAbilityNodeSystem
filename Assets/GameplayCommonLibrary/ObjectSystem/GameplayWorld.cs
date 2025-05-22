@@ -51,7 +51,7 @@ namespace GameplayCommonLibrary
         #region System
 
         //Add顺序会影响Update顺序
-        private bool AddSystem(GameplayWorldSystem system)
+        public bool AddSystem(GameplayWorldSystem system)
         {
             if (_systems.ContainsKey(system.GetRegisterType()))
             {
@@ -70,11 +70,11 @@ namespace GameplayCommonLibrary
             return true;
         }
 
-        public bool GetSystem(Type systemType, out GameplayWorldSystem system)
+        public GameplayWorldSystem GetSystem(Type systemType)
         {
-            if (_systems.TryGetValue(systemType, out system))
+            if (_systems.TryGetValue(systemType, out var system))
             {
-                return system.Enabled;
+                return system.Enabled ? system : null;
             }
 
             foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
@@ -82,30 +82,37 @@ namespace GameplayCommonLibrary
                 if (sys.GetRegisterType() != systemType)
                     continue;
                 system = sys;
-                return system.Enabled;
+                return system.Enabled ? system : null;
             }
 
-            return false;
+            return null;
         }
 
-        public bool GetSystem<T>(out T system) where T : GameplayWorldSystem
+        public T GetSystem<T>() where T : GameplayWorldSystem
         {
-            system = null;
             if (_systems.ContainsKey(typeof(T)))
             {
-                system = _systems[typeof(T)] as T;
-                return system?.Enabled ?? false;
+                var system = _systems[typeof(T)] as T;
+                if (system?.Enabled ?? false)
+                {
+                    return system;
+                }
+                return null;
             }
 
             foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
             {
                 if (sys.GetRegisterType() != typeof(T))
                     continue;
-                system = sys as T;
-                return system?.Enabled ?? false;
+                var system = sys as T;
+                if (system?.Enabled ?? false)
+                {
+                    return system;
+                }
+                return null;
             }
 
-            return false;
+            return null;
         }
 
         #endregion
