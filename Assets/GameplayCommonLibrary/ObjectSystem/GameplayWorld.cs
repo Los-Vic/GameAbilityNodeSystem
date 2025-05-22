@@ -8,19 +8,23 @@ namespace GameplayCommonLibrary
     /// </summary>
     public class GameplayWorld
     {
-        private readonly Dictionary<Type, GameplayWorldSystem> _systems = new Dictionary<Type, GameplayWorldSystem>();
+        private readonly Dictionary<Type, GameplayWorldSystem> _systems = new();
         private readonly List<GameplayWorldSystem> _tickableSystems = new();
+        private readonly List<GameplayWorldSystem> _systemRegisterTypeIsNotSelfTypeList = new();
 
         public IEntityMgr EntityMgr { get; private set; }
 
         public virtual void OnCreate()
-        {   
+        {
             EntityMgr = new DefaultEntityMgr();
         }
-        
+
         public virtual void Init()
         {
-            
+            foreach (var system in _systems.Values)
+            {
+                system.Init();
+            }
         }
 
         public virtual void UnInit()
@@ -29,6 +33,7 @@ namespace GameplayCommonLibrary
             {
                 system.UnInit();
             }
+
             _systems.Clear();
             _tickableSystems.Clear();
         }
@@ -37,33 +42,70 @@ namespace GameplayCommonLibrary
         {
             foreach (var system in _tickableSystems)
             {
+                if(!system.Enabled)
+                    continue;
                 system.Update(dt);
             }
         }
-        
-        #region Subsystem
+
+        #region System
 
         //Add顺序会影响Update顺序
-        private T AddSystem<T>(bool isTickable) where T : GameplayWorldSystem, new()
+        private bool AddSystem(GameplayWorldSystem system)
         {
-            if (_systems.ContainsKey(typeof(T)))
+            if (_systems.ContainsKey(system.GetRegisterType()))
             {
-                GameLogger.LogError($"[GameplayWorld]System of {typeof(T)} already exists");
-                return _systems[typeof(T)] as T;
+                return false;
             }
-            var system = new T();
+
             system.OnCreate(this);
-            _systems.Add(typeof(T), system);
-            
-            if(isTickable)
+            _systems.Add(system.GetRegisterType(), system);
+
+            if (system.IsTickable())
                 _tickableSystems.Add(system);
 
-            return system;
+            if (system.GetType() != system.GetRegisterType())
+                _systemRegisterTypeIsNotSelfTypeList.Add(system);
+
+            return true;
         }
 
-        public T GetSubsystem<T>() where T : GameplayWorldSystem
+        public bool GetSystem(Type systemType, out GameplayWorldSystem system)
         {
-            return _systems.GetValueOrDefault(typeof(T)) as T;
+            if (_systems.TryGetValue(systemType, out system))
+            {
+                return system.Enabled;
+            }
+
+            foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
+            {
+                if (sys.GetRegisterType() != systemType)
+                    continue;
+                system = sys;
+                return system.Enabled;
+            }
+
+            return false;
+        }
+
+        public bool GetSystem<T>(out T system) where T : GameplayWorldSystem
+        {
+            system = null;
+            if (_systems.ContainsKey(typeof(T)))
+            {
+                system = _systems[typeof(T)] as T;
+                return system?.Enabled ?? false;
+            }
+
+            foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
+            {
+                if (sys.GetRegisterType() != typeof(T))
+                    continue;
+                system = sys as T;
+                return system?.Enabled ?? false;
+            }
+
+            return false;
         }
 
         #endregion
