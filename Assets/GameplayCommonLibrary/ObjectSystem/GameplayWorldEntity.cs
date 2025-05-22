@@ -3,13 +3,15 @@ using System;
 
 namespace GameplayCommonLibrary
 {
-    //希望Entity就是一个比较单纯的数据容器。
-    //看看能不能让Entity不要引用World。如果需要World，则从System里通过方法注入
-    public class GameplayWorldEntity
+    //不允许继承，希望Entity就是一个比较单纯的数据容器。
+    //拓展数据通过添加Component实现。
+    public sealed class GameplayWorldEntity
     {
         private readonly Dictionary<Type, GameplayWorldComponent> _components = new();
+        public uint EntityID { get; private set; }
+        public void SetEntityID(uint entityID) => EntityID = entityID;
         
-        #region Components
+        #region Components Methods
         public bool AddComponent(GameplayWorldComponent component)
         {
             if (!_components.TryAdd(component.GetType(), component)) 
@@ -52,7 +54,28 @@ namespace GameplayCommonLibrary
             _components.Remove(comp.GetType());
             comp.OnRemove();
         }
+
+        public bool HasComponent<T>() where T : GameplayWorldComponent
+        {
+            return _components.ContainsKey(typeof(T));
+        }
+
+        public bool HasComponent(Type componentType)
+        {
+            return _components.ContainsKey(componentType);
+        }
+
+        public Dictionary<Type, GameplayWorldComponent>.ValueCollection GetComponents()
+        {
+            return _components.Values;
+        }
+        
+        public void ClearComponents()
+        {
+            _components.Clear();
+        }
         
         #endregion
+       
     }
 }

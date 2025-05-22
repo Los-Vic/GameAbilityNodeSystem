@@ -6,7 +6,8 @@ namespace GAS.Logic
     {
         private readonly List<GameEffect> _needTickEffects = new();
         private readonly List<GameEffect> _traverseEffectCache = new();
-
+        private readonly Dictionary<int, GameEffect> _effectInstanceLookUp = new();
+        private int _effectInstanceCounter;
 
         public override void Update(float deltaTime)
         {
@@ -31,11 +32,17 @@ namespace GAS.Logic
         {
             var effect = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameEffect>();
             effect.Init(ref param);
+
+            _effectInstanceCounter++;
+            effect.InstanceID = _effectInstanceCounter;
+            
+            _effectInstanceLookUp.Add(effect.InstanceID, effect);
             return effect;
         }
         
         internal void DestroyEffect(GameEffect effect)
         {
+            _effectInstanceLookUp.Remove(effect.InstanceID);
             effect.GetRefCountDisposableComponent().MarkForDispose();
         }
 

@@ -11,6 +11,13 @@ namespace GameplayCommonLibrary
         private readonly Dictionary<Type, GameplayWorldSystem> _systems = new Dictionary<Type, GameplayWorldSystem>();
         private readonly List<GameplayWorldSystem> _tickableSystems = new();
 
+        public IEntityMgr EntityMgr { get; private set; }
+
+        public virtual void OnCreate()
+        {   
+            EntityMgr = new DefaultEntityMgr();
+        }
+        
         public virtual void Init()
         {
             

@@ -6,6 +6,7 @@ namespace GAS.Logic
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
         private readonly Dictionary<int, GameUnit> _unitInstanceLookUp = new();
+        private int _unitInstanceCounter;
         
         public override void UnInit()
         {
@@ -25,6 +26,8 @@ namespace GAS.Logic
         {
             var unit = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameUnit>();
             unit.Init(ref param);
+            _unitInstanceCounter++;
+            unit.InstanceID = _unitInstanceCounter;
             _unitInstanceLookUp.Add(unit.InstanceID, unit);
             unit.CreateReason = param.Reason;
             System.OnUnitCreated.NotifyObservers(new GameUnitCreateObserve()

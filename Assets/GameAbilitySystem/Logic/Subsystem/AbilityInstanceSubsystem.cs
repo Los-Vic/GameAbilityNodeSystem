@@ -8,6 +8,7 @@ namespace GAS.Logic
         private readonly List<GameAbility> _needTickAbilities = new();
         private readonly List<GameAbility> _traverseAbilityCache = new();
         private readonly Dictionary<int, GameAbility> _abilityInstanceLookUp = new();
+        private int _abilityInstanceCounter;
 
         public override void UnInit()
         {
@@ -35,7 +36,7 @@ namespace GAS.Logic
         internal GameAbility CreateAbility(ref AbilityCreateParam param)
         {
             var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(param.Id);
-            if (abilityAsset == null)
+            if (!abilityAsset)
             {
                 GameLogger.LogError($"Fail to get ActiveAbilityAsset of {param.Id}");
                 return null;
@@ -43,6 +44,10 @@ namespace GAS.Logic
             
             var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
             ability.Init(System, abilityAsset, ref param);
+
+            _abilityInstanceCounter++;
+            ability.InstanceID = _abilityInstanceCounter;
+            
             _abilityInstanceLookUp.Add(ability.InstanceID, ability);
             return ability;
         }

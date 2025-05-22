@@ -56,8 +56,7 @@ namespace GAS.Logic
     //修改单位属性
     public class GameEffect:IPoolClass, IRefCountDisposableObj
     {
-        private static int _instanceIdCounter;
-        public int InstanceID { get; private set; }
+        public int InstanceID { get; internal set; }
         public GameUnit Owner { get; private set; }
         public GameUnit Instigator { get; private set; }
         public string EffectName { get; private set; }
@@ -230,8 +229,6 @@ namespace GAS.Logic
         public void OnTakeFromPool()
         {
             _isActive = true;
-            _instanceIdCounter++;
-            InstanceID = _instanceIdCounter;
         }
 
         public void OnReturnToPool()

@@ -33,8 +33,7 @@ namespace GAS.Logic
     /// </summary>
     public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
     {
-        private static int _instanceIdCounter;
-        public int InstanceID { get; private set; }
+        public int InstanceID { get; internal set; }
         
         internal GameAbilitySystem Sys { get;private set; }
         public int PlayerIndex { get; private set; }
@@ -277,8 +276,6 @@ namespace GAS.Logic
         public void OnTakeFromPool()
         {
             _isActive = true;
-            _instanceIdCounter++;
-            InstanceID = _instanceIdCounter;
         }
 
         public void OnReturnToPool()
