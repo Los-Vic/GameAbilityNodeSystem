@@ -20,12 +20,12 @@ namespace GameplayCommonLibrary
             component.OnAdd(this);
             return true;
         }
-
+        
         public T GetComponent<T>() where T:GameplayWorldComponent
         {
             return _components.TryGetValue(typeof(T), out var comp) ? (T)comp : null;
         }
-
+        
         public GameplayWorldComponent GetComponent(Type componentType)
         {
             return _components.GetValueOrDefault(componentType);

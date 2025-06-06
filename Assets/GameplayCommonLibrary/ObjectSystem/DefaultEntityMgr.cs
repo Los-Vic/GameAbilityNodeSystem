@@ -11,6 +11,7 @@ namespace GameplayCommonLibrary
 
         private ObjectPool<GameplayWorldEntity> _entityPool;
         private readonly Dictionary<Type, ObjectPool<GameplayWorldComponent>> _componentPools = new();
+        private readonly Dictionary<Type, List<GameplayWorldComponent>> _activeComponentsLookUp = new();
 
         private const int EntityPoolMaxSize = 10000;
         private const int ComponentPoolMaxSize = 10000;
@@ -36,6 +37,7 @@ namespace GameplayCommonLibrary
                 pool.Clear();
             }
             _componentPools.Clear();
+            _activeComponentsLookUp.Clear();
         }
         
         #region Entity
@@ -82,18 +84,44 @@ namespace GameplayCommonLibrary
                 pool = new ObjectPool<GameplayWorldComponent>(() => OnCreateComponent(componentType), null, null, null,
                     true, 100, ComponentPoolMaxSize);
                 _componentPools.Add(componentType, pool);
+                _activeComponentsLookUp.Add(componentType, new List<GameplayWorldComponent>());
             }
-            return pool.Get();
+            var comp = pool.Get();
+            _activeComponentsLookUp[componentType].Add(comp);
+            return comp;
         }
         
         public void DestroyComponent(GameplayWorldComponent component)
         {
-            if (!_componentPools.TryGetValue(component.GetType(), out var pool))
+            var t = component.GetType();
+            if (!_componentPools.TryGetValue(t, out var pool))
                 return;
             pool.Release(component);
+            _activeComponentsLookUp[t].Remove(component);
         }
         
+        public void GetAllComponents<T>(ref List<T> components) where T : GameplayWorldComponent
+        {
+            components.Clear();
+            if (!_activeComponentsLookUp.TryGetValue(typeof(T), out var pool))
+                return;
+            foreach (var comp in pool)
+            {
+                components.Add((T)comp);
+            }
+        }
 
+        public void GetAllComponents(Type componentType, ref List<GameplayWorldComponent> components)
+        {
+            components.Clear();
+            if (!_activeComponentsLookUp.TryGetValue(componentType, out var pool))
+                return;
+            foreach (var comp in pool)
+            {
+                components.Add(comp);
+            }
+        }
+        
         #endregion
 
         #region Object Pool

@@ -9,7 +9,8 @@ namespace GameplayCommonLibrary
     public class GameplayWorld
     {
         private readonly Dictionary<Type, GameplayWorldSystem> _systems = new();
-        private readonly List<GameplayWorldSystem> _tickableSystems = new();
+        private readonly List<GameplayWorldSystem> _orderedSystems = new(); //ordered
+        private readonly List<GameplayWorldSystem> _tickableSystems = new(); //orderer
         private readonly List<GameplayWorldSystem> _systemRegisterTypeIsNotSelfTypeList = new();
 
         public IEntityMgr EntityMgr { get; private set; }
@@ -17,25 +18,42 @@ namespace GameplayCommonLibrary
         public virtual void OnCreate()
         {
             EntityMgr = new DefaultEntityMgr();
+            EntityMgr.OnCreate();
+            CreateSystems();
         }
 
+        public virtual void CreateSystems()
+        {
+            
+        }
+        
         public virtual void Init()
         {
-            foreach (var system in _systems.Values)
+            foreach (var sys in _orderedSystems)
             {
-                system.Init();
+                sys.Init();
             }
         }
 
         public virtual void UnInit()
         {
-            foreach (var system in _systems.Values)
+            for (var i = _orderedSystems.Count; i >= 0; i--)
             {
-                system.UnInit();
+                _orderedSystems[i].UnInit();
             }
-
+        }
+        
+        public virtual void OnDestroy()
+        {
+            for (var i = _orderedSystems.Count; i >= 0; i--)
+            {
+                _orderedSystems[i].OnDestroy();
+            }
+            
             _systems.Clear();
             _tickableSystems.Clear();
+            _orderedSystems.Clear();
+            _systemRegisterTypeIsNotSelfTypeList.Clear();
         }
 
         public virtual void Update(float dt)
@@ -49,8 +67,7 @@ namespace GameplayCommonLibrary
         }
 
         #region System
-
-        //Add顺序会影响Update顺序
+        
         public bool AddSystem(GameplayWorldSystem system)
         {
             if (_systems.ContainsKey(system.GetRegisterType()))
@@ -60,9 +77,14 @@ namespace GameplayCommonLibrary
 
             system.OnCreate(this);
             _systems.Add(system.GetRegisterType(), system);
+            _orderedSystems.Add(system);
+            _orderedSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
 
             if (system.IsTickable())
+            {
                 _tickableSystems.Add(system);
+                _tickableSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
+            }
 
             if (system.GetType() != system.GetRegisterType())
                 _systemRegisterTypeIsNotSelfTypeList.Add(system);
@@ -90,9 +112,9 @@ namespace GameplayCommonLibrary
 
         public T GetSystem<T>() where T : GameplayWorldSystem
         {
-            if (_systems.ContainsKey(typeof(T)))
+            if (_systems.TryGetValue(typeof(T), out var s))
             {
-                var system = _systems[typeof(T)] as T;
+                var system = s as T;
                 if (system?.Enabled ?? false)
                 {
                     return system;
