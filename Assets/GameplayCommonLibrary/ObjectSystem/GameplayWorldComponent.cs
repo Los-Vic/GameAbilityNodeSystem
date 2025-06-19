@@ -2,14 +2,24 @@
 {
     public class GameplayWorldComponent
     {
+        public virtual void OnAdd(GameplayWorldEntity entity)
+        {
+        }
+        public virtual void OnRemove()
+        {
+        }
+    }
+
+    public class GameplayWorldComponentWithEntity : GameplayWorldComponent
+    {
         public GameplayWorldEntity Entity { get; private set; }
         
-        public virtual void OnAdd(GameplayWorldEntity entity)
+        public override void OnAdd(GameplayWorldEntity entity)
         {
             Entity = entity;
         }
 
-        public virtual void OnRemove()
+        public override void OnRemove()
         {
             Entity = null;
         }

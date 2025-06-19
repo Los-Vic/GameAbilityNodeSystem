@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace GameplayCommonLibrary
 {
@@ -10,8 +11,7 @@ namespace GameplayCommonLibrary
     {
         private readonly Dictionary<Type, GameplayWorldSystem> _systems = new();
         private readonly List<GameplayWorldSystem> _orderedSystems = new(); //ordered
-        private readonly List<GameplayWorldSystem> _tickableSystems = new(); //orderer
-        private readonly List<GameplayWorldSystem> _systemRegisterTypeIsNotSelfTypeList = new();
+        private readonly List<GameplayWorldTickableSystem> _tickableSystems = new(); //orderer
 
         public IEntityMgr EntityMgr { get; private set; }
 
@@ -53,7 +53,6 @@ namespace GameplayCommonLibrary
             _systems.Clear();
             _tickableSystems.Clear();
             _orderedSystems.Clear();
-            _systemRegisterTypeIsNotSelfTypeList.Clear();
         }
 
         public virtual void Update(float dt)
@@ -70,71 +69,56 @@ namespace GameplayCommonLibrary
         
         public bool AddSystem(GameplayWorldSystem system)
         {
-            if (_systems.ContainsKey(system.GetRegisterType()))
+            var registerType = system.GetType();
+            
+            var sysAttr = registerType.GetCustomAttribute<SystemAttribute>();
+            if (sysAttr is { Parent: not null })
+            {
+                registerType = sysAttr.Parent;
+            }
+            
+            if (_systems.ContainsKey(registerType))
             {
                 return false;
             }
 
             system.OnCreate(this);
-            _systems.Add(system.GetRegisterType(), system);
+            _systems.Add(registerType, system);
             _orderedSystems.Add(system);
             _orderedSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
 
-            if (system.IsTickable())
+            if (system is GameplayWorldTickableSystem tickableSystem)
             {
-                _tickableSystems.Add(system);
+                _tickableSystems.Add(tickableSystem);
                 _tickableSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
             }
-
-            if (system.GetType() != system.GetRegisterType())
-                _systemRegisterTypeIsNotSelfTypeList.Add(system);
 
             return true;
         }
 
+        //ReSharper restore Unity.ExpensiveCode
         public GameplayWorldSystem GetSystem(Type systemType)
         {
-            if (_systems.TryGetValue(systemType, out var system))
+            var registerType = systemType;
+            
+            var sysAttr = registerType.GetCustomAttribute<SystemAttribute>();
+            if (sysAttr is { Parent: not null })
+            {
+                registerType = sysAttr.Parent;
+            }
+            
+            if (_systems.TryGetValue(registerType, out var system))
             {
                 return system.Enabled ? system : null;
             }
-
-            foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
-            {
-                if (sys.GetRegisterType() != systemType)
-                    continue;
-                system = sys;
-                return system.Enabled ? system : null;
-            }
-
             return null;
         }
 
+        //ReSharper restore Unity.ExpensiveCode
         public T GetSystem<T>() where T : GameplayWorldSystem
         {
-            if (_systems.TryGetValue(typeof(T), out var s))
-            {
-                var system = s as T;
-                if (system?.Enabled ?? false)
-                {
-                    return system;
-                }
-                return null;
-            }
-
-            foreach (var sys in _systemRegisterTypeIsNotSelfTypeList)
-            {
-                if (sys.GetRegisterType() != typeof(T))
-                    continue;
-                var system = sys as T;
-                if (system?.Enabled ?? false)
-                {
-                    return system;
-                }
-                return null;
-            }
-
-            return null;
+            var sys = GetSystem(typeof(T));
+            return sys as T;
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine.Pool;
 
 namespace GameplayCommonLibrary
@@ -13,13 +14,15 @@ namespace GameplayCommonLibrary
         private readonly Dictionary<Type, ObjectPool<GameplayWorldComponent>> _componentPools = new();
         private readonly Dictionary<Type, List<GameplayWorldComponent>> _activeComponentsLookUp = new();
 
+        private const int EntityPoolDefaultCapacity = 512;
         private const int EntityPoolMaxSize = 10000;
+        private const int ComponentPoolDefaultCapacity = 32;
         private const int ComponentPoolMaxSize = 10000;
 
         public void OnCreate()
         {
             _entityPool = new ObjectPool<GameplayWorldEntity>(OnCreateEntity, null, null,
-                null, true, 100, EntityPoolMaxSize);
+                null, false, EntityPoolDefaultCapacity, EntityPoolMaxSize);
         }
 
         public void Init()
@@ -82,12 +85,20 @@ namespace GameplayCommonLibrary
             if (!_componentPools.TryGetValue(componentType, out var pool))
             {
                 pool = new ObjectPool<GameplayWorldComponent>(() => OnCreateComponent(componentType), null, null, null,
-                    true, 100, ComponentPoolMaxSize);
+                    false, ComponentPoolDefaultCapacity, ComponentPoolMaxSize);
                 _componentPools.Add(componentType, pool);
-                _activeComponentsLookUp.Add(componentType, new List<GameplayWorldComponent>());
+
+                if (TrackComponentActiveInstances(componentType))
+                {
+                    _activeComponentsLookUp.Add(componentType, new List<GameplayWorldComponent>());
+                }
             }
+            
             var comp = pool.Get();
-            _activeComponentsLookUp[componentType].Add(comp);
+            
+            if(_activeComponentsLookUp.TryGetValue(componentType, out var loopUp))
+                loopUp.Add(comp);
+            
             return comp;
         }
         
@@ -97,9 +108,18 @@ namespace GameplayCommonLibrary
             if (!_componentPools.TryGetValue(t, out var pool))
                 return;
             pool.Release(component);
-            _activeComponentsLookUp[t].Remove(component);
+
+            if (_activeComponentsLookUp.TryGetValue(t, out var loopUp))
+            {
+                loopUp.Remove(component);
+            }
         }
         
+        /// <summary>
+        /// TrackActiveInstances of ComponentAttribute need to be set true 
+        /// </summary>
+        /// <param name="components"></param>
+        /// <typeparam name="T"></typeparam>
         public void GetAllComponents<T>(ref List<T> components) where T : GameplayWorldComponent
         {
             components.Clear();
@@ -111,6 +131,11 @@ namespace GameplayCommonLibrary
             }
         }
 
+        /// <summary>
+        /// TrackActiveInstances of ComponentAttribute need to be set true 
+        /// </summary>
+        /// <param name="componentType"></param>
+        /// <param name="components"></param>
         public void GetAllComponents(Type componentType, ref List<GameplayWorldComponent> components)
         {
             components.Clear();
@@ -120,6 +145,21 @@ namespace GameplayCommonLibrary
             {
                 components.Add(comp);
             }
+        }
+        
+        /// <summary>
+        /// TrackActiveInstances of ComponentAttribute need to be set true 
+        /// </summary>
+        /// <param name="componentType"></param>
+        /// <returns></returns>
+        public IReadOnlyList<GameplayWorldComponent> GetAllComponents(Type componentType)
+        {
+            return _activeComponentsLookUp.GetValueOrDefault(componentType);
+        }
+        
+        private static bool TrackComponentActiveInstances(Type componentType)
+        {
+            return componentType.GetCustomAttribute<ComponentAttribute>()?.TrackActiveInstances ?? false;
         }
         
         #endregion
@@ -138,6 +178,22 @@ namespace GameplayCommonLibrary
         }
 
         #endregion
-       
+        
+        #region Debug
+
+        public string GetMgrDebugStats()
+        {
+            var log = "";
+
+            log += "-----------------Entity Mgr Object Pool Stats-----------------\n";
+            log += $"EntityPool: active[{_entityPool.CountActive}], inactive[{_entityPool.CountInactive}], total[{_entityPool.CountAll}]\n";
+            foreach (var pair in _componentPools)
+            {
+                log += $"{pair.Key.Name}Pool: active[{pair.Value.CountActive}], inactive[{pair.Value.CountInactive}], total[{pair.Value.CountAll}]\n";
+            }
+            return log;
+        }
+
+        #endregion
     }
 }

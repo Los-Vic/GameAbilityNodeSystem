@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameplayCommonLibrary
 {
@@ -13,5 +14,9 @@ namespace GameplayCommonLibrary
         public T CreateComponent<T>() where T : GameplayWorldComponent, new();
         public GameplayWorldComponent CreateComponent(Type componentType);
         public void DestroyComponent(GameplayWorldComponent component);
+        public void GetAllComponents<T>(ref List<T> components) where T:GameplayWorldComponent;
+        public void GetAllComponents(Type componentType, ref List<GameplayWorldComponent> components);
+        public IReadOnlyList<GameplayWorldComponent> GetAllComponents(Type componentType);
+        public string GetMgrDebugStats();
     }
 }

@@ -8,17 +8,6 @@ namespace GameplayCommonLibrary
     {
         public GameplayWorld World { get; private set; }
         public bool Enabled { get; set; }
-
-        //用来实现System的继承替换逻辑
-        public virtual Type GetRegisterType()
-        {
-            return GetType();
-        }
-
-        public virtual bool IsTickable()
-        {
-            return false;
-        }
         
         /// <summary>
         /// 排序值越大，Init和Update越靠后，UnInit和Destroy越靠前
@@ -53,9 +42,13 @@ namespace GameplayCommonLibrary
         {
             
         }
-        
+    }
+
+    public class GameplayWorldTickableSystem:GameplayWorldSystem
+    {
         public virtual void Update(float dt)
         {
         }
     }
+    
 }

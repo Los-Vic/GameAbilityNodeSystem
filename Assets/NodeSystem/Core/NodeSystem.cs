@@ -5,7 +5,7 @@ using GameplayCommonLibrary;
 
 namespace NS
 {
-    public class NodeSystem
+    public class NodeSystem:GameplayWorldSystem
     {
         #region Class Reference
 

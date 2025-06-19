@@ -30,7 +30,7 @@ namespace GameplayCommonLibrary
         {
             return _components.GetValueOrDefault(componentType);
         }
-
+        
         public bool RemoveComponent<T>(out T component) where T:GameplayWorldComponent
         {
             component = GetComponent<T>();
@@ -40,6 +40,15 @@ namespace GameplayCommonLibrary
             return true;
         }
 
+        public bool RemoveComponent<T>() where T:GameplayWorldComponent
+        {
+            var component = GetComponent<T>();
+            if (component == null)
+                return false;
+            RemoveComponent(component);
+            return true;
+        }
+        
         public bool RemoveComponent(Type componentType, out GameplayWorldComponent component)
         {
             component = GetComponent(componentType);
