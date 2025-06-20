@@ -30,8 +30,8 @@ namespace GAS.Logic
 
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
-            var effect = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameEffect>();
-            effect.Init(ref param);
+            var effect = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEffect>();
+            effect.Init(ref param, DisposeEffect);
 
             _effectInstanceCounter++;
             effect.InstanceID = _effectInstanceCounter;
@@ -44,6 +44,11 @@ namespace GAS.Logic
         {
             _effectInstanceLookUp.Remove(effect.InstanceID);
             effect.GetRefCountDisposableComponent().MarkForDispose();
+        }
+
+        private void DisposeEffect(GameEffect effect)
+        {
+            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(effect);
         }
 
         #endregion

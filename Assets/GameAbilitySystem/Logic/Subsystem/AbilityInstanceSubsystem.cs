@@ -42,8 +42,8 @@ namespace GAS.Logic
                 return null;
             }
             
-            var ability = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameAbility>();
-            ability.Init(System, abilityAsset, ref param);
+            var ability = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameAbility>();
+            ability.Init(System, abilityAsset, ref param, DisposeAbility);
 
             _abilityInstanceCounter++;
             ability.InstanceID = _abilityInstanceCounter;
@@ -56,6 +56,11 @@ namespace GAS.Logic
             _abilityInstanceLookUp.Remove(ability.InstanceID);
             RemoveFromTickList(ability);
             ability.GetRefCountDisposableComponent().MarkForDispose();
+        }
+
+        private void DisposeAbility(GameAbility ability)
+        {
+            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(ability);
         }
 
         internal void AddToTickList(GameAbility ability)

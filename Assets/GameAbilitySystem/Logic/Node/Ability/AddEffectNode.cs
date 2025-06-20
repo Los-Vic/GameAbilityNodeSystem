@@ -99,7 +99,7 @@ namespace GAS.Logic
                 }
             };
             
-            var effect = context.Ability.System.GetSubsystem<EffectInstanceSubsystem>().CreateEffect(ref param);
+            var effect = context.Ability.System.EffectInstanceSubsystem.CreateEffect(ref param);
             unit.AddEffect(effect);
 
             if (!_node.NotInstant)

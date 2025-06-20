@@ -33,8 +33,8 @@ namespace GAS.Logic
             if(!CheckEventStack(ref param))
                 return;
             
-            var eventArg = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameEventArg>();
-            eventArg.Init(ref param);
+            var eventArg = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEventArg>();
+            eventArg.Init(ref param, DisposeGameEventArg);
             
             _eventStack.Push(eventArg);
             GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit?.UnitName}, stack depth:{_eventStack.Count}");
@@ -46,6 +46,11 @@ namespace GAS.Logic
             _eventStack.Pop();
             
             eventArg.GetRefCountDisposableComponent().MarkForDispose();
+        }
+
+        private void DisposeGameEventArg(GameEventArg arg)
+        {
+            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(arg);
         }
         
         internal GameplayEvent<GameEventArg> GetGameEvent(EGameEventType gameEventType)

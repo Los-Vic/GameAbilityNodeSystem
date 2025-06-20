@@ -46,7 +46,7 @@ namespace GAS.Logic
                 playContext.SubUnitInstanceID = target.InstanceID;
             }
            
-            context.Ability.System.GetSubsystem<GameCueSubsystem>().PlayAbilityFxCue(ref playContext);
+            context.Ability.System.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
             Complete();
         }
 

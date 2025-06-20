@@ -5,7 +5,7 @@ using GameplayCommonLibrary;
 
 namespace NS
 {
-    public class NodeSystem:GameplayWorldSystem
+    public class NodeSystem
     {
         #region Class Reference
 
@@ -27,7 +27,6 @@ namespace NS
 
         #endregion
         
-
         public virtual void OnCreateSystem()
         {
             NodePoolMgr = new ClassObjectPoolMgr();

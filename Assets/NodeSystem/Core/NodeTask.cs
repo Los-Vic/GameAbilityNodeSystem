@@ -99,7 +99,7 @@ namespace NS
         }
         
         #region PoolObject
-        public virtual void OnCreateFromPool(ClassObjectPool pool)
+        public virtual void OnCreateFromPool()
         {
         }
 

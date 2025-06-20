@@ -5,7 +5,7 @@ namespace GameplayCommonLibrary
 {
     public interface IPoolClass
     {
-        void OnCreateFromPool(ClassObjectPool pool);
+        void OnCreateFromPool();
         void OnTakeFromPool();
         void OnReturnToPool();
         void OnDestroy();
@@ -17,7 +17,6 @@ namespace GameplayCommonLibrary
         //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
         private readonly UnityEngine.Pool.ObjectPool<IPoolClass> _pool;
         private readonly Type _poolObjectType;
-        private readonly List<IPoolClass> _activePoolObjects = new();
 
         //Constructor
         public ClassObjectPool(Type type, int capacity, int maxSize)
@@ -40,7 +39,6 @@ namespace GameplayCommonLibrary
         public IPoolClass Get()
         {
             var obj = _pool.Get();
-            _activePoolObjects.Add(obj);
             obj.OnTakeFromPool();
             return obj;
         }
@@ -52,29 +50,15 @@ namespace GameplayCommonLibrary
                 GameLogger.LogError($"[ObjectPool]destroy object failed: pool type [{_poolObjectType}] is not equal to type [{obj.GetType()}]");
                 return;
             }
-            
-            if (_activePoolObjects.Remove(obj))
-            {
-                obj.OnReturnToPool();
-                _pool.Release(obj);
-            }
+            obj.OnReturnToPool();
+            _pool.Release(obj);
         }
         
         public void Clear()
         {
-            GameLogger.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], active [{_activePoolObjects.Count}], total [{_pool.CountAll}]");
+            GameLogger.Log($"[ObjectPool]clear object pool, type [{_poolObjectType}], active [{_pool.CountActive}], total [{_pool.CountAll}]");
             _pool.Clear();
-            
-            foreach (var obj in _activePoolObjects)
-            {
-                obj.OnDestroy(); 
-            }
-            _activePoolObjects.Clear();
         }
-        
-        public List<IPoolClass> GetActiveObjects() => _activePoolObjects;
-        public bool IsActiveObject(IPoolClass obj) => _activePoolObjects.Contains(obj);
-
         
         #region Pool Callback
 
@@ -89,7 +73,7 @@ namespace GameplayCommonLibrary
                 return null;
             }
            
-            obj.OnCreateFromPool(this);
+            obj.OnCreateFromPool();
             return obj;
         }
 
@@ -167,19 +151,6 @@ namespace GameplayCommonLibrary
                 return;
 
             pool.Release(obj);
-        }
-        
-        public List<IPoolClass> GetActiveObjects(Type type)
-        {
-            if (!_objectPoolMap.TryGetValue(type, out var pool))
-                return null;
-            return pool.GetActiveObjects();
-        }
-
-        public bool IsActiveObject(IPoolClass obj)
-        {
-            var type = obj.GetType();
-            return _objectPoolMap.TryGetValue(type, out var pool) && pool.IsActiveObject(obj);
         }
         
         public IEnumerable<ClassObjectPool> GetAllPools()

@@ -1,4 +1,5 @@
-﻿using MissQ;
+﻿using System;
+using MissQ;
 
 namespace GAS.Logic
 {

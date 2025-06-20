@@ -5,7 +5,6 @@ namespace GameplayCommonLibrary
     public interface IRefCountRequester
     {
         bool IsRequesterStillValid();
-        string GetRequesterDesc();
     }
 
     public interface IRefCountDisposableObj
@@ -46,10 +45,6 @@ namespace GameplayCommonLibrary
             }
         }
 
-#if BUILD_DEV || UNITY_EDITOR
-        private readonly Dictionary<IRefCountRequester, string> _refCountRequesterMap = new();
-#endif
-
         private readonly List<IRefCountRequester> _refCountRequesters = new();
         public bool IsPendingDispose { get; private set; }
 
@@ -62,20 +57,12 @@ namespace GameplayCommonLibrary
         {
             IsPendingDispose = false;
             _refCountRequesters.Clear();
-#if BUILD_DEV || UNITY_EDITOR
-            _refCountRequesterMap.Clear();
-#endif
         }
 
         public void AddRefCount(IRefCountRequester requester)
         {
             if (_refCountRequesters.Contains(requester))
                 return;
-
-#if BUILD_DEV || UNITY_EDITOR
-            _refCountRequesterMap.TryAdd(requester, requester.GetRequesterDesc());
-#endif
-
             _refCountRequesters.Add(requester);
         }
 
@@ -83,9 +70,6 @@ namespace GameplayCommonLibrary
         {
             if (!_refCountRequesters.Contains(requester))
                 return;
-#if BUILD_DEV || UNITY_EDITOR
-            _refCountRequesterMap.Remove(requester);
-#endif
             _refCountRequesters.Remove(requester);
             TryDisposeOwner();
         }
@@ -115,24 +99,5 @@ namespace GameplayCommonLibrary
                 DisposeOwner();
             }
         }
-
-#if BUILD_DEV || UNITY_EDITOR
-        public List<string> GetRefLog()
-        {
-            var log = new List<string>();
-
-            log.Add($"-------Ref log[{RefCount}]-------");
-            var count = 0;
-            foreach (var pair in _refCountRequesterMap)
-            {
-                count++;
-                log.Add($"[{count}]{pair.Value}");
-            }
-
-            log.Add("-------End ref log-------");
-
-            return log;
-        }
-#endif
     }
 }

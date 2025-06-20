@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
 
@@ -40,7 +41,6 @@ namespace GAS.Logic
 
         private const string DefaultUnitName = "UnkownUnit";
         private string _unitName = DefaultUnitName;
-        private ClassObjectPool _pool;
         private RefCountDisposableComponent _refCountDisposableComponent;
         private bool _isActive;
         
@@ -66,31 +66,34 @@ namespace GAS.Logic
         public readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
         public readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
-        internal void Init(ref GameUnitCreateParam param)
+        private AbilityActivationReqSubsystem _abilityActivationReqSubsystem;
+        private Action<GameUnit> _disposeMethod;
+ 
+        
+        internal void Init(ref GameUnitCreateParam param, Action<GameUnit> disposeMethod)
         {
             Sys = param.AbilitySystem;
             PlayerIndex = param.PlayerIndex;
             _unitName = param.UnitName;
-            
-            
-            Sys.GetSubsystem<AbilityActivationReqSubsystem>().CreateGameUnitQueue(this);
+            _disposeMethod = disposeMethod;
+            Sys.AbilityActivationReqSubsystem.CreateGameUnitQueue(this);
         }
 
         private void UnInit()
         {
             OnUnitDestroyed.Clear();
-            Sys.GetSubsystem<AbilityActivationReqSubsystem>().RemoveGameUnitQueue(this);
+            _abilityActivationReqSubsystem.RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
             {
-                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroySimpleAttribute(attribute);
+                Sys.AttributeInstanceSubsystem.DestroySimpleAttribute(attribute);
             }
             SimpleAttributes.Clear();
 
             foreach (var attribute in CompositeAttributes.Values)
             {
-                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroyCompositeAttribute(attribute);
+                Sys.AttributeInstanceSubsystem.DestroyCompositeAttribute(attribute);
             }
             CompositeAttributes.Clear();
             
@@ -98,14 +101,14 @@ namespace GAS.Logic
             foreach (var ability in GameAbilities)
             {
                 ability.OnRemoveAbility();
-                Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
+                Sys.AbilityInstanceSubsystem.DestroyAbility(ability);
             }
             GameAbilities.Clear();
             //Clear Effects
             foreach (var effect in GameEffects)
             {
                 effect.OnRemoveEffect();
-                Sys.GetSubsystem<EffectInstanceSubsystem>().DestroyEffect(effect);
+                Sys.EffectInstanceSubsystem.DestroyEffect(effect);
             }
             GameEffects.Clear();
         }
@@ -114,7 +117,7 @@ namespace GAS.Logic
 
         public void AddSimpleAttribute(SimpleAttributeCreateParam param)
         {
-            var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateSimpleAttribute(ref param);
+            var attribute = Sys.AttributeInstanceSubsystem.CreateSimpleAttribute(ref param);
             SimpleAttributes.TryAdd(attribute.Type, attribute);
             attribute.OnValChanged.RegisterObserver(attribute, (msg) =>
             {
@@ -125,7 +128,7 @@ namespace GAS.Logic
                     OldVal = msg.OldVal,
                     NewVal = msg.NewVal,
                 };
-                Sys.GetSubsystem<GameCueSubsystem>().PlayAttributeValChangeCue(ref playCueContext);
+                Sys.GameCueSubsystem.PlayAttributeValChangeCue(ref playCueContext);
             }, 1);
         }
 
@@ -133,7 +136,7 @@ namespace GAS.Logic
         {
             if (SimpleAttributes.Remove(type, out var attribute))
             {
-                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroySimpleAttribute(attribute);
+                Sys.AttributeInstanceSubsystem.DestroySimpleAttribute(attribute);
             }
         }
 
@@ -159,7 +162,7 @@ namespace GAS.Logic
 
         public void AddCompositeAttribute(CompositeAttributeCreateParam param)
         {
-            var attribute = Sys.GetSubsystem<AttributeInstanceSubsystem>().CreateCompositeAttribute(ref param);
+            var attribute = Sys.AttributeInstanceSubsystem.CreateCompositeAttribute(ref param);
             CompositeAttributes.TryAdd(attribute.Type, attribute);
             
             attribute.OnValChanged.RegisterObserver(attribute, (msg) =>
@@ -171,7 +174,7 @@ namespace GAS.Logic
                     OldVal = msg.OldVal,
                     NewVal = msg.NewVal,
                 };
-                Sys.GetSubsystem<GameCueSubsystem>().PlayAttributeValChangeCue(ref playCueContext);
+                Sys.GameCueSubsystem.PlayAttributeValChangeCue(ref playCueContext);
             }, 1);
         }
 
@@ -179,7 +182,7 @@ namespace GAS.Logic
         {
             if (CompositeAttributes.Remove(type, out var attribute))
             {
-                Sys.GetSubsystem<AttributeInstanceSubsystem>().DestroyCompositeAttribute(attribute);
+                Sys.AttributeInstanceSubsystem.DestroyCompositeAttribute(attribute);
             }
         }
 
@@ -209,7 +212,7 @@ namespace GAS.Logic
 
         public void AddAbility(AbilityCreateParam param)
         {
-            var ability = Sys.GetSubsystem<AbilityInstanceSubsystem>().CreateAbility(ref param);
+            var ability = Sys.AbilityInstanceSubsystem.CreateAbility(ref param);
             if (ability == null)
                 return;
             GameAbilities.Add(ability);
@@ -230,7 +233,7 @@ namespace GAS.Logic
         public void RemoveAbility(GameAbility ability)
         {
             ability.OnRemoveAbility();
-            Sys.GetSubsystem<AbilityInstanceSubsystem>().DestroyAbility(ability);
+            Sys.AbilityInstanceSubsystem.DestroyAbility(ability);
         }
 
         #endregion
@@ -246,7 +249,7 @@ namespace GAS.Logic
         public void RemoveEffect(GameEffect effect)
         {
             effect.OnRemoveEffect();
-            Sys.GetSubsystem<EffectInstanceSubsystem>().DestroyEffect(effect);
+            Sys.EffectInstanceSubsystem.DestroyEffect(effect);
         }
 
         public void RemoveEffectByName(string effectName)
@@ -268,9 +271,8 @@ namespace GAS.Logic
         #endregion
 
         #region Object Pool
-        public void OnCreateFromPool(ClassObjectPool pool)
+        public void OnCreateFromPool()
         {
-            _pool = pool;
         }
 
         public void OnTakeFromPool()
@@ -311,7 +313,7 @@ namespace GAS.Logic
         public void OnObjDispose()
         {
             GameLogger.Log($"Release Unit: {UnitName}");
-            _pool.Release(this);
+            _disposeMethod(this);
         }
 
         #endregion
@@ -330,7 +332,7 @@ namespace GAS.Logic
                 GameLogger.Log($"{UnitName} already has tag {t}");
                 return;
             }
-            Sys.GetSubsystem<GameTagSubsystem>().AddGameTag(this, t);
+            Sys.GameTagSubsystem.AddGameTag(this, t);
         }
 
         public void RemoveTag(EGameTag t)
@@ -340,7 +342,7 @@ namespace GAS.Logic
                 GameLogger.Log($"{UnitName} not has tag {t}");
                 return;
             }
-            Sys.GetSubsystem<GameTagSubsystem>().RemoveGameTag(this, t);
+            Sys.GameTagSubsystem.RemoveGameTag(this, t);
         }
         
         #endregion

@@ -275,7 +275,7 @@ namespace NS
         
         #region Pool Object
 
-        public void OnCreateFromPool(ClassObjectPool pool)
+        public void OnCreateFromPool()
         {
         }
 
@@ -297,11 +297,6 @@ namespace NS
         public bool IsRequesterStillValid()
         {
             return _isValid;
-        }
-
-        public string GetRequesterDesc()
-        {
-            return $"graph:{_asset.name}, entry:{_entryNode.DisplayName()}";
         }
     }
 }

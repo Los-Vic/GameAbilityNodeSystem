@@ -137,7 +137,7 @@ namespace GAS
             var u = System?.GetGameUnitByInstanceID(setAttributeValContext.unitInstanceID);
             if (u == null)
                 return;
-            System?.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(u, setAttributeValContext.type,
+            System?.AttributeInstanceSubsystem.SetAttributeVal(u, setAttributeValContext.type,
                 setAttributeValContext.newVal);
         }
         
@@ -179,12 +179,6 @@ namespace GAS
         private void DumpObjectPool()
         {
             System?.DumpObjectPool();
-        }
-
-        [Button("DumpRefCounterObjects")]
-        private void DumpRefCounterObjects()
-        {
-            System?.DumpRefCounterObjects();
         }
     }
     

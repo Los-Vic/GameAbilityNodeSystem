@@ -59,7 +59,7 @@ namespace GAS.Logic
             base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
 
-            var job = context.Ability.System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr
+            var job = context.Ability.System.ClassObjectPoolSubsystem.ClassObjectPoolMgr
                 .Get<AbilityActivationReqJob>();
 
             var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, context.Ability.Lv);

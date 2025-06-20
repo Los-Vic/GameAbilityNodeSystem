@@ -34,7 +34,7 @@ namespace GAS.Logic
                 GameCueName = _node.CueName,
             };
            
-            context.Ability.System.GetSubsystem<GameCueSubsystem>().StopAbilityFxCue(ref stopContext);
+            context.Ability.System.GameCueSubsystem.StopAbilityFxCue(ref stopContext);
             Complete();
         }
 

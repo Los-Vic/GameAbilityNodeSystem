@@ -1,4 +1,5 @@
-﻿using GameplayCommonLibrary;
+﻿using System;
+using GameplayCommonLibrary;
 using MissQ;
 using NS;
 
@@ -20,9 +21,9 @@ namespace GAS.Logic
 
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
-        private ClassObjectPool _pool;
+        private Action<GameEventArg> _disposeMethod;
 
-        public void Init(ref GameEventInitParam param)
+        public void Init(ref GameEventInitParam param, Action<GameEventArg> disposeMethod)
         {
             EventType = param.EventType;
             EventSrcUnit = param.EventSrcUnit;
@@ -33,6 +34,7 @@ namespace GAS.Logic
             EventValue2 = param.EventValue2;
             EventValue3 = param.EventValue3;
             EventString = param.EventString;
+            _disposeMethod = disposeMethod;
         }
 
         private void Reset()
@@ -44,9 +46,8 @@ namespace GAS.Logic
         }
         
         #region IPoolObject
-        public void OnCreateFromPool(ClassObjectPool pool)
+        public void OnCreateFromPool()
         {
-            _pool = pool;
         }
 
         public void OnTakeFromPool()
@@ -71,11 +72,6 @@ namespace GAS.Logic
             return _isActive;
         }
 
-        public string GetRequesterDesc()
-        {
-            return $"{EventType}";
-        }
-
         #endregion
 
 
@@ -98,7 +94,7 @@ namespace GAS.Logic
 
         public void OnObjDispose()
         {
-            _pool?.Release(this);
+            _disposeMethod(this);
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameplayCommonLibrary;
 using GAS.Logic.Value;
 using MissQ;
@@ -67,8 +68,8 @@ namespace GAS.Logic
         internal GameAbilitySystem System { get; private set; }
         private bool _isActive;
         private RefCountDisposableComponent _refCountDisposableComponent;
-        private ClassObjectPool _pool;
         private bool _hasOnTickEntry;
+        private Action<GameAbility> _disposeMethod;
         
         /// <summary>
         /// 技能生效次数
@@ -79,12 +80,13 @@ namespace GAS.Logic
         
         public string AbilityName => Asset?.abilityName ?? string.Empty;
         
-        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityCreateParam param)
+        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityCreateParam param, Action<GameAbility> disposeMethod)
         {
             ID = param.Id;
             Asset = asset;
             _instigator = param.Instigator;
             Lv = param.Lv;
+            _disposeMethod = disposeMethod;
             
             GraphController.Init(sys, Asset, this);
             
@@ -115,9 +117,8 @@ namespace GAS.Logic
         
         #region Object Pool
 
-        public void OnCreateFromPool(ClassObjectPool pool)
+        public void OnCreateFromPool()
         {
-            _pool = pool;
         }
 
         public void OnTakeFromPool()
@@ -156,7 +157,7 @@ namespace GAS.Logic
             }
             else if (!IsInCooldown)
             {
-                System.GetSubsystem<AbilityInstanceSubsystem>().RemoveFromTickList(this);
+                System.AbilityInstanceSubsystem.RemoveFromTickList(this);
             }
         }
         
@@ -185,14 +186,14 @@ namespace GAS.Logic
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    System.GetSubsystem<GameEventSubsystem>().RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    System.GameEventSubsystem.RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
 
             _hasOnTickEntry = GraphController.HasEntryNode(typeof(OnTickAbilityEntryNode));
             if (_hasOnTickEntry)
             {
-                System.GetSubsystem<AbilityInstanceSubsystem>().AddToTickList(this);
+                System.AbilityInstanceSubsystem.AddToTickList(this);
             }
         }
 
@@ -205,7 +206,7 @@ namespace GAS.Logic
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    System.GetSubsystem<GameEventSubsystem>().UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    System.GameEventSubsystem.UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
             
@@ -251,7 +252,7 @@ namespace GAS.Logic
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
                 var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Owner.Sys.GetSubsystem<AttributeInstanceSubsystem>().SetAttributeVal(Owner, costElement.attributeType, newVal);
+                Owner.Sys.AttributeInstanceSubsystem.SetAttributeVal(Owner, costElement.attributeType, newVal);
             }
         }
         
@@ -268,7 +269,7 @@ namespace GAS.Logic
             CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
             if (CooldownDuration > 0)
             {
-                System.GetSubsystem<AbilityInstanceSubsystem>().AddToTickList(this);
+                System.AbilityInstanceSubsystem.AddToTickList(this);
                 IsInCooldown = true;
             }
         }
@@ -367,7 +368,7 @@ namespace GAS.Logic
                 return;
             }
             _activationReqJobs.Add(job);
-            System.GetSubsystem<AbilityActivationReqSubsystem>().EnqueueJob(job);
+            System.AbilityActivationReqSubsystem.EnqueueJob(job);
         }
         
         private void CancelAllActivationReqJobs()
@@ -402,7 +403,7 @@ namespace GAS.Logic
         {
             GameLogger.Log($"Release Ability: {AbilityName} of {Owner.UnitName}");
             Owner.GameAbilities.Remove(this);
-            _pool.Release(this);
+            _disposeMethod(this);
         }
 
         #endregion

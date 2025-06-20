@@ -70,7 +70,7 @@ namespace GAS.Logic
         
         #region Pool Interface
 
-        public void OnCreateFromPool(ClassObjectPool pool)
+        public void OnCreateFromPool()
         {
         }
 

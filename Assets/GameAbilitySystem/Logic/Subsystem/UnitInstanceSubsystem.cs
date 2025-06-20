@@ -11,12 +11,12 @@ namespace GAS.Logic
         public override void UnInit()
         {
             _unitInstanceLookUp.Clear();
-            var units = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
-            if(units == null)
-                return;
-            foreach (var u in units.ToArray())
+
+            var units = new List<GameUnit>();
+            System.GetAllGameUnits(ref units);
+            foreach (var u in units)
             {
-                DestroyGameUnit((GameUnit)u);
+                DestroyGameUnit(u);
             }
         }
 
@@ -24,8 +24,8 @@ namespace GAS.Logic
 
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var unit = System.GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Get<GameUnit>();
-            unit.Init(ref param);
+            var unit = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameUnit>();
+            unit.Init(ref param, DisposeUnit);
             _unitInstanceCounter++;
             unit.InstanceID = _unitInstanceCounter;
             _unitInstanceLookUp.Add(unit.InstanceID, unit);
@@ -39,7 +39,7 @@ namespace GAS.Logic
             {
                 UnitInstanceID = unit.InstanceID
             };
-            System.GetSubsystem<GameCueSubsystem>().PlayUnitCreateCue(ref context);
+            System.GameCueSubsystem.PlayUnitCreateCue(ref context);
             GameLogger.Log($"Create unit:{param.UnitName}, reason:{param.Reason}");
             return unit;
         }
@@ -53,7 +53,7 @@ namespace GAS.Logic
             {
                 UnitInstanceID = unit.InstanceID
             };
-            System.GetSubsystem<GameCueSubsystem>().PlayUnitDestroyCue(ref context);
+            System.GameCueSubsystem.PlayUnitDestroyCue(ref context);
             unit.OnUnitDestroyed.NotifyObservers(reason);
             System.OnUnitDestroyed.NotifyObservers(new GameUnitDestroyObserve()
             {
@@ -61,6 +61,11 @@ namespace GAS.Logic
                 Unit = unit
             });
             unit.GetRefCountDisposableComponent().MarkForDispose();
+        }
+
+        private void DisposeUnit(GameUnit unit)
+        {
+            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(unit);
         }
 
         internal GameUnit GetGameUnitByInstanceID(int unitInstanceID) => _unitInstanceLookUp.GetValueOrDefault(unitInstanceID);

@@ -46,6 +46,24 @@ namespace GAS.Logic
         public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
         public readonly Observable<GameUnitDestroyObserve> OnUnitDestroyed = new ();
         
+        //GameUnit
+        private readonly List<GameUnit> _allGameUnits = new();
+
+        #region SubSystems
+
+        public ClassObjectPoolSubsystem ClassObjectPoolSubsystem { get; private set; }
+        public GameEventSubsystem GameEventSubsystem {get; private set;}
+        public GameTagSubsystem GameTagSubsystem { get; private set; }
+        public AttributeInstanceSubsystem AttributeInstanceSubsystem { get; private set; }
+        public AbilityInstanceSubsystem AbilityInstanceSubsystem { get;private set; }
+        public UnitInstanceSubsystem UnitInstanceSubsystem { get; private set; }
+        public EffectInstanceSubsystem EffectInstanceSubsystem { get; private set; }
+        public GameCueSubsystem GameCueSubsystem { get;private set; }
+        public AbilityActivationReqSubsystem AbilityActivationReqSubsystem { get; private set; }
+
+        #endregion
+        
+        
         public GameAbilitySystem(GameAbilitySystemCreateParam param)
         {
             PlayerNums = param.PlayerNums;
@@ -60,17 +78,17 @@ namespace GAS.Logic
         {
             base.OnCreateSystem();
             
-            AddSubsystem<ClassObjectPoolSubsystem>(false);
-            AddSubsystem<GameEventSubsystem>(false);
-            AddSubsystem<GameTagSubsystem>(false);
-            AddSubsystem<AttributeInstanceSubsystem>(false);
-            AddSubsystem<AbilityInstanceSubsystem>(true);
-            AddSubsystem<UnitInstanceSubsystem>(false);
-            AddSubsystem<EffectInstanceSubsystem>(false);
-            AddSubsystem<GameCueSubsystem>(false);
+            ClassObjectPoolSubsystem = AddSubsystem<ClassObjectPoolSubsystem>(false);
+            GameEventSubsystem = AddSubsystem<GameEventSubsystem>(false);
+            GameTagSubsystem = AddSubsystem<GameTagSubsystem>(false);
+            AttributeInstanceSubsystem = AddSubsystem<AttributeInstanceSubsystem>(false);
+            AbilityInstanceSubsystem = AddSubsystem<AbilityInstanceSubsystem>(true);
+            UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(false);
+            EffectInstanceSubsystem = AddSubsystem<EffectInstanceSubsystem>(false);
+            GameCueSubsystem = AddSubsystem<GameCueSubsystem>(false);
             
-            var abilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
-            abilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
+            AbilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
+            AbilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
         }
 
         public override void InitSystem()
@@ -124,12 +142,7 @@ namespace GAS.Logic
 
             return subsystem;
         }
-
-        public T GetSubsystem<T>() where T : GameAbilitySubsystem
-        {
-            return _subsystems.GetValueOrDefault(typeof(T)) as T;
-        }
-
+        
         #endregion
 
         #region GameEvent
@@ -141,7 +154,7 @@ namespace GAS.Logic
 
         public void PostGameEvent(GameEventInitParam param)
         {
-            GetSubsystem<GameEventSubsystem>().PostGameEvent(ref param);
+            GameEventSubsystem.PostGameEvent(ref param);
         }
         
 
@@ -151,34 +164,29 @@ namespace GAS.Logic
 
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            return GetSubsystem<UnitInstanceSubsystem>().CreateGameUnit(ref param);
+            var unit = UnitInstanceSubsystem.CreateGameUnit(ref param);
+            _allGameUnits.Add(unit);
+            return unit;
         }
 
         public void DestroyGameUnit(GameUnit gameUnit)
         {
-            GetSubsystem<UnitInstanceSubsystem>().DestroyGameUnit(gameUnit);
+            _allGameUnits.Remove(gameUnit);
+            UnitInstanceSubsystem.DestroyGameUnit(gameUnit);
         }
 
         public void GetAllGameUnits(ref List<GameUnit> unitList)
         {
-            var units = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.GetActiveObjects(typeof(GameUnit));
             unitList.Clear();
-            
-            if(units == null)
-                return;
-            foreach (var u in units)
+            foreach (var u in _allGameUnits)
             {
-                if (u is GameUnit gameUnit)
-                {
-                    unitList.Add(gameUnit);
-                }
+                unitList.Add(u);
             }
         }
 
         public GameUnit GetGameUnitByInstanceID(int instanceID)
         {
-            var unitSubsystem = GetSubsystem<UnitInstanceSubsystem>();
-            return unitSubsystem.GetGameUnitByInstanceID(instanceID);
+            return UnitInstanceSubsystem.GetGameUnitByInstanceID(instanceID);
         }
 
         #endregion
@@ -187,8 +195,7 @@ namespace GAS.Logic
 
         public GameAbility GetGameAbilityByInstanceID(int instanceID)
         {
-            var subsystem = GetSubsystem<AbilityInstanceSubsystem>();
-            return subsystem.GetAbilityByInstanceID(instanceID);
+            return AbilityInstanceSubsystem.GetAbilityByInstanceID(instanceID);
         }
 
         #endregion
@@ -201,54 +208,8 @@ namespace GAS.Logic
             GameLogger.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
             GameLogger.Log("----------ObjectPool----------------------");
-            GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr.Log();
+            ClassObjectPoolSubsystem.ClassObjectPoolMgr.Log();
             GameLogger.Log("----------Dump ObjectPools End------------");
-        }
-        public void DumpRefCounterObjects()
-        {
-            var poolMgr = GetSubsystem<ClassObjectPoolSubsystem>().ClassObjectPoolMgr;
-
-            var listGameEvent = poolMgr.GetActiveObjects(typeof(GameEventArg));
-            if (listGameEvent != null)
-            {
-                foreach (var arg in listGameEvent)
-                {
-                    var a = (GameEventArg)arg;
-                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
-                    foreach (var log in logList)
-                    {
-                        GameLogger.Log(log);
-                    }
-                }
-            }
-            
-            var listGameAbility = poolMgr.GetActiveObjects(typeof(GameAbility));
-            if (listGameAbility != null)
-            {
-                foreach (var arg in listGameAbility)
-                {
-                    var a = (GameAbility)arg;
-                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
-                    foreach (var log in logList)
-                    {
-                        GameLogger.Log(log);
-                    }
-                }
-            }
-            
-            var listGameEffect = poolMgr.GetActiveObjects(typeof(GameEffect));
-            if (listGameEffect != null)
-            {
-                foreach (var arg in listGameEffect)
-                {
-                    var a = (GameEffect)arg;
-                    var logList = a.GetRefCountDisposableComponent().GetRefLog();
-                    foreach (var log in logList)
-                    {
-                        GameLogger.Log(log);
-                    }
-                }
-            }
         }
 
         #endregion
@@ -257,12 +218,12 @@ namespace GAS.Logic
 
         public void RegisterCueObservables(object obj, RegisterCueParam param)
         {
-            GetSubsystem<GameCueSubsystem>().RegisterCueObservables(obj, param);
+            GameCueSubsystem.RegisterCueObservables(obj, param);
         }
 
         public void UnregisterCueObservables(object obj)
         {
-            GetSubsystem<GameCueSubsystem>().UnregisterCueObservables(obj);
+            GameCueSubsystem.UnregisterCueObservables(obj);
         }
 
         #endregion

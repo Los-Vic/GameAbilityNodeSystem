@@ -20,7 +20,7 @@ namespace NS
 
         #region Pool Object
         
-        public virtual void OnCreateFromPool(ClassObjectPool pool)
+        public virtual void OnCreateFromPool()
         {
         }
 
