@@ -43,11 +43,86 @@ namespace GAS.Logic
 
     public sealed class GetTargetNodeRunner : FlowNodeRunner
     {
+        private GetTargetNode _node;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            _node = (GetTargetNode)nodeAsset;
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+            
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            if (context.Ability.System.TargetSearcher.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
+                    out var target))
+            {
+                GraphRunner.SetOutPortVal(_node.OutUnit, target);
+                Complete();   
+            }
+            else
+            {
+                Abort();
+            }
+        }
+
+        public override string GetNextNode()
+        {
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutFlowPort);
+            if(!port.IsConnected())
+                return null;
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            return connectPort.belongNodeId;
+        }
         
+        public override void OnReturnToPool()
+        {
+            _node = null;
+            base.OnReturnToPool();
+        }
     }
     
     public sealed class GetTargetsNodeRunner : FlowNodeRunner
     {
+        private GetTargetsNode _node;
+        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        {
+            base.Init(nodeAsset, graphRunner);
+            _node = (GetTargetsNode)nodeAsset;
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+            
+            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var targets = new List<GameUnit>();
+            if (context.Ability.System.TargetSearcher.GetTargetsFromAbility(context.Ability, _node.TargetMultipleCfg,
+                   ref targets))
+            {
+                GraphRunner.SetOutPortVal(_node.OutUnitList, targets);
+                Complete();   
+            }
+            else
+            {
+                Abort();
+            }
+        }
+
+        public override string GetNextNode()
+        {
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutFlowPort);
+            if(!port.IsConnected())
+                return null;
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            return connectPort.belongNodeId;
+        }
         
+        public override void OnReturnToPool()
+        {
+            _node = null;
+            base.OnReturnToPool();
+        }
     }
 }

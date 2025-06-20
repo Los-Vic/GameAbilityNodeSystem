@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GAS.Logic.Target;
 using MissQ;
 using NS;
 using UnityEngine.Assertions;
@@ -11,6 +12,7 @@ namespace GAS.Logic
     {
         public IAssetConfigProvider AssetConfigProvider;
         public ICommandDelegator CommandDelegator;
+        public ITargetSearcher  TargetSearcher;
         public int PlayerNums;
     }
 
@@ -36,11 +38,14 @@ namespace GAS.Logic
         private readonly Dictionary<Type, GameAbilitySubsystem> _subsystems = new();
         private readonly List<GameAbilitySubsystem> _tickableSubsystems = new();
         
-        //Provider
+        //Asset Provider
         internal IAssetConfigProvider AssetConfigProvider { get; private set; }
         
         //Command Delegator
         internal ICommandDelegator CommandDelegator { get; private set; }
+        
+        //Target Searcher
+        internal ITargetSearcher TargetSearcher { get; private set; }
         
         //Observable
         public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
@@ -69,6 +74,7 @@ namespace GAS.Logic
             PlayerNums = param.PlayerNums;
             AssetConfigProvider = param.AssetConfigProvider;
             CommandDelegator = param.CommandDelegator;
+            TargetSearcher = param.TargetSearcher;
 
             Assert.IsNotNull(AssetConfigProvider);
             Assert.IsNotNull(CommandDelegator);

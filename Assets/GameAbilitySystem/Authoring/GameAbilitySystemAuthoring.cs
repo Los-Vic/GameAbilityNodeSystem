@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GAS.Logic;
+using GAS.Logic.Target;
 using MissQ;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace GAS
     /// <summary>
     /// A simple example, only run in editor. Use AssetDatabase load assets.
     /// </summary>
-    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider, ICommandDelegator
+    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider, ICommandDelegator, ITargetSearcher
     {
         private GameAbilitySystem _system;
         private GameAbilitySystemDebugger _debugger;
@@ -135,6 +136,17 @@ namespace GAS
             });
             unit.AddTag(EGameTag.Unit);
             return unit;
+        }
+
+        public bool GetTargetFromAbility(GameAbility ability, TargetSelectSingleBase cfg, out GameUnit target)
+        {
+            target = null;
+            return false;
+        }
+
+        public bool GetTargetsFromAbility(GameAbility ability, TargetSelectMultipleBase cfg, ref List<GameUnit> targets)
+        {
+            return false;
         }
     }
 }
