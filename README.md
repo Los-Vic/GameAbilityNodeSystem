@@ -19,3 +19,12 @@ Ability通过Effect来影响单位身上的属性
 用来触发表现相关逻辑，比如属性变化需要触发UI表现，技能激活需要触发粒子特效和模型动画等等。
 #### 8. Command
 外部的一些游戏特化的指令，如召唤单位等等
+
+
+# 测试
+
+一个简单的测试环境
+![test scene](image-1.png)
+
+简单的查看单位状态的窗口
+![window to check unit states](image-2.png)
