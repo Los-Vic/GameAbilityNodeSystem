@@ -11,7 +11,7 @@ namespace GAS.Logic
             base.UnInit();
         }
 
-        private GameTag GetGameTagInstance(EGameTag eGameTag)
+        internal GameTag GetGameTagInstance(EGameTag eGameTag)
         {
             if(_tagInstances.TryGetValue(eGameTag, out var tagInstance))
                 return tagInstance;

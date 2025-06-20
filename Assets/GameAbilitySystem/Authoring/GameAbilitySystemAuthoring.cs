@@ -43,6 +43,7 @@ namespace GAS
                 PlayerNums = 1,
                 AssetConfigProvider = this,
                 CommandDelegator = this,
+                TargetSearcher = this,
             });
             _system.OnCreateSystem();
             _system.InitSystem();
@@ -138,13 +139,13 @@ namespace GAS
             return unit;
         }
 
-        public bool GetTargetFromAbility(GameAbility ability, TargetSelectSingleBase cfg, out GameUnit target)
+        public bool GetTargetFromAbility(GameAbility ability, TargetQuerySingleBase cfg, out GameUnit target)
         {
             target = null;
             return false;
         }
 
-        public bool GetTargetsFromAbility(GameAbility ability, TargetSelectMultipleBase cfg, ref List<GameUnit> targets)
+        public bool GetTargetsFromAbility(GameAbility ability, TargetQueryMultipleBase cfg, ref List<GameUnit> targets)
         {
             return false;
         }

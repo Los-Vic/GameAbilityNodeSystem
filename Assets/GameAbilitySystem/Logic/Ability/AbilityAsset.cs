@@ -17,7 +17,7 @@ namespace GAS.Logic
     public struct AbilityCostCfgElement
     {
         [SerializeReference]
-        public TargetSelectBase costTarget;
+        public TargetQueryBase costTarget;
         public ESimpleAttributeType attributeType;
         [BoxGroup("CostVal"), HideLabel]
         [SerializeReference]

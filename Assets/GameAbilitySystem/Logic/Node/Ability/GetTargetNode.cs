@@ -14,7 +14,7 @@ namespace GAS.Logic
 
         [Exposed]
         [SerializeReference]
-        public TargetSelectSingleBase TargetSingleCfg;
+        public TargetQuerySingleBase TargetSingleCfg;
         
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutFlowPort;
@@ -32,7 +32,7 @@ namespace GAS.Logic
         
         [Exposed]
         [SerializeReference]
-        public TargetSelectMultipleBase TargetMultipleCfg;
+        public TargetQueryMultipleBase TargetMultipleCfg;
         
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutFlowPort;

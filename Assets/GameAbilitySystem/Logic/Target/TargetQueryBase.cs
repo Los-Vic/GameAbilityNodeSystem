@@ -3,20 +3,20 @@
 namespace GAS.Logic.Target
 {
     [Serializable]
-    public abstract class TargetSelectBase
+    public abstract class TargetQueryBase
     {
         
     }
     
    
     [Serializable]
-    public abstract class TargetSelectSingleBase:TargetSelectBase
+    public abstract class TargetQuerySingleBase:TargetQueryBase
     {
         
     }
     
     [Serializable]
-    public abstract class TargetSelectMultipleBase:TargetSelectBase
+    public abstract class TargetQueryMultipleBase:TargetQueryBase
     {
         
     }
