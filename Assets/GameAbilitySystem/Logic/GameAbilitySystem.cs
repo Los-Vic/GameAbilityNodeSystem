@@ -79,7 +79,7 @@ namespace GAS.Logic
             base.OnCreateSystem();
             
             ClassObjectPoolSubsystem = AddSubsystem<ClassObjectPoolSubsystem>(false);
-            GameEventSubsystem = AddSubsystem<GameEventSubsystem>(false);
+            GameEventSubsystem = AddSubsystem<GameEventSubsystem>(true);
             GameTagSubsystem = AddSubsystem<GameTagSubsystem>(false);
             AttributeInstanceSubsystem = AddSubsystem<AttributeInstanceSubsystem>(false);
             AbilityInstanceSubsystem = AddSubsystem<AbilityInstanceSubsystem>(true);
@@ -218,7 +218,7 @@ namespace GAS.Logic
 
         public void RegisterCueObservables(object obj, RegisterCueParam param)
         {
-            GameCueSubsystem.RegisterCueObservables(obj, param);
+            GameCueSubsystem.RegisterCueObservables(obj, ref param);
         }
 
         public void UnregisterCueObservables(object obj)

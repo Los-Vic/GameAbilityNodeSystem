@@ -10,7 +10,7 @@ namespace GAS
             _gameAbilitySystem = abilitySystem;
         }
 
-        public void Init()
+        public void Init() 
         {
             _gameAbilitySystem.RegisterCueObservables(this, new RegisterCueParam()
             {

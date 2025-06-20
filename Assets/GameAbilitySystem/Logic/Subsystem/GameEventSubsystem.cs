@@ -9,11 +9,25 @@ namespace GAS.Logic
         private readonly Dictionary<EGameEventType, GameplayEvent<GameEventArg>> _gameEvents = new();
         private readonly Stack<GameEventArg> _eventStack = new();
         private const int StackDepthWarningThreshold = 20;
+        private readonly List<GameEventInitParam> _nextFrameEventsCache = new();
 
         public override void UnInit()
         {
             _gameEvents.Clear();
             _eventStack.Clear();
+        }
+
+        public override void Update(float deltaTime)
+        {
+            if (_nextFrameEventsCache.Count == 0)
+                return;
+            
+            foreach (var p in _nextFrameEventsCache)
+            {
+                var param = p;
+                RealPostgameEvent(ref param);
+            }
+            _nextFrameEventsCache.Clear();
         }
 
         public void RegisterGameEvent(EGameEventType eventType, Action<GameEventArg> callback, int priority = 0)
@@ -29,6 +43,19 @@ namespace GAS.Logic
         }
 
         internal void PostGameEvent(ref GameEventInitParam param)
+        {
+            switch (param.TimePolicy)
+            {
+                case EGameEventTimePolicy.Immediate:
+                    RealPostgameEvent(ref param);
+                    break;
+                case EGameEventTimePolicy.NextFrame:
+                    _nextFrameEventsCache.Add(param);
+                    break;
+            }
+        }
+
+        private void RealPostgameEvent(ref GameEventInitParam param)
         {
             if(!CheckEventStack(ref param))
                 return;

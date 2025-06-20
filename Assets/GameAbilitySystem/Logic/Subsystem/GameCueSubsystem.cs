@@ -35,7 +35,7 @@ namespace GAS.Logic
             base.UnInit();
         }
 
-        internal void RegisterCueObservables(object obj, RegisterCueParam param)
+        internal void RegisterCueObservables(object obj, ref RegisterCueParam param)
         {
             _playAttributeValChangeCueObservable.RegisterObserver(obj, param.OnAttributeChange);
             _playAbilityFxCueObservable.RegisterObserver(obj, param.OnPlayAbilityCue);

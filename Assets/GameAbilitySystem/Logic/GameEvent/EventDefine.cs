@@ -22,10 +22,17 @@ namespace GAS.Logic
         SrcIsSelfAllyUnits = 5,
         SrcIsRivalUnits = 6
     }
+
+    public enum EGameEventTimePolicy
+    {
+        Immediate = 0, //立刻发出事件
+        NextFrame = 1, //下一帧
+    }
     
     public struct GameEventInitParam
     {
         public EGameEventType EventType;
+        public EGameEventTimePolicy TimePolicy;
         public GameUnit EventSrcUnit; //nullable
         public GameAbility EventSrcAbility; //nullable
         public GameEffect EventSrcEffect;  //nullable
