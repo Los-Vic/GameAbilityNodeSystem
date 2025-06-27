@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GameplayCommonLibrary;
 using GAS.Logic.Target;
 using NS;
 using UnityEngine;
@@ -12,12 +13,18 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InFlowPort;
 
+        [Exposed] 
+        public bool IgnoreSelf;
+        
         [Exposed]
         [SerializeReference]
         public TargetQuerySingleBase TargetSingleCfg;
         
-        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "Found")]
         public string OutFlowPort;
+        
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "NoTarget")]
+        public string OutFlowPortFail;
 
         [Port(EPortDirection.Output, typeof(GameUnit), "Target")]
         public string OutUnit;
@@ -30,12 +37,18 @@ namespace GAS.Logic
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InFlowPort;
         
+        [Exposed] 
+        public bool IgnoreSelf;
+        
         [Exposed]
         [SerializeReference]
         public TargetQueryMultipleBase TargetMultipleCfg;
         
-        [Port(EPortDirection.Output, typeof(BaseFlowPort))]
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "Found")]
         public string OutFlowPort;
+        
+        [Port(EPortDirection.Output, typeof(BaseFlowPort), "NoTarget")]
+        public string OutFlowPortFail;
         
         [Port(EPortDirection.Output, typeof(List<GameUnit>), "TargetList")]
         public string OutUnitList;
@@ -44,10 +57,12 @@ namespace GAS.Logic
     public sealed class GetTargetNodeRunner : FlowNodeRunner
     {
         private GetTargetNode _node;
+        private bool _found;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (GetTargetNode)nodeAsset;
+            _found = false;
         }
 
         public override void Execute()
@@ -55,21 +70,23 @@ namespace GAS.Logic
             base.Execute();
             
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            if (context.Ability.System.TargetSearcher.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
-                    out var target))
-            {
+            _found = context.Ability.System.TargetSearcher.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
+                out var target, _node.IgnoreSelf);
+
+            if(_found)
                 GraphRunner.SetOutPortVal(_node.OutUnit, target);
-                Complete();   
-            }
-            else
-            {
-                Abort();
-            }
+            
+            GameLogger.Log(_found
+                ? $"Ability {context.Ability} found target {target}"
+                : $"Ability {context.Ability} found target failed");
+            Complete();   
         }
 
         public override string GetNextNode()
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutFlowPort);
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_found
+                ? _node.OutFlowPort
+                : _node.OutFlowPortFail);
             if(!port.IsConnected())
                 return null;
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
@@ -86,10 +103,12 @@ namespace GAS.Logic
     public sealed class GetTargetsNodeRunner : FlowNodeRunner
     {
         private GetTargetsNode _node;
+        private bool _found;
         public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
         {
             base.Init(nodeAsset, graphRunner);
             _node = (GetTargetsNode)nodeAsset;
+            _found = false;
         }
 
         public override void Execute()
@@ -98,21 +117,17 @@ namespace GAS.Logic
             
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var targets = new List<GameUnit>();
-            if (context.Ability.System.TargetSearcher.GetTargetsFromAbility(context.Ability, _node.TargetMultipleCfg,
-                   ref targets))
-            {
-                GraphRunner.SetOutPortVal(_node.OutUnitList, targets);
-                Complete();   
-            }
-            else
-            {
-                Abort();
-            }
+
+            _found = context.Ability.System.TargetSearcher.GetTargetsFromAbility(context.Ability,
+                _node.TargetMultipleCfg, ref targets, _node.IgnoreSelf);
+            
+            GraphRunner.SetOutPortVal(_node.OutUnitList, targets);
+            GameLogger.Log($"Ability {context.Ability} found targets count {targets.Count}");
         }
 
         public override string GetNextNode()
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutFlowPort);
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_found ? _node.OutFlowPort: _node.OutFlowPortFail);
             if(!port.IsConnected())
                 return null;
             var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);

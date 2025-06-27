@@ -12,8 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62ced9abfdcb428b8c512228bcc93cc0, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  nodes: []
-  ports: []
+  nodes:
+  - rid: 4786282482181079114
+  - rid: 4786282482181079132
+  ports:
+  - rid: 4786282482181079115
+  - rid: 4786282482181079133
+  - rid: 4786282482181079134
+  - rid: 4786282482181079135
+  - rid: 4786282482181079136
   abilityName: "\u6D4B\u8BD5\u6280\u80FD"
   id: 0
   cooldown:
@@ -25,3 +32,92 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 4786282482181079114
+      type: {class: OnAddAbilityEntryNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+      data:
+        guid: 457e3eab-14ec-4679-abd7-be63ae513542
+        position:
+          serializedVersion: 2
+          x: 185.6
+          y: 188
+          width: 101.600006
+          height: 76.79999
+        nodeName: OnAdd
+        nodeFunctionType: 2
+        OutPortExec: 6cbe149c-0187-42f5-b8a6-301d0977edc8
+    - rid: 4786282482181079115
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 6cbe149c-0187-42f5-b8a6-301d0977edc8
+        belongNodeId: 457e3eab-14ec-4679-abd7-be63ae513542
+        connectPortId: 837920b3-9074-42d3-b8ed-980f7a0fbc07
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4786282482181079132
+      type: {class: GetTargetsNode, ns: GAS.Logic, asm: GameAbilitySystem.Logic}
+      data:
+        guid: 30c9fdc8-fe0d-4d16-a37a-c96107c73d6a
+        position:
+          serializedVersion: 2
+          x: 362.4
+          y: 188
+          width: 312.00003
+          height: 288
+        nodeName: GetTargetsNode
+        nodeFunctionType: 1
+        InFlowPort: 837920b3-9074-42d3-b8ed-980f7a0fbc07
+        IgnoreSelf: 1
+        TargetMultipleCfg:
+          rid: 4786282482181079137
+        OutFlowPort: 94c03c2e-fda7-4953-82f7-737d98729011
+        OutFlowPortFail: 5bdec2b0-9a8a-4875-afb9-ef076b4c8b8d
+        OutUnitList: f05d8419-7a8f-443d-b6eb-a85fd0200cdf
+    - rid: 4786282482181079133
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 837920b3-9074-42d3-b8ed-980f7a0fbc07
+        belongNodeId: 30c9fdc8-fe0d-4d16-a37a-c96107c73d6a
+        connectPortId: 6cbe149c-0187-42f5-b8a6-301d0977edc8
+        direction: 0
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4786282482181079134
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 94c03c2e-fda7-4953-82f7-737d98729011
+        belongNodeId: 30c9fdc8-fe0d-4d16-a37a-c96107c73d6a
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4786282482181079135
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: 5bdec2b0-9a8a-4875-afb9-ef076b4c8b8d
+        belongNodeId: 30c9fdc8-fe0d-4d16-a37a-c96107c73d6a
+        connectPortId: 
+        direction: 1
+        portType: NS.BaseFlowPort, NodeSystem, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        isFlowPort: 1
+    - rid: 4786282482181079136
+      type: {class: NodePort, ns: NS, asm: NodeSystem}
+      data:
+        guid: f05d8419-7a8f-443d-b6eb-a85fd0200cdf
+        belongNodeId: 30c9fdc8-fe0d-4d16-a37a-c96107c73d6a
+        connectPortId: 
+        direction: 1
+        portType: System.Collections.Generic.List`1[[GAS.Logic.GameUnit, GameAbilitySystem.Logic,
+          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0,
+          Culture=neutral, PublicKeyToken=b77a5c561934e089
+        isFlowPort: 0
+    - rid: 4786282482181079137
+      type: {class: TargetQueryGameTagMultiple, ns: GAS.Logic.Target, asm: GameAbilitySystem.Logic}
+      data:
+        withAll: 01000000
+        withAny: 
+        withNone: 

@@ -21,8 +21,8 @@ namespace GAS.Logic
             
             attribute.SetVal(newVal);
 
-            GameLogger.Log($"DefaultAttributeValSetter set val, unit {unit.UnitName}, attribute {attribute.Type}, inNewVal {newVal}, " +
-                           $"res {oldVal}->{attribute.Val}, changedByEffect {changedByEffect?.EffectName ?? ""}");
+            GameLogger.Log($"DefaultAttributeValSetter set val, unit {unit}, attribute {attribute.Type}, inNewVal {newVal}, " +
+                           $"res {oldVal}->{attribute.Val}, changedByEffect {changedByEffect}");
             
             if (attribute.Val != oldVal)
             {

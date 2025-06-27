@@ -139,14 +139,21 @@ namespace GAS
             return unit;
         }
 
-        public bool GetTargetFromAbility(GameAbility ability, TargetQuerySingleBase cfg, out GameUnit target)
+        public bool GetTargetFromAbility(GameAbility ability, TargetQuerySingleBase cfg, out GameUnit target, bool ignoreSelf = false)
         {
             target = null;
             return false;
         }
 
-        public bool GetTargetsFromAbility(GameAbility ability, TargetQueryMultipleBase cfg, ref List<GameUnit> targets)
+        public bool GetTargetsFromAbility(GameAbility ability, TargetQueryMultipleBase cfg, ref List<GameUnit> targets, bool ignoreSelf = false)
         {
+            targets.Clear();
+            switch (cfg)
+            {
+                case TargetQueryGameTagMultiple t:
+                    TargetQueryGameTagUtility.GetQueryResult(ability, t, ref targets, ignoreSelf);
+                    break;
+            }
             return false;
         }
     }

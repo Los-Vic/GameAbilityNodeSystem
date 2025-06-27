@@ -112,7 +112,12 @@ namespace GAS.Logic
             }
             GameEffects.Clear();
         }
-        
+
+        public override string ToString()
+        {
+            return _unitName;
+        }
+
         #region Attributes
 
         public void AddSimpleAttribute(SimpleAttributeCreateParam param)

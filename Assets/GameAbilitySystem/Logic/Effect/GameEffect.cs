@@ -87,6 +87,11 @@ namespace GAS.Logic
             EffectCfg = default;
         }
 
+        public override string ToString()
+        {
+            return EffectName;
+        }
+
         internal void OnTick()
         {
             if (!EffectCfg.UseLifetimeVal) 
@@ -102,7 +107,7 @@ namespace GAS.Logic
         internal void OnAddEffect(GameUnit owner)
         {
             Owner = owner;
-            GameLogger.Log($"On add effect: {EffectName} of {Owner.UnitName}");
+            GameLogger.Log($"On add effect: {EffectName} of {Owner}");
             
             var oldAttributeVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType);
             var modifyOutputVal = GetModifyOutputVal(owner, EffectCfg.AttributeType, EffectCfg.ModifierOp, EffectCfg.ModifierVal);
@@ -142,7 +147,7 @@ namespace GAS.Logic
 
         internal void OnRemoveEffect()
         {
-            GameLogger.Log($"On remove effect: {EffectName} of {Owner.UnitName}");
+            GameLogger.Log($"On remove effect: {EffectName} of {Owner}");
             
             switch (EffectCfg.RollbackPolicy)
             {
@@ -263,7 +268,7 @@ namespace GAS.Logic
 
         public void OnObjDispose()
         {
-            GameLogger.Log($"Release Effect: {EffectName} of {Owner?.UnitName}");
+            GameLogger.Log($"Release Effect: {EffectName} of {Owner}");
             Owner?.GameEffects.Remove(this);
             _disposeMethod(this);
         }

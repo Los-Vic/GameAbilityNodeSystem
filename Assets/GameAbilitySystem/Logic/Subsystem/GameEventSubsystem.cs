@@ -64,7 +64,7 @@ namespace GAS.Logic
             eventArg.Init(ref param, DisposeGameEventArg);
             
             _eventStack.Push(eventArg);
-            GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit?.UnitName}, stack depth:{_eventStack.Count}");
+            GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit}, stack depth:{_eventStack.Count}");
             
             var gameEvent = GetGameEvent(param.EventType);
             gameEvent.OnEvent(eventArg);

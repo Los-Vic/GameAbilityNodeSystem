@@ -46,7 +46,7 @@ namespace GAS.Logic
 
         internal void DestroyGameUnit(GameUnit unit, EDestroyUnitReason reason = EDestroyUnitReason.None)
         {
-            GameLogger.Log($"Destroy unit:{unit.UnitName}, reason:{reason}");
+            GameLogger.Log($"Destroy unit:{unit}, reason:{reason}");
             _unitInstanceLookUp.Remove(unit.InstanceID);
             unit.DestroyReason = reason;
             var context = new UnitDestroyCueContext()

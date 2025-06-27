@@ -6,23 +6,24 @@ namespace GAS.Logic.Target
     [Serializable]
     public class TargetQueryGameTagMultiple: TargetQueryMultipleBase
     {
-        public List<EGameTag> WithAll;
-        public List<EGameTag> WithAny;
-        public List<EGameTag> WithNone;
+        public List<EGameTag> withAll;
+        public List<EGameTag> withAny;
+        public List<EGameTag> withNone;
     }
 
     public class TargetQueryGameTagUtility
     {
-        public static bool GetQueryResult(GameAbility ability, TargetQueryGameTagMultiple cfg, ref List<GameUnit> units)
+        public static bool GetQueryResult(GameAbility ability, TargetQueryGameTagMultiple cfg, ref List<GameUnit> units, bool ignoreSelf = false)
         {
             units.Clear();
+            
             //With All
-            var hasWithAll = cfg.WithAll is { Count: > 0 };
+            var hasWithAll = cfg.withAll is { Count: > 0 };
             if (hasWithAll)
             {
-                foreach (var o in ability.System.GameTagSubsystem.GetGameTagInstance(cfg.WithAll[0]).Owners)
+                foreach (var o in ability.System.GameTagSubsystem.GetGameTagInstance(cfg.withAll[0]).Owners)
                 {
-                    if(o is GameUnit u)
+                    if(o is GameUnit u && IgnoreSelfCheck(u))
                         units.Add(u);
                 }
 
@@ -30,9 +31,9 @@ namespace GAS.Logic.Target
                 {
                     var u = units[i];
                     var fail = false;
-                    for (var j = 1 ; j < cfg.WithAll.Count; j++)
+                    for (var j = 1 ; j < cfg.withAll.Count; j++)
                     {
-                        if(u.GetTagContainer().HasTag(cfg.WithAll[j]))
+                        if(u.GetTagContainer().HasTag(cfg.withAll[j]))
                             continue;
                         fail = true;
                     }
@@ -43,7 +44,7 @@ namespace GAS.Logic.Target
             }
             
             //With Any
-            var hasWithAny = cfg.WithAny is { Count: > 0 };
+            var hasWithAny = cfg.withAny is { Count: > 0 };
             if (hasWithAny)
             {
                 if (hasWithAll)
@@ -52,7 +53,7 @@ namespace GAS.Logic.Target
                     {
                         var u = units[i];
                         var success = false;
-                        foreach (var t in cfg.WithAny)
+                        foreach (var t in cfg.withAny)
                         {
                             if (!u.GetTagContainer().HasTag(t))
                                 continue;
@@ -66,11 +67,11 @@ namespace GAS.Logic.Target
                 }
                 else
                 {
-                    foreach (var t in cfg.WithAny)
+                    foreach (var t in cfg.withAny)
                     {
                         foreach (var o in ability.System.GameTagSubsystem.GetGameTagInstance(t).Owners)
                         {
-                            if(o is GameUnit u)
+                            if(o is GameUnit u && IgnoreSelfCheck(u))
                                 units.Add(u);
                         }
                     }
@@ -78,7 +79,7 @@ namespace GAS.Logic.Target
             }
             
             //With None
-            if (cfg.WithNone is { Count: > 0 })
+            if (cfg.withNone is { Count: > 0 })
             {
                 if (!hasWithAny && !hasWithAll)
                     ability.System.GetAllGameUnits(ref units);
@@ -87,19 +88,24 @@ namespace GAS.Logic.Target
                 {
                     var u = units[i];
                     var fail = false;
-                    foreach (var t in cfg.WithNone)
+                    foreach (var t in cfg.withNone)
                     {
                         if (!u.GetTagContainer().HasTag(t)) 
                             continue;
                         fail = true;
                         break;
                     }
-                    if(fail)
+                    if(fail || !IgnoreSelfCheck(u))
                         units.RemoveAt(i);
                 }
             }
 
             return units.Count > 0;
+
+            bool IgnoreSelfCheck(GameUnit u)
+            {
+                return !ignoreSelf || u != ability.Owner;
+            }
         }
     }
     

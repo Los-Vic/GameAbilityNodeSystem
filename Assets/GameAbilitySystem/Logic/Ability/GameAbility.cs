@@ -114,7 +114,12 @@ namespace GAS.Logic
             _instigator = null;
             Asset = null;
         }
-        
+
+        public override string ToString()
+        {
+            return AbilityName;
+        }
+
         #region Object Pool
 
         public void OnCreateFromPool()
@@ -175,7 +180,7 @@ namespace GAS.Logic
         internal void OnAddAbility(GameUnit owner)
         {
             Owner = owner;
-            GameLogger.Log($"On add ability: {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"On add ability: {AbilityName} of {Owner}");
             State = EAbilityState.Available;
             
             if(GraphController.HasEntryNode(typeof(OnAddAbilityEntryNode)))
@@ -199,7 +204,7 @@ namespace GAS.Logic
 
         internal void OnRemoveAbility()
         {
-            GameLogger.Log($"On remove ability: {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"On remove ability: {AbilityName} of {Owner}");
             
             var gameEventNodeList = GraphController.GetRegisteredGameEventNodePairs();
             if (gameEventNodeList != null)
@@ -281,13 +286,13 @@ namespace GAS.Logic
         {
             if (_activateAbilityRunners.Count == 0)
             {
-                GameLogger.Log($"Cancel ability failed, not activated. {AbilityName} of {Owner.UnitName}");
+                GameLogger.Log($"Cancel ability failed, not activated. {AbilityName} of {Owner}");
                 return;
             }
 
             foreach (var runner in _activateAbilityRunners)
             {
-                GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName} of {Owner.UnitName}");
+                GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName} of {Owner}");
                 runner.CancelRunner();
             }
 
@@ -312,7 +317,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartPreCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartPreCast succeeded. {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"Activate OnStartPreCast succeeded. {AbilityName} of {Owner}");
             var runner = GraphController.RunGraph(typeof(OnStartPreCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -322,7 +327,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartCast succeeded. {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"Activate OnStartCast succeeded. {AbilityName} of {Owner}");
             var runner = GraphController.RunGraph(typeof(OnStartCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -332,7 +337,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartPostCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartPostCast succeeded. {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"Activate OnStartPostCast succeeded. {AbilityName} of {Owner}");
             var runner = GraphController.RunGraph(typeof(OnStartPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -342,7 +347,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnEndPostCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnEndPostCast succeeded. {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"Activate OnEndPostCast succeeded. {AbilityName} of {Owner}");
             var runner = GraphController.RunGraph(typeof(OnEndPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -401,7 +406,7 @@ namespace GAS.Logic
 
         public void OnObjDispose()
         {
-            GameLogger.Log($"Release Ability: {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"Release Ability: {AbilityName} of {Owner}");
             Owner.GameAbilities.Remove(this);
             _disposeMethod(this);
         }
@@ -414,7 +419,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnInstigatorDestroyNode)))
                 return;
             
-            GameLogger.Log($"On instigator destroy. {AbilityName} of {Owner.UnitName}");
+            GameLogger.Log($"On instigator destroy. {AbilityName} of {Owner}");
             GraphController.RunGraph(typeof(OnInstigatorDestroyNode));
         }
     }

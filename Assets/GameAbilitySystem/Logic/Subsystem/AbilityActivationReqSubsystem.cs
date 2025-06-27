@@ -60,14 +60,14 @@ namespace GAS.Logic
 
         internal void StartJob()
         {
-            GameLogger.Log($"Start activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
+            GameLogger.Log($"Start activation job: {Req.Ability} of {Req.Ability.Owner}");
             JobState = EActivationReqJobState.Running;
             ExecuteStartPreCast();
         }
 
         internal void CancelJob()
         {
-            GameLogger.Log($"Cancel activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
+            GameLogger.Log($"Cancel activation job: {Req.Ability} of {Req.Ability.Owner}");
             JobState = EActivationReqJobState.Cancelled;
             Req.EventArgs?.GetRefCountDisposableComponent().RemoveRefCount(this);
         }
@@ -136,7 +136,7 @@ namespace GAS.Logic
             CastState = EActivationJobInCastState.None;
             Req.Ability.ActivateOnEndPostCast(Req.EventArgs);
             JobState = EActivationReqJobState.Completed;
-            GameLogger.Log($"Complete activation job: {Req.Ability.AbilityName} of {Req.Ability.Owner.UnitName}");
+            GameLogger.Log($"Complete activation job: {Req.Ability} of {Req.Ability.Owner}");
         }
         
         public bool IsRequesterStillValid()
@@ -276,7 +276,7 @@ namespace GAS.Logic
                    }
                    else
                    {
-                       GameLogger.LogError($"fail to find unit job queue, unit:{unit.UnitName}");
+                       GameLogger.LogError($"fail to find unit job queue, unit:{unit}");
                    }
                    break;
                case EActivationQueueType.Player:

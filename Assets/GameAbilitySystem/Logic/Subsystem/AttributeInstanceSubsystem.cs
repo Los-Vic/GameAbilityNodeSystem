@@ -28,7 +28,7 @@ namespace GAS.Logic
             var attribute = unit.GetSimpleAttribute(type);
             if (attribute == null)
             {
-                GameLogger.LogError($"Fail to find simple attribute {type} of {unit.UnitName}");
+                GameLogger.LogError($"Fail to find simple attribute {type} of {unit}");
                 return;
             }
             
