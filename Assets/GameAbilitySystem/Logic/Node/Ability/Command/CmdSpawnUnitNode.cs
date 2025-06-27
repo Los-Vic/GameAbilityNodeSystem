@@ -2,12 +2,15 @@
 
 namespace GAS.Logic.Command
 {
-    [Node("SpawnUnit", "AbilitySystem/Command/SpawnUnit", ENodeFunctionType.Value, typeof(CmdSpawnUnitNodeRunner), 
+    [Node("SpawnUnit", "AbilitySystem/Command/SpawnUnit", ENodeFunctionType.Action, typeof(CmdSpawnUnitNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public class CmdSpawnUnitNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]
         public string InPortExec;
+
+        [Port(EPortDirection.Input, typeof(int), "PlayerIndex")]
+        public string InPlayerIndex;
         
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]
         public string OutPortExec;
@@ -17,8 +20,6 @@ namespace GAS.Logic.Command
 
         [Exposed]
         public string UnitName;
-        [Exposed]
-        public int PlayerIndex;
     }
     
      public sealed class CmdSpawnUnitNodeRunner : FlowNodeRunner
@@ -34,7 +35,8 @@ namespace GAS.Logic.Command
         {
             base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            var unit = context.Ability.System.CommandDelegator.SpawnUnit(_node.UnitName, _node.PlayerIndex);
+            var playerIndex = GraphRunner.GetInPortVal<int>(_node.InPlayerIndex);
+            var unit = context.Ability.System.CommandDelegator.SpawnUnit(_node.UnitName, playerIndex);
             GraphRunner.SetOutPortVal(_node.OutPortUnit, unit);
             
             Complete();
