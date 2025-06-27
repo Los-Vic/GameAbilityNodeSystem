@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GAS
 {
-    public partial class GameAbilitySystemDebugger : MonoBehaviour
+    public partial class GameAbilitySystemDebuggerTest : MonoBehaviour
     {
         
     }
@@ -42,7 +42,7 @@ namespace GAS
         public float signal3;
     }
     
-    public partial class GameAbilitySystemDebugger
+    public partial class GameAbilitySystemDebuggerTest
     {
         //Need inject
         public GameAbilitySystem System;

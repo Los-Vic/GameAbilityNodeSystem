@@ -15,6 +15,7 @@ namespace GAS.Logic
         {
             _gameEvents.Clear();
             _eventStack.Clear();
+            _nextFrameEventsCache.Clear();
         }
 
         public override void Update(float deltaTime)

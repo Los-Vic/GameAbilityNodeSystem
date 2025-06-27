@@ -70,7 +70,8 @@ namespace GAS.Logic
             base.Execute();
             
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            _found = context.Ability.System.TargetSearcher.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
+            
+            _found = TargetQueryUtility.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
                 out var target, _node.IgnoreSelf);
 
             if(_found)
@@ -118,7 +119,7 @@ namespace GAS.Logic
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var targets = new List<GameUnit>();
 
-            _found = context.Ability.System.TargetSearcher.GetTargetsFromAbility(context.Ability,
+            _found = TargetQueryUtility.GetTargetsFromAbility(context.Ability,
                 _node.TargetMultipleCfg, ref targets, _node.IgnoreSelf);
             
             GraphRunner.SetOutPortVal(_node.OutUnitList, targets);

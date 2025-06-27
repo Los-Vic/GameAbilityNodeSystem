@@ -11,7 +11,7 @@ using UnityEditor;
 namespace GAS.Logic.Value
 {
     [Serializable]
-    public class ValuePickerParam:ValuePickerBase
+    public class ValuePickerAbilityParam:ValuePickerBase
     {
         [Header("参数")]
         [ValueDropdown(nameof(GetAllParams))] //odin draw in inspector

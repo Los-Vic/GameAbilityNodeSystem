@@ -180,9 +180,22 @@ namespace GAS.Logic
         private readonly List<Queue<AbilityActivationReqJob>> _updateUnitQueueList = new();
         private readonly List<AbilityActivationReqJob> _traverseJobList = new();
 
+        public override void Init()
+        {
+            for (var i = 0; i < System.PlayerNums; i++)
+            {
+                _playerQueues.Add(i, new Queue<AbilityActivationReqJob>());
+            }
+        }
+
         public override void UnInit()
         {
-            base.UnInit();
+            _worldQueue.Clear();
+            _playerQueues.Clear();
+            _unitQueues.Clear();
+            _independentJobList.Clear();
+            _updateUnitQueueList.Clear();
+            _traverseJobList.Clear();
         }
 
         public override void Update(float deltaTime)
@@ -334,14 +347,6 @@ namespace GAS.Logic
                        System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
                    }
                    break;
-            }
-        }
-
-        internal void CreatePlayerQueues(int playerCount)
-        {
-            for (var i = 0; i < playerCount; i++)
-            {
-                _playerQueues.Add(i, new Queue<AbilityActivationReqJob>());
             }
         }
         

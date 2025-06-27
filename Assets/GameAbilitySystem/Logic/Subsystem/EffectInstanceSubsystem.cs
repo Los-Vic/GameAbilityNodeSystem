@@ -65,5 +65,8 @@ namespace GAS.Logic
         {
             _needTickEffects.Remove(effect);
         }
+        
+        internal GameEffect GetEffectByInstanceID(int instanceID) =>
+            _effectInstanceLookUp.GetValueOrDefault(instanceID);
     }
 }

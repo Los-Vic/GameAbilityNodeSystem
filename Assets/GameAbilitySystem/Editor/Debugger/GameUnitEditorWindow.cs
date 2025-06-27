@@ -107,7 +107,7 @@ namespace GAS.Editor
         private void BuildUnitList()
         {
             unitsTable.Clear();
-            var systemDebugger = FindAnyObjectByType<GameAbilitySystemDebugger>();
+            var systemDebugger = FindAnyObjectByType<GameAbilitySystemDebuggerTest>();
             if (systemDebugger?.System == null)
             {
                 Debug.LogWarning("Can not find a game ability system instance !");

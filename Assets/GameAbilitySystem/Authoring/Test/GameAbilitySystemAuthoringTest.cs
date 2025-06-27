@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using GAS.Logic;
 using GAS.Logic.Target;
+using GAS.Logic.Value;
 using MissQ;
 using UnityEditor;
 using UnityEngine;
 
 namespace GAS
 {
-    public partial class GameAbilitySystemAuthoring:MonoBehaviour
+    public partial class GameAbilitySystemAuthoringTest:MonoBehaviour
     {
         
     }
@@ -17,10 +18,10 @@ namespace GAS
     /// <summary>
     /// A simple example, only run in editor. Use AssetDatabase load assets.
     /// </summary>
-    public partial class GameAbilitySystemAuthoring:IAssetConfigProvider, ICommandDelegator, ITargetSearcher
+    public partial class GameAbilitySystemAuthoringTest:IAssetConfigProvider, ICommandDelegator, ITargetSearcher, IValueProvider
     {
         private GameAbilitySystem _system;
-        private GameAbilitySystemDebugger _debugger;
+        private GameAbilitySystemDebuggerTest _debuggerTest;
         
         public ConfigHub configHub;
         
@@ -33,7 +34,7 @@ namespace GAS
 
         private void Awake()
         {
-            _debugger = GetComponent<GameAbilitySystemDebugger>();
+            _debuggerTest = GetComponent<GameAbilitySystemDebuggerTest>();
         }
 
         private void Start()
@@ -44,10 +45,11 @@ namespace GAS
                 AssetConfigProvider = this,
                 CommandDelegator = this,
                 TargetSearcher = this,
+                ValueProvider = this,
             });
             _system.OnCreateSystem();
             _system.InitSystem();
-            _debugger.System = _system;
+            _debuggerTest.System = _system;
             
             if (configHub.abilityEffectParamConfig)
             {
@@ -90,18 +92,6 @@ namespace GAS
             
             _abilityAssetsCache.TryAdd(abilityId, asset);
             return asset;
-        }
-
-        public FP GetAbilityEffectParamVal(string paramName, uint lv)
-        {
-            if (!_paramMap.TryGetValue(paramName, out var paramVals))
-                return 0;
-
-            if (paramVals.Count == 0)
-                return 0;
-            
-            var id = (int)Math.Clamp(lv, 0, paramVals.Count - 1);
-            return paramVals[id];
         }
 
         public GameUnit SpawnUnit(string unitName, int playerIndex)
@@ -148,13 +138,29 @@ namespace GAS
         public bool GetTargetsFromAbility(GameAbility ability, TargetQueryMultipleBase cfg, ref List<GameUnit> targets, bool ignoreSelf = false)
         {
             targets.Clear();
-            switch (cfg)
-            {
-                case TargetQueryGameTagMultiple t:
-                    TargetQueryGameTagUtility.GetQueryResult(ability, t, ref targets, ignoreSelf);
-                    break;
-            }
             return false;
+        }
+        
+        public FP GetValue(ValuePickerBase valuePicker, GameUnit unit, uint lv = 0)
+        {
+            switch (valuePicker)
+            {
+                case ValuePickerAbilityParam a:
+                    return GetAbilityEffectParamVal(a.paramName, lv);
+            }
+            return 0;
+        }
+        
+        private FP GetAbilityEffectParamVal(string paramName, uint lv)
+        {
+            if (!_paramMap.TryGetValue(paramName, out var paramVals))
+                return 0;
+
+            if (paramVals.Count == 0)
+                return 0;
+            
+            var id = (int)Math.Clamp(lv, 0, paramVals.Count - 1);
+            return paramVals[id];
         }
     }
 }

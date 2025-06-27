@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameplayCommonLibrary;
 using GAS.Logic.Target;
+using GAS.Logic.Value;
 using MissQ;
 using NS;
 using UnityEngine.Assertions;
@@ -13,6 +14,7 @@ namespace GAS.Logic
         public IAssetConfigProvider AssetConfigProvider;
         public ICommandDelegator CommandDelegator;
         public ITargetSearcher  TargetSearcher;
+        public IValueProvider ValueProvider;
         public int PlayerNums;
     }
 
@@ -47,6 +49,9 @@ namespace GAS.Logic
         //Target Searcher
         internal ITargetSearcher TargetSearcher { get; private set; }
         
+        //Value Provider
+        internal IValueProvider ValueProvider { get; private set; }
+        
         //Observable
         public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
         public readonly Observable<GameUnitDestroyObserve> OnUnitDestroyed = new ();
@@ -75,9 +80,12 @@ namespace GAS.Logic
             AssetConfigProvider = param.AssetConfigProvider;
             CommandDelegator = param.CommandDelegator;
             TargetSearcher = param.TargetSearcher;
+            ValueProvider = param.ValueProvider;
 
             Assert.IsNotNull(AssetConfigProvider);
             Assert.IsNotNull(CommandDelegator);
+            Assert.IsNotNull(TargetSearcher);
+            Assert.IsNotNull(ValueProvider);
         }
 
         public override void OnCreateSystem()
@@ -92,9 +100,7 @@ namespace GAS.Logic
             UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(false);
             EffectInstanceSubsystem = AddSubsystem<EffectInstanceSubsystem>(false);
             GameCueSubsystem = AddSubsystem<GameCueSubsystem>(false);
-            
             AbilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
-            AbilityActivationReqSubsystem.CreatePlayerQueues(PlayerNums);
         }
 
         public override void InitSystem()
@@ -202,6 +208,15 @@ namespace GAS.Logic
         public GameAbility GetGameAbilityByInstanceID(int instanceID)
         {
             return AbilityInstanceSubsystem.GetAbilityByInstanceID(instanceID);
+        }
+
+        #endregion
+
+        #region GameEffect
+
+        public GameEffect GetGameEffectByInstanceID(int instanceID)
+        {
+            return EffectInstanceSubsystem.GetEffectByInstanceID(instanceID);
         }
 
         #endregion

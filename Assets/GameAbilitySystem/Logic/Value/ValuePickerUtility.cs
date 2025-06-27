@@ -8,8 +8,6 @@ namespace GAS.Logic.Value
         {
             switch (valuePicker)
             {
-                case ValuePickerParam v :
-                    return unit.Sys.AssetConfigProvider.GetAbilityEffectParamVal(v.paramName, lv);
                 case ValuePickerSimpleAttribute v:
                     return unit.GetSimpleAttributeVal(v.simpleAttributeType);
                 case ValuePickerCompositeAttribute v:
@@ -18,7 +16,7 @@ namespace GAS.Logic.Value
                     return v.val;
             }
 
-            return 0;
+            return unit.Sys.ValueProvider.GetValue(valuePicker, unit, lv);
         }
     }
 }

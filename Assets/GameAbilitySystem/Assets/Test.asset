@@ -131,7 +131,7 @@ MonoBehaviour:
         InPlayerIndex: e056bb45-388c-4d8d-be55-0d902ccda362
         OutPortExec: 35803e85-c4a3-4bff-b077-70c81620975d
         OutPortUnit: 98c94a1b-65fa-4ca4-acf6-31a53597c36a
-        UnitName: 
+        UnitName: Card
     - rid: 4786282482181079155
       type: {class: NodePort, ns: NS, asm: NodeSystem}
       data:
