@@ -98,7 +98,6 @@ namespace GAS
         {
             var param = new GameUnitCreateParam()
             {
-                AbilitySystem = _system,
                 UnitName = unitName,
                 PlayerIndex = playerIndex
             };

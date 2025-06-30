@@ -21,14 +21,17 @@ namespace GAS.Logic
     {
         public ESimpleAttributeType Type;
         public FP DefaultVal;
-        public List<IValueDecorator> Decorators;
+        public List<ValueDecorator> Decorators;
     }
     
+    [System.Serializable]
     public class SimpleAttribute:IPoolClass
     {
         public ESimpleAttributeType Type { get; private set; }
+        
         private FP _val;
-        private List<IValueDecorator> _valDecorators;
+        
+        private List<ValueDecorator> _valDecorators;
         //for game logic
         public readonly Observable<AttributeChangeMsg> OnValChanged = new();
         //for view, UI

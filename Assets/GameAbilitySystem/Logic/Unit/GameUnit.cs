@@ -7,10 +7,15 @@ namespace GAS.Logic
 {
     public struct GameUnitCreateParam
     {
-        public GameAbilitySystem AbilitySystem;
         public string UnitName;
         public int PlayerIndex;
         public ECreateUnitReason Reason;
+    }
+
+    public struct GameUnitCreateParamEx
+    {
+        public GameUnitCreateParam BaseParam;
+        public int UnitInstanceID;
     }
 
     public enum ECreateUnitReason
@@ -34,22 +39,25 @@ namespace GAS.Logic
     /// </summary>
     public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
     {
-        public int InstanceID { get; internal set; }
-        
-        internal GameAbilitySystem Sys { get;private set; }
-        public int PlayerIndex { get; private set; }
-
         private const string DefaultUnitName = "UnkownUnit";
-        private string _unitName = DefaultUnitName;
-        private RefCountDisposableComponent _refCountDisposableComponent;
-        private bool _isActive;
         
+        
+        public int InstanceID { get; private set; }
+        public int PlayerIndex { get; private set; }
+       
+        private string _unitName = DefaultUnitName;
+
+        private RefCountDisposableComponent _refCountDisposableComponent;
+        
+        private bool _isActive;
         public string UnitName => _unitName;
         
-        internal ECreateUnitReason CreateReason { get; set; }
+        internal ECreateUnitReason CreateReason { get; private set; }
         internal EDestroyUnitReason DestroyReason { get; set; }
 
         internal readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new();
+        
+        internal GameAbilitySystem Sys { get;private set; }
         
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
@@ -70,11 +78,13 @@ namespace GAS.Logic
         private Action<GameUnit> _disposeMethod;
  
         
-        internal void Init(ref GameUnitCreateParam param, Action<GameUnit> disposeMethod)
+        internal void Init(GameAbilitySystem sys, ref GameUnitCreateParamEx param, Action<GameUnit> disposeMethod)
         {
-            Sys = param.AbilitySystem;
-            PlayerIndex = param.PlayerIndex;
-            _unitName = param.UnitName;
+            Sys = sys;
+            PlayerIndex = param.BaseParam.PlayerIndex;
+            _unitName = param.BaseParam.UnitName;
+            CreateReason = param.BaseParam.Reason;
+            InstanceID = param.UnitInstanceID;
             _disposeMethod = disposeMethod;
             Sys.AbilityActivationReqSubsystem.CreateGameUnitQueue(this);
         }

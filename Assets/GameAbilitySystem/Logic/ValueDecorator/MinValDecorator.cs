@@ -1,25 +1,27 @@
-﻿using MissQ;
+﻿using System;
+using MissQ;
 
 namespace GAS.Logic
 {
-    public class MinValDecorator:IValueDecorator
+    [Serializable]
+    public class MinValDecorator:ValueDecorator
     {
-        private readonly FP _minVal;
+        public FP minVal;
         
         public MinValDecorator(FP minVal)
         {
-            _minVal = minVal;
+            this.minVal = minVal;
         }
         
-        public bool Process(in FP inVal, out FP outVal)
+        public override bool Process(in FP inVal, out FP outVal)
         {
-            if (inVal.CompareTo(_minVal) >= 0)
+            if (inVal.CompareTo(minVal) >= 0)
             {
                 outVal = inVal;
                 return false;
             }
 
-            outVal = _minVal;
+            outVal = minVal;
             return true;
         }
     }

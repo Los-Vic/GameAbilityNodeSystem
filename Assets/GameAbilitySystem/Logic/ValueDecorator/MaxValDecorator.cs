@@ -1,25 +1,27 @@
-﻿using MissQ;
+﻿using System;
+using MissQ;
 
 namespace GAS.Logic
 {
-    public class MaxValDecorator:IValueDecorator
+    [Serializable]
+    public class MaxValDecorator:ValueDecorator
     {
-        private readonly FP _maxVal;
+        public FP maxVal;
         
         public MaxValDecorator(FP maxVal)
         {
-            _maxVal = maxVal;
+            this.maxVal = maxVal;
         }
         
-        public bool Process(in FP inVal, out FP outVal)
+        public override bool Process(in FP inVal, out FP outVal)
         {
-            if (inVal.CompareTo(_maxVal) <= 0)
+            if (inVal.CompareTo(maxVal) <= 0)
             {
                 outVal = inVal;
                 return false;
             }
 
-            outVal = _maxVal;
+            outVal = maxVal;
             return true;
         }
     }

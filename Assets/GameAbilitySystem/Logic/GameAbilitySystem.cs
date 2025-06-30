@@ -55,9 +55,6 @@ namespace GAS.Logic
         //Observable
         public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
         public readonly Observable<GameUnitDestroyObserve> OnUnitDestroyed = new ();
-        
-        //GameUnit
-        private readonly List<GameUnit> _allGameUnits = new();
 
         #region SubSystems
 
@@ -174,28 +171,11 @@ namespace GAS.Logic
         
         #region GameUnit
 
-        public GameUnit CreateGameUnit(ref GameUnitCreateParam param)
-        {
-            var unit = UnitInstanceSubsystem.CreateGameUnit(ref param);
-            _allGameUnits.Add(unit);
-            return unit;
-        }
-
-        public void DestroyGameUnit(GameUnit gameUnit)
-        {
-            _allGameUnits.Remove(gameUnit);
-            UnitInstanceSubsystem.DestroyGameUnit(gameUnit);
-        }
-
-        public void GetAllGameUnits(ref List<GameUnit> unitList)
-        {
-            unitList.Clear();
-            foreach (var u in _allGameUnits)
-            {
-                unitList.Add(u);
-            }
-        }
-
+        public GameUnit CreateGameUnit(ref GameUnitCreateParam param) => UnitInstanceSubsystem.CreateGameUnit(ref param);
+        public GameUnit CreateGameUnitEx(ref GameUnitCreateParamEx paramEx) => UnitInstanceSubsystem.CreateGameUnitEx(ref paramEx);
+        public void DestroyGameUnit(GameUnit gameUnit) => UnitInstanceSubsystem.DestroyGameUnit(gameUnit);
+        public void DestroyGameUnit(int unitInstance) => UnitInstanceSubsystem.DestroyGameUnit(unitInstance);
+        public void GetAllGameUnits(ref List<GameUnit> unitList) => UnitInstanceSubsystem.GetAllUnits(ref unitList);
         public GameUnit GetGameUnitByInstanceID(int instanceID)
         {
             return UnitInstanceSubsystem.GetGameUnitByInstanceID(instanceID);
