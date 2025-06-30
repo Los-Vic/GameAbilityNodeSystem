@@ -52,7 +52,7 @@ namespace GAS
             if (context.AttributeType != ESimpleAttributeType.None)
             {
                 var attribute = unit.GetSimpleAttribute(context.AttributeType);
-                attribute.OnPlayValChangeCue.NotifyObservers(new AttributeChangeForCue()
+                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, new AttributeChangeForCue()
                 {
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,
@@ -61,7 +61,7 @@ namespace GAS
             else
             {
                 var attribute = unit.GetCompositeAttribute(context.CompositeAttributeType);
-                attribute.OnPlayValChangeCue.NotifyObservers(new AttributeChangeForCue()
+                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, new AttributeChangeForCue()
                 {
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,

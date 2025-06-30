@@ -12,7 +12,7 @@ namespace GAS.Logic
         public ECreateUnitReason Reason;
     }
 
-    public struct GameUnitCreateParamEx
+    internal struct GameUnitCreateParamEx
     {
         public GameUnitCreateParam BaseParam;
         public int UnitInstanceID;
@@ -40,8 +40,6 @@ namespace GAS.Logic
     public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
     {
         private const string DefaultUnitName = "UnkownUnit";
-        
-        
         public int InstanceID { get; private set; }
         public int PlayerIndex { get; private set; }
        
@@ -123,6 +121,8 @@ namespace GAS.Logic
             GameEffects.Clear();
         }
 
+        public bool IsPendingDestroy() => GetRefCountDisposableComponent().IsPendingDispose;
+        
         public override string ToString()
         {
             return _unitName;

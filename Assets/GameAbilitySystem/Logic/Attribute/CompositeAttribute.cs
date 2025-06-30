@@ -19,8 +19,8 @@ namespace GAS.Logic
         private List<SimpleAttribute> _simpleAttributes;
         private Func<List<FP>, FP> _valEquation;
         private readonly List<FP> _simpleAttributeVals = new();
-        public readonly Observable<AttributeChangeMsg> OnValChanged = new();
-        public readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
+        internal readonly Observable<AttributeChangeMsg> OnValChanged = new();
+        internal readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
         public FP Val
         {
             get

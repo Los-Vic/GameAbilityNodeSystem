@@ -33,9 +33,9 @@ namespace GAS.Logic
         
         private List<ValueDecorator> _valDecorators;
         //for game logic
-        public readonly Observable<AttributeChangeMsg> OnValChanged = new();
+        internal readonly Observable<AttributeChangeMsg> OnValChanged = new();
         //for view, UI
-        public readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
+        internal readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
         
         public void Init(ref SimpleAttributeCreateParam param)
         {

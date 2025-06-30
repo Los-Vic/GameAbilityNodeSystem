@@ -172,7 +172,6 @@ namespace GAS.Logic
         #region GameUnit
 
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param) => UnitInstanceSubsystem.CreateGameUnit(ref param);
-        public GameUnit CreateGameUnitEx(ref GameUnitCreateParamEx paramEx) => UnitInstanceSubsystem.CreateGameUnitEx(ref paramEx);
         public void DestroyGameUnit(GameUnit gameUnit) => UnitInstanceSubsystem.DestroyGameUnit(gameUnit);
         public void DestroyGameUnit(int unitInstance) => UnitInstanceSubsystem.DestroyGameUnit(unitInstance);
         public void GetAllGameUnits(ref List<GameUnit> unitList) => UnitInstanceSubsystem.GetAllUnits(ref unitList);
@@ -199,6 +198,59 @@ namespace GAS.Logic
             return EffectInstanceSubsystem.GetEffectByInstanceID(instanceID);
         }
 
+        #endregion
+
+        #region  Observe Attribute OnValChange
+
+        public void RegisterAttributeOnValChange(object observer, SimpleAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
+        {
+            attribute.OnValChanged.RegisterObserver(observer, callback, priority);
+        }
+        
+        public void UnRegisterAttributeOnValChange(object observer, SimpleAttribute attribute)
+        {
+            attribute.OnValChanged.UnRegisterObserver(observer);
+        }
+
+        public void RegisterAttributeOnValChange(object observer, CompositeAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
+        {
+            attribute.OnValChanged.RegisterObserver(observer, callback, priority);
+        }
+        
+        public void UnRegisterAttributeOnValChange(object observer, CompositeAttribute attribute)
+        {
+            attribute.OnValChanged.UnRegisterObserver(observer);
+        }
+        
+        public void RegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
+        {
+            attribute.OnPlayValChangeCue.RegisterObserver(observer, callback, priority);
+        }
+        
+        public void UnRegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute)
+        {
+            attribute.OnPlayValChangeCue.UnRegisterObserver(observer);
+        }
+        public void RegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
+        {
+            attribute.OnPlayValChangeCue.RegisterObserver(observer, callback, priority);
+        }
+        
+        public void UnRegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute)
+        {
+            attribute.OnPlayValChangeCue.UnRegisterObserver(observer);
+        }
+
+        public void PlayAttributeOnChangeCue(SimpleAttribute attribute, AttributeChangeForCue changeForCue)
+        {
+            attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
+        }
+        
+        public void PlayAttributeOnChangeCue(CompositeAttribute attribute, AttributeChangeForCue changeForCue)
+        {
+            attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
+        }
+        
         #endregion
 
         #region Log
