@@ -28,3 +28,6 @@ Ability通过Effect来影响单位身上的属性
 
 简单的查看单位状态的窗口
 ![window to check unit states](image-2.png)
+
+简单的测试技能资源
+![ability asset](image.png)
