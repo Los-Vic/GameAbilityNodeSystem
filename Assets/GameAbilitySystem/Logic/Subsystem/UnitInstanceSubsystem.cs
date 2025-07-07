@@ -1,90 +1,95 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler; 
 
 namespace GAS.Logic
 {
+    /// <summary>
+    /// Unit拥有Ability、Effect、Attribute对象，但销毁Unit时，会销毁所拥有的对象
+    /// </summary>
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
-        private readonly Dictionary<int, GameUnit> _unitInstanceLookUp = new();
-        private int _unitInstanceIDCounter;
-        
+        public HandlerResourceMgr<GameUnit> UnitHandlerRscMgr { get; private set; }
+        private readonly List<Handler<GameUnit>> _pendingDestroyUnitList = new();
+
+        public override void Init()
+        {
+            base.Init();
+            UnitHandlerRscMgr = new HandlerResourceMgr<GameUnit>(512);
+        }
+
         public override void UnInit()
         {
-            _unitInstanceLookUp.Clear();
-
-            var units = new List<GameUnit>();
-            System.GetAllGameUnits(ref units);
-            foreach (var u in units)
-            {
-                DestroyGameUnit(u);
-            }
+            UnitHandlerRscMgr.ForeachResource(DisposeUnit);
+            _pendingDestroyUnitList.Clear();
         }
 
-        public void GetAllUnits(ref List<GameUnit> unitList)
+        public override void Update(float deltaTime)
         {
-            unitList.Clear();
-            unitList.AddRange(_unitInstanceLookUp.Values);
-        }
-        
-        private int GetNextUnitInstanceID()
-        {
-            while (true)
+            if (_pendingDestroyUnitList.Count == 0)
+                return;
+
+            for (var i = _pendingDestroyUnitList.Count - 1; i >= 0; i--)
             {
-                var nextId = _unitInstanceIDCounter + 1;
-                if (_unitInstanceLookUp.ContainsKey(nextId)) 
+                var h = _pendingDestroyUnitList[i];
+                if (UnitHandlerRscMgr.GetRefCount(h) != 0 || !UnitHandlerRscMgr.Dereference(h, out var unit)) 
                     continue;
-                _unitInstanceIDCounter = nextId;
-                return nextId;
+                DisposeUnit(unit);
+                _pendingDestroyUnitList.RemoveAt(i);
             }
+        }
+
+        public GameUnit[] GetAllUnits()
+        {
+            return UnitHandlerRscMgr.GetAllResources();
         }
 
         #region Game Unit Instance Create/Destroy
-
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var paramEx = new GameUnitCreateParamEx()
-            {
-                BaseParam = param,
-                UnitInstanceID = GetNextUnitInstanceID()
-            };
-
-            return CreateGameUnitEx(ref paramEx);
-        }
-
-        internal GameUnit CreateGameUnitEx(ref GameUnitCreateParamEx paramEx)
-        {
-            if (_unitInstanceLookUp.ContainsKey(paramEx.UnitInstanceID))
-            {
-                GameLogger.LogError($"Create game unit failed. unit instance id has existed ! {paramEx.UnitInstanceID}");
-                return null;
-            }
-            
             var unit = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameUnit>();
-            unit.Init(System, ref paramEx, DisposeUnit);
-            _unitInstanceLookUp.Add(unit.InstanceID, unit);
+            var h = UnitHandlerRscMgr.Create(unit);
+
+            var initParam = new GameUnitInitParam()
+            {
+                CreateParam = param,
+                Handler = h
+            };
+            unit.Init(System, ref initParam);
+            
             System.OnUnitCreated.NotifyObservers(new GameUnitCreateObserve()
             {
-                Reason = paramEx.BaseParam.Reason,
+                Reason = param.Reason,
                 Unit = unit
             });
             var context = new UnitCreateCueContext()
             {
-                UnitInstanceID = unit.InstanceID
+                UnitInstanceID = unit.Handler
             };
             System.GameCueSubsystem.PlayUnitCreateCue(ref context);
-            GameLogger.Log($"Create unit:{paramEx.BaseParam.UnitName}, reason:{paramEx.BaseParam.Reason}");
+            GameLogger.Log($"Create unit:{param.UnitName}, reason:{param.Reason}");
             return unit;
         }
         
-        internal void DestroyGameUnit(GameUnit unit, EDestroyUnitReason reason = EDestroyUnitReason.None)
+        internal void DestroyGameUnit(Handler<GameUnit> unitHandler, EDestroyUnitReason reason = EDestroyUnitReason.None)
         {
+            if (!UnitHandlerRscMgr.Dereference(unitHandler, out var unit))
+            {
+                GameLogger.LogError($"Destroy game unit failed, unit handler generation mismatch. {unitHandler}");
+                return;
+            }
+
+            if (unit.Status is EUnitStatus.Destroyed or EUnitStatus.PendingDestroy)
+            {
+                GameLogger.Log($"Unit is marked as destroyed or destroyed, {unit}");
+                return;
+            }
+            
             GameLogger.Log($"Destroy unit:{unit}, reason:{reason}");
-            _unitInstanceLookUp.Remove(unit.InstanceID);
-            unit.DestroyReason = reason;
+            unit.MarkForDestroy(reason);
             var context = new UnitDestroyCueContext()
             {
-                UnitInstanceID = unit.InstanceID
+                UnitInstanceID = unitHandler
             };
             System.GameCueSubsystem.PlayUnitDestroyCue(ref context);
             unit.OnUnitDestroyed.NotifyObservers(reason);
@@ -93,23 +98,22 @@ namespace GAS.Logic
                 Reason = reason,
                 Unit = unit
             });
-            unit.GetRefCountDisposableComponent().MarkForDispose();
-        }
 
-        internal void DestroyGameUnit(int unitInstanceID, EDestroyUnitReason reason = EDestroyUnitReason.None)
-        {
-            var unit = GetGameUnitByInstanceID(unitInstanceID);
-            if (unit == null)
-                return;
-            DestroyGameUnit(unit, reason);
+            if (UnitHandlerRscMgr.GetRefCount(unitHandler) > 0)
+            {
+                _pendingDestroyUnitList.Add(unitHandler);
+            }
+            else
+            {
+                DisposeUnit(unit);
+            }
         }
 
         private void DisposeUnit(GameUnit unit)
         {
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(unit);
+            UnitHandlerRscMgr.Release(unit.Handler);
         }
-
-        internal GameUnit GetGameUnitByInstanceID(int unitInstanceID) => _unitInstanceLookUp.GetValueOrDefault(unitInstanceID);
 
         #endregion
     }

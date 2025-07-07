@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using GAS.Logic;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -47,7 +47,7 @@ namespace GAS.Editor
 
         [BoxGroup("Unit")]
         [ReadOnly]
-        public int instanceId;
+        public uint handler;
         
         [BoxGroup("Unit")]
         [LabelText("Attributes")]
@@ -113,9 +113,8 @@ namespace GAS.Editor
                 Debug.LogWarning("Can not find a game ability system instance !");
                 return;
             }
-
-            var unitList = new List<GameUnit>();
-            systemDebugger.System.GetAllGameUnits(ref unitList);
+            
+            var unitList = systemDebugger.System.GetAllGameUnits();
             
             var simpleAttributes = new List<SimpleAttribute>();
             var compositeAttributes = new List<CompositeAttribute>();
@@ -126,7 +125,7 @@ namespace GAS.Editor
                 var editorObj = new GameUnitEditorObj
                 {
                     name = unit.UnitName,
-                    instanceId = unit.InstanceID,
+                    handler = unit.Handler,
                     attributes = new List<GameUnitEditorAttribute>(),
                     effects = new List<GameUnitEditorEffect>(),
                     abilities = new List<GameUnitEditorAbility>(),

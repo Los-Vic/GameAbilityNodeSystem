@@ -1,35 +1,51 @@
 ﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 
 namespace GAS.Logic
 {
+    //Ability的Handler不应该AddRef
     public class AbilityInstanceSubsystem:GameAbilitySubsystem
     {
         private readonly List<GameAbility> _needTickAbilities = new();
         private readonly List<GameAbility> _traverseAbilityCache = new();
-        private readonly Dictionary<int, GameAbility> _abilityInstanceLookUp = new();
-        private int _abilityInstanceCounter;
+        private readonly List<GameAbility> _pendingDestroyAbilities = new();
+        
+        public HandlerResourceMgr<GameAbility> AbilityHandlerRscMgr { get; private set; }
+
+        public override void Init()
+        {
+            base.Init();
+            AbilityHandlerRscMgr = new(1024);
+        }
 
         public override void UnInit()
         {
-            _abilityInstanceLookUp.Clear();
+            _needTickAbilities.Clear();
+            _traverseAbilityCache.Clear();
+            _pendingDestroyAbilities.Clear();
             base.UnInit();
         }
 
         public override void Update(float deltaTime)
         {
-            if(_needTickAbilities.Count == 0)
+            if(_needTickAbilities.Count == 0 && _pendingDestroyAbilities.Count == 0)
                 return;
 
             _traverseAbilityCache.Clear();
-            foreach (var a in _needTickAbilities)
-            {
-                _traverseAbilityCache.Add(a);
-            }
-
+            _traverseAbilityCache.AddRange(_needTickAbilities);
             foreach (var a in _traverseAbilityCache)
             {
                 a.OnTick();
+            }
+
+            for (var i = _pendingDestroyAbilities.Count - 1; i >= 0; i--)
+            {
+                var h = _pendingDestroyAbilities[i].Handler;
+                if (AbilityHandlerRscMgr.GetRefCount(h) != 0)
+                    continue;
+                DisposeAbility(_pendingDestroyAbilities[i]);
+                _pendingDestroyAbilities.RemoveAt(i);
             }
         }
 
@@ -43,23 +59,41 @@ namespace GAS.Logic
             }
             
             var ability = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameAbility>();
-            ability.Init(System, abilityAsset, ref param, DisposeAbility);
+            var h = AbilityHandlerRscMgr.Create(ability);
 
-            _abilityInstanceCounter++;
-            ability.InstanceID = _abilityInstanceCounter;
-            
-            _abilityInstanceLookUp.Add(ability.InstanceID, ability);
+            var initParam = new AbilityInitParam()
+            {
+                CreateParam = param,
+                Handler = h
+            };
+            ability.Init(System, abilityAsset, ref initParam);
             return ability;
         }
         internal void DestroyAbility(GameAbility ability)
         {
-            _abilityInstanceLookUp.Remove(ability.InstanceID);
+            if (ability.State is EAbilityState.MarkDestroy or EAbilityState.UnInitialized)
+                return;
+            
+            ability.MarkDestroy();
             RemoveFromTickList(ability);
-            ability.GetRefCountDisposableComponent().MarkForDispose();
+            if (AbilityHandlerRscMgr.GetRefCount(ability.Handler) > 0)
+            {
+                _pendingDestroyAbilities.Add(ability);
+            }
+            else
+            {
+                DisposeAbility(ability);
+            }
         }
 
         private void DisposeAbility(GameAbility ability)
         {
+            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(ability.Owner, out var owner))
+            {
+                GameLogger.Log($"Release Ability: {ability}");
+                owner.GameAbilities.Remove(ability);
+            }
+            
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(ability);
         }
 
@@ -76,7 +110,7 @@ namespace GAS.Logic
             _needTickAbilities.Remove(ability);
         }
 
-        internal GameAbility GetAbilityByInstanceID(int instanceID) =>
-            _abilityInstanceLookUp.GetValueOrDefault(instanceID);
+        internal bool GetAbilityByHandler(Handler<GameAbility> h, out GameAbility ability) =>
+            AbilityHandlerRscMgr.Dereference(h, out ability);
     }
 }

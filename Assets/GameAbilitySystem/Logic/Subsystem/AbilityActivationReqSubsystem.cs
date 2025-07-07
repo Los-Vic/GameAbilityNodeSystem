@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 using MissQ;
 
 namespace GAS.Logic
@@ -18,13 +19,14 @@ namespace GAS.Logic
         public FP CastTime;
         public FP PostCastTime;
     }
-    
+
     public enum EActivationReqJobState
     {
         Waiting,
         Running,
         Completed,
-        Cancelled
+        Cancelled,
+        Aborted,
     }
 
     public enum EActivationJobInCastState
@@ -32,49 +34,64 @@ namespace GAS.Logic
         None,
         PreCast,
         Cast,
-        PostCast
+        PostCast,
     }
-    
+
     public struct AbilityActivationReq
     {
-        public GameAbility Ability;
-        public GameEventArg EventArgs;
+        public Handler<GameAbility> Ability;
+        public Handler<GameEventArg> EventArgs;
         public EActivationQueueType QueueType;
         public AbilityCastCfg CastCfg;
     }
-    
-    public class AbilityActivationReqJob:IRefCountRequester, IPoolClass
+
+    public class AbilityActivationReqJob : IPoolClass
     {
-        public AbilityActivationReq Req { get;private set; }
+        public AbilityActivationReq Req { get; private set; }
         public EActivationReqJobState JobState { get; private set; }
         public EActivationJobInCastState CastState { get; private set; }
 
-        private bool _isValid;
         private FP _timeFromLastCastState;
+        private GameAbilitySystem _system;
 
-        internal void InitJob(AbilityActivationReq req)
+        internal void InitJob(GameAbilitySystem system, AbilityActivationReq req)
         {
+            _system = system;
             Req = req;
-            Req.EventArgs?.GetRefCountDisposableComponent().AddRefCount(this);
+            system.GameEventSubsystem.GameEventResourceMgr.AddRefCount(req.EventArgs);
         }
 
         internal void StartJob()
         {
-            GameLogger.Log($"Start activation job: {Req.Ability} of {Req.Ability.Owner}");
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                GameLogger.LogWarning($"Start Job failed, failed to get ability {Req.Ability}");
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
+            GameLogger.Log($"Start activation job: {ability}");
             JobState = EActivationReqJobState.Running;
             ExecuteStartPreCast();
         }
 
         internal void CancelJob()
         {
-            GameLogger.Log($"Cancel activation job: {Req.Ability} of {Req.Ability.Owner}");
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                GameLogger.LogWarning($"Cancel Job failed, failed to get ability {Req.Ability}");
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
+            GameLogger.Log($"Cancel activation job: {ability}");
             JobState = EActivationReqJobState.Cancelled;
-            Req.EventArgs?.GetRefCountDisposableComponent().RemoveRefCount(this);
+            _system.GameEventSubsystem.GameEventResourceMgr.RemoveRefCount(Req.EventArgs);
         }
-        
+
         internal void TickJob(FP tickTime)
         {
-            if(JobState != EActivationReqJobState.Running)
+            if (JobState != EActivationReqJobState.Running)
                 return;
 
             _timeFromLastCastState += tickTime;
@@ -86,6 +103,7 @@ namespace GAS.Logic
                         _timeFromLastCastState -= Req.CastCfg.PreCastTime;
                         ExecuteStartCast();
                     }
+
                     break;
                 case EActivationJobInCastState.Cast:
                     if (_timeFromLastCastState >= Req.CastCfg.CastTime)
@@ -93,6 +111,7 @@ namespace GAS.Logic
                         _timeFromLastCastState -= Req.CastCfg.CastTime;
                         ExecuteStartPostCast();
                     }
+
                     break;
                 case EActivationJobInCastState.PostCast:
                     if (_timeFromLastCastState >= Req.CastCfg.PostCastTime)
@@ -100,48 +119,73 @@ namespace GAS.Logic
                         _timeFromLastCastState -= Req.CastCfg.PostCastTime;
                         ExecuteEndPostCast();
                     }
+
                     break;
             }
         }
 
         private void ExecuteStartPreCast()
         {
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
             CastState = EActivationJobInCastState.PreCast;
-            Req.Ability.ActivateOnStartPreCast(Req.EventArgs);
+            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            ability.ActivateOnStartPreCast(eventArg);
             if (Req.CastCfg.PreCastTime > 0)
                 return;
             ExecuteStartCast();
         }
-        
+
         private void ExecuteStartCast()
         {
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
             CastState = EActivationJobInCastState.Cast;
-            Req.Ability.ActivateOnStartCast(Req.EventArgs);
-            if(Req.CastCfg.CastTime > 0)
+            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            ability.ActivateOnStartCast(eventArg);
+            if (Req.CastCfg.CastTime > 0)
                 return;
             ExecuteStartPostCast();
         }
-        
+
         private void ExecuteStartPostCast()
         {
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
             CastState = EActivationJobInCastState.PostCast;
-            Req.Ability.ActivateOnStartPostCast(Req.EventArgs);
-            if(Req.CastCfg.PostCastTime > 0) 
+            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            ability.ActivateOnStartPostCast(eventArg);
+            if (Req.CastCfg.PostCastTime > 0)
                 return;
             ExecuteEndPostCast();
         }
-        
+
         private void ExecuteEndPostCast()
         {
+            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            {
+                JobState = EActivationReqJobState.Aborted;
+                return;
+            }
+
             CastState = EActivationJobInCastState.None;
-            Req.Ability.ActivateOnEndPostCast(Req.EventArgs);
+            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            ability.ActivateOnEndPostCast(eventArg);
             JobState = EActivationReqJobState.Completed;
-            GameLogger.Log($"Complete activation job: {Req.Ability} of {Req.Ability.Owner}");
-        }
-        
-        public bool IsRequesterStillValid()
-        {
-            return _isValid;
+
+            GameLogger.Log($"Complete activation job: {ability}");
         }
 
         public void OnCreateFromPool()
@@ -150,13 +194,11 @@ namespace GAS.Logic
 
         public void OnTakeFromPool()
         {
-            _isValid = true;
         }
 
         public void OnReturnToPool()
         {
-            Req.EventArgs?.GetRefCountDisposableComponent().RemoveRefCount(this);
-            _isValid = false;
+            _system.GameEventSubsystem.GameEventResourceMgr.RemoveRefCount(Req.EventArgs);
             CastState = EActivationJobInCastState.None;
             JobState = EActivationReqJobState.Waiting;
             _timeFromLastCastState = 0;
@@ -166,17 +208,17 @@ namespace GAS.Logic
         {
         }
     }
-    
+
     /// <summary>
     /// Job的结束
     /// </summary>
-    public class AbilityActivationReqSubsystem:GameAbilitySubsystem
+    public class AbilityActivationReqSubsystem : GameAbilitySubsystem
     {
         private readonly Queue<AbilityActivationReqJob> _worldQueue = new();
         private readonly Dictionary<int, Queue<AbilityActivationReqJob>> _playerQueues = new();
         private readonly Dictionary<GameUnit, Queue<AbilityActivationReqJob>> _unitQueues = new();
         private readonly List<AbilityActivationReqJob> _independentJobList = new();
-        
+
         private readonly List<Queue<AbilityActivationReqJob>> _updateUnitQueueList = new();
         private readonly List<AbilityActivationReqJob> _traverseJobList = new();
 
@@ -205,11 +247,12 @@ namespace GAS.Logic
             {
                 var job = _worldQueue.Peek();
                 job.TickJob(deltaTime);
-                if(job.JobState == EActivationReqJobState.Running)
+                if (job.JobState == EActivationReqJobState.Running)
                     break;
                 _worldQueue.Dequeue();
                 System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
             }
+
             //Player
             foreach (var queue in _playerQueues.Values)
             {
@@ -217,7 +260,7 @@ namespace GAS.Logic
                 {
                     var job = queue.Peek();
                     job.TickJob(deltaTime);
-                    if(job.JobState == EActivationReqJobState.Running)
+                    if (job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
                     System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
@@ -231,20 +274,20 @@ namespace GAS.Logic
             {
                 _updateUnitQueueList.Add(queue);
             }
-            
+
             foreach (var queue in _updateUnitQueueList)
             {
                 while (queue.Count > 0)
                 {
                     var job = queue.Peek();
                     job.TickJob(deltaTime);
-                    if(job.JobState == EActivationReqJobState.Running)
+                    if (job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
                     System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
                 }
             }
-            
+
             //Independent
             _traverseJobList.Clear();
             foreach (var job in _independentJobList)
@@ -266,90 +309,107 @@ namespace GAS.Logic
         {
             switch (job.Req.QueueType)
             {
-               case EActivationQueueType.Unit:
-                   var unit = job.Req.Ability.Owner;
-                   if (_unitQueues.TryGetValue(unit, out var unitQueue))
-                   {
-                       if (unitQueue.Count > 0)
-                       {
-                           unitQueue.Enqueue(job);
-                       }
-                       else
-                       {
-                           job.StartJob();
-                           if (job.JobState == EActivationReqJobState.Running)
-                           {
-                               unitQueue.Enqueue(job);
-                           }
-                           else
-                           {
-                               System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
-                           }
-                       }
-                   }
-                   else
-                   {
-                       GameLogger.LogError($"fail to find unit job queue, unit:{unit}");
-                   }
-                   break;
-               case EActivationQueueType.Player:
-                   var playerIndex = job.Req.Ability.Owner.PlayerIndex;
-                   if (_playerQueues.TryGetValue(playerIndex, out var playerQueue))
-                   {
-                       if (playerQueue.Count > 0)
-                       {
-                           playerQueue.Enqueue(job);
-                       }
-                       else
-                       {
-                           job.StartJob();
-                           if (job.JobState == EActivationReqJobState.Running)
-                           {
-                               playerQueue.Enqueue(job);
-                           }
-                           else
-                           {
-                               System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
-                           }
-                       }
-                   }
-                   else
-                   {
-                       GameLogger.LogError($"fail to find player job queue, player:{playerIndex}");
-                   }
-                   break;
-               case EActivationQueueType.World:
-                   if (_worldQueue.Count > 0)
-                   {
-                       _worldQueue.Enqueue(job);
-                   }
-                   else
-                   {
-                       job.StartJob();
-                       if (job.JobState == EActivationReqJobState.Running)
-                       {
-                           _worldQueue.Enqueue(job);
-                       }
-                       else
-                       {
-                           System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
-                       }
-                   }
-                   break;
-               case EActivationQueueType.NoQueue:
-                   job.StartJob();
-                   if (job.JobState == EActivationReqJobState.Running)
-                   {
-                       _independentJobList.Add(job);
-                   }
-                   else
-                   {
-                       System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
-                   }
-                   break;
+                case EActivationQueueType.Unit:
+                {
+                    if (!System.GetRscFromHandler(job.Req.Ability, out var ability))
+                        break;
+
+                    if (!System.GetRscFromHandler(ability.Owner, out var unit))
+                        break;
+
+                    if (_unitQueues.TryGetValue(unit, out var unitQueue))
+                    {
+                        if (unitQueue.Count > 0)
+                        {
+                            unitQueue.Enqueue(job);
+                        }
+                        else
+                        {
+                            job.StartJob();
+                            if (job.JobState == EActivationReqJobState.Running)
+                            {
+                                unitQueue.Enqueue(job);
+                            }
+                            else
+                            {
+                                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        GameLogger.LogError($"fail to find unit job queue, unit:{unit}");
+                    }
+
+                    break;
+                }
+                case EActivationQueueType.Player:
+                {
+                    if (!System.GetRscFromHandler(job.Req.Ability, out var ability))
+                        break;
+                    if (!System.GetRscFromHandler(ability.Owner, out var owner))
+                        break;
+                    var playerIndex = owner.PlayerIndex;
+                    if (_playerQueues.TryGetValue(playerIndex, out var playerQueue))
+                    {
+                        if (playerQueue.Count > 0)
+                        {
+                            playerQueue.Enqueue(job);
+                        }
+                        else
+                        {
+                            job.StartJob();
+                            if (job.JobState == EActivationReqJobState.Running)
+                            {
+                                playerQueue.Enqueue(job);
+                            }
+                            else
+                            {
+                                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        GameLogger.LogError($"fail to find player job queue, player:{playerIndex}");
+                    }
+
+                    break;
+                }
+                case EActivationQueueType.World:
+                    if (_worldQueue.Count > 0)
+                    {
+                        _worldQueue.Enqueue(job);
+                    }
+                    else
+                    {
+                        job.StartJob();
+                        if (job.JobState == EActivationReqJobState.Running)
+                        {
+                            _worldQueue.Enqueue(job);
+                        }
+                        else
+                        {
+                            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                        }
+                    }
+
+                    break;
+                case EActivationQueueType.NoQueue:
+                    job.StartJob();
+                    if (job.JobState == EActivationReqJobState.Running)
+                    {
+                        _independentJobList.Add(job);
+                    }
+                    else
+                    {
+                        System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                    }
+
+                    break;
             }
         }
-        
+
         internal void CreateGameUnitQueue(GameUnit unit)
         {
             _unitQueues.TryAdd(unit, new Queue<AbilityActivationReqJob>());
@@ -360,6 +420,4 @@ namespace GAS.Logic
             _unitQueues.Remove(unit);
         }
     }
-    
-    
 }

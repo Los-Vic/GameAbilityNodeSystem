@@ -1,4 +1,5 @@
 ﻿using System;
+using GameplayCommonLibrary.Handler;
 using MissQ;
 
 namespace GAS.Logic
@@ -29,17 +30,23 @@ namespace GAS.Logic
         NextFrame = 1, //下一帧
     }
     
-    public struct GameEventInitParam
+    public struct GameEventCreateParam
     {
         public EGameEventType EventType;
         public EGameEventTimePolicy TimePolicy;
-        public GameUnit EventSrcUnit; //nullable
-        public GameAbility EventSrcAbility; //nullable
-        public GameEffect EventSrcEffect;  //nullable
-        public GameUnit EventTargetUnit;   //nullable
+        public Handler<GameUnit> EventSrcUnit; //nullable
+        public Handler<GameAbility> EventSrcAbility; //nullable
+        public Handler<GameEffect> EventSrcEffect;  //nullable
+        public Handler<GameUnit> EventTargetUnit;   //nullable
         public FP EventValue1;
         public FP EventValue2;
         public FP EventValue3;
         public string EventString;
+    }
+
+    public struct GameEventInitParam
+    {
+        public GameEventCreateParam CreateParam;
+        public Handler<GameEventArg>  Handler;
     }
 }

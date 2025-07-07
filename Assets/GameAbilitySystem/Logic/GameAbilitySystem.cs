@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 using GAS.Logic.Target;
 using GAS.Logic.Value;
 using MissQ;
 using NS;
 using UnityEngine.Assertions;
+using UnityEngine.XR;
 
 namespace GAS.Logic
 {
@@ -94,8 +96,8 @@ namespace GAS.Logic
             GameTagSubsystem = AddSubsystem<GameTagSubsystem>(false);
             AttributeInstanceSubsystem = AddSubsystem<AttributeInstanceSubsystem>(false);
             AbilityInstanceSubsystem = AddSubsystem<AbilityInstanceSubsystem>(true);
-            UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(false);
-            EffectInstanceSubsystem = AddSubsystem<EffectInstanceSubsystem>(false);
+            UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(true);
+            EffectInstanceSubsystem = AddSubsystem<EffectInstanceSubsystem>(true);
             GameCueSubsystem = AddSubsystem<GameCueSubsystem>(false);
             AbilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
         }
@@ -161,7 +163,7 @@ namespace GAS.Logic
         //     return GetSubsystem<GameEventSubsystem>().GetGameEvent(type);
         // }
 
-        public void PostGameEvent(GameEventInitParam param)
+        public void PostGameEvent(GameEventCreateParam param)
         {
             GameEventSubsystem.PostGameEvent(ref param);
         }
@@ -172,33 +174,36 @@ namespace GAS.Logic
         #region GameUnit
 
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param) => UnitInstanceSubsystem.CreateGameUnit(ref param);
-        public void DestroyGameUnit(GameUnit gameUnit) => UnitInstanceSubsystem.DestroyGameUnit(gameUnit);
-        public void DestroyGameUnit(int unitInstance) => UnitInstanceSubsystem.DestroyGameUnit(unitInstance);
-        public void GetAllGameUnits(ref List<GameUnit> unitList) => UnitInstanceSubsystem.GetAllUnits(ref unitList);
-        public GameUnit GetGameUnitByInstanceID(int instanceID)
-        {
-            return UnitInstanceSubsystem.GetGameUnitByInstanceID(instanceID);
-        }
+        public void DestroyGameUnit(Handler<GameUnit> unitHandler) => UnitInstanceSubsystem.DestroyGameUnit(unitHandler);
+        public void DestroyGameUnit(GameUnit unit) => UnitInstanceSubsystem.DestroyGameUnit(unit.Handler);
+        public GameUnit[] GetAllGameUnits() => UnitInstanceSubsystem.GetAllUnits();
 
         #endregion
 
-        #region GameAbility
+        #region Handler
 
-        public GameAbility GetGameAbilityByInstanceID(int instanceID)
+        public bool GetRscFromHandler(Handler<GameUnit> handler, out GameUnit unit)
         {
-            return AbilityInstanceSubsystem.GetAbilityByInstanceID(instanceID);
+            return UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(handler, out unit);
         }
-
-        #endregion
-
-        #region GameEffect
-
-        public GameEffect GetGameEffectByInstanceID(int instanceID)
+        
+        public bool GetRscFromHandler(Handler<GameAbility> handler, out GameAbility ability)
         {
-            return EffectInstanceSubsystem.GetEffectByInstanceID(instanceID);
+            return AbilityInstanceSubsystem.AbilityHandlerRscMgr.Dereference(handler, out ability);
         }
-
+        
+        public bool GetRscFromHandler(Handler<GameEffect> handler, out GameEffect effect)
+        {
+            return EffectInstanceSubsystem.EffectResourceMgr.Dereference(handler, out effect);
+        }
+        
+        public bool GetRscFromHandler(Handler<GameEventArg> handler, out GameEventArg eventArg)
+        {
+            return GameEventSubsystem.GameEventResourceMgr.Dereference(handler, out eventArg);
+        }
+        
         #endregion
+      
 
         #region  Observe Attribute OnValChange
 

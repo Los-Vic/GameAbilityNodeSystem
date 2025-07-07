@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 using MissQ;
 using UnityEngine;
 
@@ -50,41 +50,48 @@ namespace GAS.Logic
     
     public struct GameEffectCreateParam
     {
-        public GameUnit Instigator;
+        public Handler<GameUnit> Instigator;
         public GameEffectCfg EffectCfg;
+    }
+
+    public struct GameEffectInitParam
+    {
+        public GameEffectCreateParam CreateParam;
+        public Handler<GameEffect> Handler;
     }
     
     //修改单位属性
-    public class GameEffect:IPoolClass, IRefCountDisposableObj
+    public class GameEffect:IPoolClass
     {
-        public int InstanceID { get; internal set; }
-        public GameUnit Owner { get; private set; }
-        public GameUnit Instigator { get; private set; }
+        public Handler<GameEffect> Handler { get; private set; }
+        public Handler<GameUnit> Owner { get; private set; }
+        public Handler<GameUnit> Instigator { get; private set; }
         public string EffectName { get; private set; }
         
-        private RefCountDisposableComponent _refCountDisposableComponent;
-        private bool _isActive;
-        private Action<GameEffect> _disposeMethod;
         public GameEffectCfg EffectCfg { get; private set; }
 
+        public GameAbilitySystem Sys { get; private set; }
         private FP _modifyDiffVal;
         private FP _lifeTimeCounter;
         
-        internal void Init(ref GameEffectCreateParam param, Action<GameEffect> disposeMethod)
+        internal void Init(GameAbilitySystem system, ref GameEffectInitParam param)
         {
-            EffectCfg = param.EffectCfg;
-            EffectName = param.EffectCfg.Name;
-            Instigator = param.Instigator;
-            _disposeMethod = disposeMethod;
+            EffectCfg = param.CreateParam.EffectCfg;
+            EffectName = param.CreateParam.EffectCfg.Name;
+            Instigator = param.CreateParam.Instigator;
+            Handler = param.Handler;
+            Sys = system;
         }
         
         private void UnInit()
         {
             _lifeTimeCounter = 0;
             _modifyDiffVal = 0;
-            Owner = null;
+            Owner = 0;
+            Instigator = 0;
             EffectName = string.Empty;
             EffectCfg = default;
+            Handler = 0;
         }
 
         public override string ToString()
@@ -96,39 +103,40 @@ namespace GAS.Logic
         {
             if (!EffectCfg.UseLifetimeVal) 
                 return;
-            _lifeTimeCounter += Owner.Sys.DeltaTime;
+            _lifeTimeCounter += Sys.DeltaTime;
 
             if (_lifeTimeCounter < EffectCfg.LifetimeVal) 
                 return;
             
-            Owner.RemoveEffect(this);
+            if(Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                owner.RemoveEffect(this);
         }
         
         internal void OnAddEffect(GameUnit owner)
         {
-            Owner = owner;
-            GameLogger.Log($"On add effect: {EffectName} of {Owner}");
+            Owner = owner.Handler;
+            GameLogger.Log($"On add effect: {EffectName} of {owner}");
             
             var oldAttributeVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType);
             var modifyOutputVal = GetModifyOutputVal(owner, EffectCfg.AttributeType, EffectCfg.ModifierOp, EffectCfg.ModifierVal);
-            owner.Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, modifyOutputVal, this);
+            Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, modifyOutputVal, this);
             _modifyDiffVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - oldAttributeVal;
 
             if (EffectCfg.NotInstant)
             {
                 if (EffectCfg.UseLifetimeVal)
                 {
-                    owner.Sys.EffectInstanceSubsystem.AddToTickList(this);
+                    Sys.EffectInstanceSubsystem.AddToTickList(this);
                 }
 
-                if (EffectCfg.LifeWithInstigator)
+                if (EffectCfg.LifeWithInstigator && Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
                 {
-                    Instigator.OnUnitDestroyed.RegisterObserver(this, (EDestroyUnitReason reason)=> Owner.RemoveEffect(this));
+                    instigator.OnUnitDestroyed.RegisterObserver(this, (EDestroyUnitReason reason)=> owner.RemoveEffect(this));
                 }
                 
                 if (EffectCfg.DeadEvent != EGameEventType.None)
                 {
-                    owner.Sys.GameEventSubsystem.RegisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
+                    Sys.GameEventSubsystem.RegisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
                 }
             }
 
@@ -136,11 +144,11 @@ namespace GAS.Logic
             {
                 var cueContext = new PlayEffectFxCueContext()
                 {
-                    EffectInstanceID = InstanceID,
+                    EffectHandler = Handler,
                     GameCueName = EffectCfg.CueName,
-                    UnitInstanceID = owner.InstanceID
+                    UnitHandler = Owner
                 };
-                owner.Sys.GameCueSubsystem.PlayEffectCue(ref cueContext);
+                Sys.GameCueSubsystem.PlayEffectCue(ref cueContext);
             }
           
         }
@@ -148,12 +156,13 @@ namespace GAS.Logic
         internal void OnRemoveEffect()
         {
             GameLogger.Log($"On remove effect: {EffectName} of {Owner}");
+            Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner);
             
             switch (EffectCfg.RollbackPolicy)
             {
                 case EModifyRollbackPolicy.ByVal:
-                    var newVal = Owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - _modifyDiffVal;
-                    Owner.Sys.AttributeInstanceSubsystem.SetAttributeVal(Owner, EffectCfg.AttributeType, newVal, this);
+                    var newVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - _modifyDiffVal;
+                    Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, newVal, this);
                     break;
                 case EModifyRollbackPolicy.ByOp:
                     var rollbackOp = EffectCfg.ModifierOp switch
@@ -164,8 +173,8 @@ namespace GAS.Logic
                         EModifierOp.Divide => EModifierOp.Multiply,
                         _ => EModifierOp.None
                     };
-                    var modifierOutput =  GetModifyOutputVal(Owner, EffectCfg.AttributeType, rollbackOp, EffectCfg.ModifierVal);
-                    Owner.Sys.AttributeInstanceSubsystem.SetAttributeVal(Owner, EffectCfg.AttributeType, modifierOutput, this);
+                    var modifierOutput =  GetModifyOutputVal(owner, EffectCfg.AttributeType, rollbackOp, EffectCfg.ModifierVal);
+                    Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, modifierOutput, this);
                     break;
             }
             
@@ -173,28 +182,28 @@ namespace GAS.Logic
             {
                 var cueContext = new StopEffectFxCueContext()
                 {
-                    EffectInstanceID = InstanceID,
+                    EffectHandler = Handler,
                     GameCueName = EffectCfg.CueName,
-                    UnitInstanceID = Owner.InstanceID
+                    UnitHandler = Owner
                 };
-                Owner.Sys.GameCueSubsystem.StopEffectCue(ref cueContext);
+                Sys.GameCueSubsystem.StopEffectCue(ref cueContext);
             }
             
             if (EffectCfg.NotInstant)
             {
                 if (EffectCfg.UseLifetimeVal || EffectCfg.LifeWithInstigator)
                 {
-                    Owner.Sys.EffectInstanceSubsystem.RemoveFromTickList(this);
+                    Sys.EffectInstanceSubsystem.RemoveFromTickList(this);
                 }
 
-                if (EffectCfg.LifeWithInstigator)
+                if (EffectCfg.LifeWithInstigator && Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
                 {
-                    Instigator.OnUnitDestroyed.UnRegisterObserver(this);
+                    instigator.OnUnitDestroyed.UnRegisterObserver(this);
                 }
                 
                 if (EffectCfg.DeadEvent != EGameEventType.None)
                 {
-                    Owner.Sys.GameEventSubsystem.UnregisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
+                    Sys.GameEventSubsystem.UnregisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
                 }
             }
         }
@@ -220,10 +229,13 @@ namespace GAS.Logic
         
         private void OnDeadEventCall(GameEventArg arg)
         {
-            if(!GameEventSubsystem.CheckEventFilters(Owner, arg, EffectCfg.EventFilters))
+            if (!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
                 return;
             
-            Owner.RemoveEffect(this);
+            if(!GameEventSubsystem.CheckEventFilters(owner, arg, EffectCfg.EventFilters))
+                return;
+            
+            owner.RemoveEffect(this);
         }
         
         #region Object Pool
@@ -234,12 +246,10 @@ namespace GAS.Logic
 
         public void OnTakeFromPool()
         {
-            _isActive = true;
         }
 
         public void OnReturnToPool()
         {
-            _isActive = false;
             UnInit();
         }
 
@@ -248,32 +258,5 @@ namespace GAS.Logic
         }
 
         #endregion
-
-        #region IRefCountDisposableObj
-
-        public RefCountDisposableComponent GetRefCountDisposableComponent()
-        {
-            return _refCountDisposableComponent ?? new RefCountDisposableComponent(this);
-        }
-
-        public bool IsDisposed()
-        {
-            return !_isActive;
-        }
-
-        public void ForceDisposeObj()
-        {
-            GetRefCountDisposableComponent().DisposeOwner();
-        }
-
-        public void OnObjDispose()
-        {
-            GameLogger.Log($"Release Effect: {EffectName} of {Owner}");
-            Owner?.GameEffects.Remove(this);
-            _disposeMethod(this);
-        }
-
-        #endregion
-      
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameplayCommonLibrary.Handler;
 using GAS.Logic;
 using Sirenix.OdinInspector;
-using UnityEngine;
+using UnityEngine; 
 
 namespace GAS
 {
@@ -26,7 +27,7 @@ namespace GAS
     [Serializable]
     public struct SetAttributeValContext
     {
-        public int unitInstanceID;
+        public uint unitHandler;
         public ESimpleAttributeType type;
         public float newVal;
     }
@@ -34,7 +35,7 @@ namespace GAS
     [Serializable]
     public struct AddAbilityContext
     {
-        public int unitInstanceID;
+        public uint unitHandler;
         public uint abilityID;
         public uint lv;
         public float signal1;
@@ -121,7 +122,7 @@ namespace GAS
                 {
                     Id = ability,
                     Lv = 1,
-                    Instigator = unit,
+                    Instigator = unit.Handler,
                 });
             }
         }
@@ -133,10 +134,11 @@ namespace GAS
         [Button("Set Attribute Val")]
         public void SetAttributeVal()
         {
-            var u = System?.GetGameUnitByInstanceID(setAttributeValContext.unitInstanceID);
-            if (u == null)
+            if (System == null)
                 return;
-            System?.AttributeInstanceSubsystem.SetAttributeVal(u, setAttributeValContext.type,
+            if (!System.GetRscFromHandler((Handler<GameUnit>)setAttributeValContext.unitHandler, out var u))
+                return;
+            System.AttributeInstanceSubsystem.SetAttributeVal(u, setAttributeValContext.type,
                 setAttributeValContext.newVal);
         }
         
@@ -147,14 +149,16 @@ namespace GAS
         [Button("Add Ability")]
         public void AddAbility()
         {
-            var u = System?.GetGameUnitByInstanceID(addAbilityContext.unitInstanceID);
-            if (u == null)
+            if (System == null)
                 return;
+            if (!System.GetRscFromHandler((Handler<GameUnit>)addAbilityContext.unitHandler, out var u))
+                return;
+            
             u.AddAbility(new AbilityCreateParam()
             {
                 Id = addAbilityContext.abilityID,
                 Lv = addAbilityContext.lv,
-                Instigator = u,
+                Instigator = u.Handler,
                 SignalVal1 = addAbilityContext.signal1,
                 SignalVal2 = addAbilityContext.signal2,
                 SignalVal3 = addAbilityContext.signal3,
@@ -168,7 +172,7 @@ namespace GAS
         [Button("Post Event")]
         public void PostEvent()
         {
-            System?.PostGameEvent(new GameEventInitParam()
+            System?.PostGameEvent(new GameEventCreateParam()
             {
                 EventType = gameEventType,
             });

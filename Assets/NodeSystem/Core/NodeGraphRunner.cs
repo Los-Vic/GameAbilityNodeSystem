@@ -16,7 +16,7 @@ namespace NS
     {
     }
     
-    public class NodeGraphRunner:IPoolClass, IRefCountRequester
+    public class NodeGraphRunner:IPoolClass
     {
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
@@ -293,10 +293,5 @@ namespace NS
         }
 
         #endregion
-
-        public bool IsRequesterStillValid()
-        {
-            return _isValid;
-        }
     }
 }

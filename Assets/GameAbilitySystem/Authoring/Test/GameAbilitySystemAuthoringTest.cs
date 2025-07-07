@@ -102,6 +102,7 @@ namespace GAS
                 PlayerIndex = playerIndex
             };
             var unit = _system.CreateGameUnit(ref param);
+            
             unit.AddSimpleAttribute(new SimpleAttributeCreateParam()
             {
                 Type = ESimpleAttributeType.Mana,

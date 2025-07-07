@@ -36,7 +36,7 @@ namespace GAS.Logic.Command
             base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var playerIndex = GraphRunner.GetInPortVal<int>(_node.InPlayerIndex);
-            var unit = context.Ability.System.CommandDelegator.SpawnUnit(_node.UnitName, playerIndex);
+            var unit = context.Ability.Sys.CommandDelegator.SpawnUnit(_node.UnitName, playerIndex);
             GraphRunner.SetOutPortVal(_node.OutPortUnit, unit);
             
             Complete();

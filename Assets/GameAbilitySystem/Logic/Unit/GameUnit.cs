@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 using MissQ;
 
 namespace GAS.Logic
@@ -12,12 +12,12 @@ namespace GAS.Logic
         public ECreateUnitReason Reason;
     }
 
-    internal struct GameUnitCreateParamEx
+    public struct GameUnitInitParam
     {
-        public GameUnitCreateParam BaseParam;
-        public int UnitInstanceID;
+        public GameUnitCreateParam CreateParam;
+        public Handler<GameUnit> Handler;
     }
-
+    
     public enum ECreateUnitReason
     {
         None = 0,
@@ -26,6 +26,13 @@ namespace GAS.Logic
     public enum EDestroyUnitReason
     {
         None = 0,
+    }
+
+    public enum EUnitStatus
+    {
+        Normal,
+        PendingDestroy,
+        Destroyed,
     }
     
     /// <summary>
@@ -37,21 +44,17 @@ namespace GAS.Logic
     /// 5、技能前后摇，技能施放队列管理
     /// 6、单位标签
     /// </summary>
-    public class GameUnit: IPoolClass, IRefCountDisposableObj, ITagOwner
+    public class GameUnit: IPoolClass, ITagOwner
     {
         private const string DefaultUnitName = "UnkownUnit";
-        public int InstanceID { get; private set; }
+        public Handler<GameUnit> Handler { get; private set; }
         public int PlayerIndex { get; private set; }
        
         private string _unitName = DefaultUnitName;
-
-        private RefCountDisposableComponent _refCountDisposableComponent;
-        
-        private bool _isActive;
         public string UnitName => _unitName;
         
         internal ECreateUnitReason CreateReason { get; private set; }
-        internal EDestroyUnitReason DestroyReason { get; set; }
+        internal EDestroyUnitReason DestroyReason { get; private set; }
 
         internal readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new();
         
@@ -72,18 +75,19 @@ namespace GAS.Logic
         public readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
         public readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
-        private AbilityActivationReqSubsystem _abilityActivationReqSubsystem;
-        private Action<GameUnit> _disposeMethod;
- 
+        //Status
+        public EUnitStatus Status { get; private set; }
         
-        internal void Init(GameAbilitySystem sys, ref GameUnitCreateParamEx param, Action<GameUnit> disposeMethod)
+        private AbilityActivationReqSubsystem _abilityActivationReqSubsystem;
+        
+        internal void Init(GameAbilitySystem sys, ref GameUnitInitParam param)
         {
             Sys = sys;
-            PlayerIndex = param.BaseParam.PlayerIndex;
-            _unitName = param.BaseParam.UnitName;
-            CreateReason = param.BaseParam.Reason;
-            InstanceID = param.UnitInstanceID;
-            _disposeMethod = disposeMethod;
+            PlayerIndex = param.CreateParam.PlayerIndex;
+            _unitName = param.CreateParam.UnitName;
+            CreateReason = param.CreateParam.Reason;
+            Handler = param.Handler;
+            Status = EUnitStatus.Normal;
             Sys.AbilityActivationReqSubsystem.CreateGameUnitQueue(this);
         }
 
@@ -119,9 +123,14 @@ namespace GAS.Logic
                 Sys.EffectInstanceSubsystem.DestroyEffect(effect);
             }
             GameEffects.Clear();
+            Status = EUnitStatus.Destroyed;
         }
 
-        public bool IsPendingDestroy() => GetRefCountDisposableComponent().IsPendingDispose;
+        internal void MarkForDestroy(EDestroyUnitReason reason)
+        {
+            DestroyReason = reason;
+            Status = EUnitStatus.PendingDestroy;
+        }
         
         public override string ToString()
         {
@@ -139,7 +148,7 @@ namespace GAS.Logic
                 var playCueContext = new PlayAttributeValChangeCueContext()
                 {
                     AttributeType = attribute.Type,
-                    UnitInstanceID = InstanceID,
+                    UnitHandler = Handler,
                     OldVal = msg.OldVal,
                     NewVal = msg.NewVal,
                 };
@@ -185,7 +194,7 @@ namespace GAS.Logic
                 var playCueContext = new PlayAttributeValChangeCueContext()
                 {
                     CompositeAttributeType = attribute.Type,
-                    UnitInstanceID = InstanceID,
+                    UnitHandler = Handler,
                     OldVal = msg.OldVal,
                     NewVal = msg.NewVal,
                 };
@@ -292,43 +301,16 @@ namespace GAS.Logic
 
         public void OnTakeFromPool()
         {
-            _isActive = true;
         }
 
         public void OnReturnToPool()
         {
-            _isActive = false;
             UnInit();
         }
 
         public void OnDestroy()
         {
             
-        }
-
-        #endregion
-
-        #region IRefCountDisposableObj
-
-        public RefCountDisposableComponent GetRefCountDisposableComponent()
-        {
-            return _refCountDisposableComponent ??= new RefCountDisposableComponent(this);
-        }
-
-        public bool IsDisposed()
-        {
-            return !_isActive;
-        }
-
-        public void ForceDisposeObj()
-        {
-            GetRefCountDisposableComponent().DisposeOwner();
-        }
-
-        public void OnObjDispose()
-        {
-            GameLogger.Log($"Release Unit: {UnitName}");
-            _disposeMethod(this);
         }
 
         #endregion

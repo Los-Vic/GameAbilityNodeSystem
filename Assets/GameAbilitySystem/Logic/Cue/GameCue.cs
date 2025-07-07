@@ -1,10 +1,11 @@
-﻿using MissQ;
+﻿using GameplayCommonLibrary.Handler;
+using MissQ; 
 
 namespace GAS.Logic
 {
     public struct PlayAttributeValChangeCueContext
     {
-        public int UnitInstanceID;
+        public Handler<GameUnit> UnitHandler;
         public ESimpleAttributeType AttributeType;
         public ECompositeAttributeType CompositeAttributeType;
         public FP OldVal;
@@ -14,40 +15,40 @@ namespace GAS.Logic
     public struct PlayAbilityFxCueContext
     {
         public string GameCueName;
-        public int UnitInstanceID;
-        public int AbilityInstanceID;
+        public Handler<GameUnit> UnitHandler;
+        public Handler<GameAbility> AbilityHandler;
         public FP Param;
-        public int SubUnitInstanceID;
+        public Handler<GameUnit> SubUnitHandler;
     }
 
     public struct StopAbilityFxCueContext
     {
         public string GameCueName;
-        public int UnitInstanceID;
-        public int AbilityInstanceID;
+        public Handler<GameUnit> UnitHandler;
+        public Handler<GameAbility> AbilityHandler;
     }
     
     public struct PlayEffectFxCueContext
     {
         public string GameCueName;
-        public int UnitInstanceID;
-        public int EffectInstanceID;
+        public Handler<GameUnit> UnitHandler;
+        public Handler<GameEffect> EffectHandler;
     }
 
     public struct StopEffectFxCueContext
     {
         public string GameCueName;
-        public int UnitInstanceID;
-        public int EffectInstanceID;
+        public Handler<GameUnit> UnitHandler;
+        public Handler<GameEffect> EffectHandler;
     }
 
     public struct UnitCreateCueContext
     {
-        public int UnitInstanceID;
+        public Handler<GameUnit> UnitInstanceID;
     }
     
     public struct UnitDestroyCueContext
     {
-        public int UnitInstanceID;
+        public Handler<GameUnit> UnitInstanceID;
     }
 }

@@ -48,7 +48,8 @@ namespace GAS
         private void OnAttributeChange(PlayAttributeValChangeCueContext context)
         {
             //forward event directly
-            var unit = _gameAbilitySystem.GetGameUnitByInstanceID(context.UnitInstanceID);
+            if (!_gameAbilitySystem.GetRscFromHandler(context.UnitHandler, out var unit))
+                return;
             if (context.AttributeType != ESimpleAttributeType.None)
             {
                 var attribute = unit.GetSimpleAttribute(context.AttributeType);

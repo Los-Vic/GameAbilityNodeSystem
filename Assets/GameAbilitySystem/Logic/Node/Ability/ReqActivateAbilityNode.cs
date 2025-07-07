@@ -1,4 +1,5 @@
-﻿using GAS.Logic.Value;
+﻿using GameplayCommonLibrary;
+using GAS.Logic.Value;
 using NS;
 using UnityEngine;
 
@@ -59,13 +60,19 @@ namespace GAS.Logic
             base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
 
-            var job = context.Ability.System.ClassObjectPoolSubsystem.ClassObjectPoolMgr
+            var job = context.Ability.Sys.ClassObjectPoolSubsystem.ClassObjectPoolMgr
                 .Get<AbilityActivationReqJob>();
 
-            var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, context.Ability.Owner, context.Ability.Lv);
-            var cast = ValuePickerUtility.GetValue(_node.CastTime, context.Ability.Owner, context.Ability.Lv);
-            var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, context.Ability.Owner, context.Ability.Lv);
-            var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, context.Ability.Owner,
+            if (!context.Ability.Sys.GetRscFromHandler(context.Ability.Owner, out var owner))
+            {
+                GameLogger.LogError($"Failed to get owner of {context.Ability}");
+                Abort();
+            }
+            
+            var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, owner, context.Ability.Lv);
+            var cast = ValuePickerUtility.GetValue(_node.CastTime, owner, context.Ability.Lv);
+            var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, owner, context.Ability.Lv);
+            var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, owner,
                 context.Ability.Lv);
 
             var total = preCast + cast + postCast;
@@ -77,16 +84,16 @@ namespace GAS.Logic
                 postCast *= ratio;
             }
 
-            job.InitJob(new AbilityActivationReq()
+            job.InitJob(context.Ability.Sys, new AbilityActivationReq()
             {
-                Ability = context.Ability,
+                Ability = context.Ability.Handler,
                 CastCfg = new AbilityCastCfg()
                 {
                     PreCastTime = preCast,
                     CastTime = cast,
                     PostCastTime = postCast,
                 },
-                EventArgs = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal),
+                EventArgs = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal)?.Handler ?? 0,
                 QueueType = _node.QueueType
             });
 

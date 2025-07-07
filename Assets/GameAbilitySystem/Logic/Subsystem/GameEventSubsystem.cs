@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 
 namespace GAS.Logic
 {
@@ -9,18 +10,26 @@ namespace GAS.Logic
         private readonly Dictionary<EGameEventType, GameplayEvent<GameEventArg>> _gameEvents = new();
         private readonly Stack<GameEventArg> _eventStack = new();
         private const int StackDepthWarningThreshold = 20;
-        private readonly List<GameEventInitParam> _nextFrameEventsCache = new();
+        private readonly List<GameEventCreateParam> _nextFrameEventsCache = new();
+        private readonly List<GameEventArg> _pendingDestroyEvents = new();
+        internal HandlerResourceMgr<GameEventArg> GameEventResourceMgr { get; private set; }
+
+        public override void Init()
+        {
+            GameEventResourceMgr = new(256);
+        }
 
         public override void UnInit()
         {
             _gameEvents.Clear();
             _eventStack.Clear();
             _nextFrameEventsCache.Clear();
+            _pendingDestroyEvents.Clear();
         }
 
         public override void Update(float deltaTime)
         {
-            if (_nextFrameEventsCache.Count == 0)
+            if (_nextFrameEventsCache.Count == 0 && _pendingDestroyEvents.Count == 0)
                 return;
             
             foreach (var p in _nextFrameEventsCache)
@@ -29,6 +38,15 @@ namespace GAS.Logic
                 RealPostgameEvent(ref param);
             }
             _nextFrameEventsCache.Clear();
+
+            for (var i = _pendingDestroyEvents.Count - 1; i >= 0; i--)
+            {
+                var arg = _pendingDestroyEvents[i];
+                if(GameEventResourceMgr.GetRefCount(arg.Handler) > 0)
+                    continue;
+                DisposeGameEventArg(arg);
+                _pendingDestroyEvents.RemoveAt(i);
+            }
         }
 
         public void RegisterGameEvent(EGameEventType eventType, Action<GameEventArg> callback, int priority = 0)
@@ -43,7 +61,7 @@ namespace GAS.Logic
             gameEvent.RemoveListener(callback);
         }
 
-        internal void PostGameEvent(ref GameEventInitParam param)
+        internal void PostGameEvent(ref GameEventCreateParam param)
         {
             switch (param.TimePolicy)
             {
@@ -56,13 +74,19 @@ namespace GAS.Logic
             }
         }
 
-        private void RealPostgameEvent(ref GameEventInitParam param)
+        private void RealPostgameEvent(ref GameEventCreateParam param)
         {
             if(!CheckEventStack(ref param))
                 return;
             
             var eventArg = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEventArg>();
-            eventArg.Init(ref param, DisposeGameEventArg);
+            var h = GameEventResourceMgr.Create(eventArg);
+            var initParam = new GameEventInitParam()
+            {
+                CreateParam = param,
+                Handler = h
+            };
+            eventArg.Init(ref initParam);
             
             _eventStack.Push(eventArg);
             GameLogger.Log($"Push game event, event type:{param.EventType}, event src:{param.EventSrcUnit}, stack depth:{_eventStack.Count}");
@@ -72,8 +96,15 @@ namespace GAS.Logic
             
             GameLogger.Log($"Pop game event, event type:{param.EventType}, stack depth:{_eventStack.Count}");
             _eventStack.Pop();
-            
-            eventArg.GetRefCountDisposableComponent().MarkForDispose();
+
+            if (GameEventResourceMgr.GetRefCount(h) == 0)
+            {
+                DisposeGameEventArg(eventArg);
+            }
+            else
+            {
+                _pendingDestroyEvents.Add(eventArg);
+            }
         }
 
         private void DisposeGameEventArg(GameEventArg arg)
@@ -96,7 +127,7 @@ namespace GAS.Logic
         /// </summary>
         /// <param name="newParam"></param>
         /// <returns></returns>
-        private bool CheckEventStack(ref GameEventInitParam newParam)
+        private bool CheckEventStack(ref GameEventCreateParam newParam)
         {
             if (_eventStack.Count >= StackDepthWarningThreshold)
             {
@@ -105,28 +136,24 @@ namespace GAS.Logic
 
             foreach (var arg in _eventStack)
             {
-                if(arg.EventSrcUnit == null || newParam.EventSrcUnit == null)
+                if(!arg.EventSrcUnit.IsAssigned || !newParam.EventSrcUnit.IsAssigned)
                     continue;
                 
                 if(arg.EventSrcUnit != newParam.EventSrcUnit)
                     continue;
 
-                if (arg.EventSrcAbility != null && newParam.EventSrcAbility != null)
+                if (arg.EventSrcAbility.IsAssigned && newParam.EventSrcAbility.IsAssigned &&
+                    arg.EventSrcAbility == newParam.EventSrcAbility)
                 {
-                    if (arg.EventSrcAbility == newParam.EventSrcAbility)
-                    {
-                        GameLogger.LogWarning("Check event stack: ignore new event, same src ability");
-                        return false;
-                    }
+                    GameLogger.LogWarning("Check event stack: ignore new event, same src ability");
+                    return false;
                 }
-                
-                if (arg.EventSrcEffect != null && newParam.EventSrcEffect != null)
+
+                if (arg.EventSrcEffect.IsAssigned && newParam.EventSrcEffect.IsAssigned &&
+                    arg.EventSrcEffect == newParam.EventSrcEffect)
                 {
-                    if (arg.EventSrcEffect == newParam.EventSrcEffect)
-                    {
-                        GameLogger.LogWarning("Check event stack: ignore new event, same src effect");
-                        return false;
-                    }
+                    GameLogger.LogWarning("Check event stack: ignore new event, same src effect");
+                    return false;
                 }
             }
             
@@ -137,9 +164,10 @@ namespace GAS.Logic
         {
             if (filters == null || filters.Count == 0)
                 return true;
-            
-            var src = arg.EventSrcUnit;
-            if (src == null && filters.Count > 0)
+
+            var srcHandler = arg.EventSrcUnit;
+            if (!srcHandler.IsAssigned ||
+                !owner.Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(srcHandler, out var src))
                 return false;
             
             foreach (var f in filters)

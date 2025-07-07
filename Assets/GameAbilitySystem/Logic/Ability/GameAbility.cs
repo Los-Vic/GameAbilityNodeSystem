@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
+using GameplayCommonLibrary.Handler;
 using GAS.Logic.Value;
 using MissQ;
 using NS;
@@ -14,7 +14,13 @@ namespace GAS.Logic
         public FP SignalVal1;
         public FP SignalVal2;
         public FP SignalVal3;
-        public GameUnit Instigator;
+        public Handler<GameUnit> Instigator;
+    }
+
+    public struct AbilityInitParam
+    {
+        public AbilityCreateParam CreateParam;
+        public Handler<GameAbility> Handler;
     }
 
     public enum ECheckAbilityResult
@@ -33,16 +39,14 @@ namespace GAS.Logic
         UnInitialized,
     }
     
-    public class GameAbility :IPoolClass, IRefCountDisposableObj
+    public class GameAbility :IPoolClass
     {
-        public int InstanceID { get; internal set; }
+        public Handler<GameAbility> Handler { get; private set; }
         internal AbilityAsset Asset { get; private set; }
         internal readonly GameAbilityGraphController GraphController = new();
         public uint Lv { get; private set; }
-        public GameUnit Owner { get; private set; }
-        
-        private GameUnit _instigator;
-        public GameUnit Instigator => _instigator ?? Owner;
+        public Handler<GameUnit> Owner { get; private set; }
+        public Handler<GameUnit> Instigator { get; private set; }
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }
         
@@ -65,11 +69,8 @@ namespace GAS.Logic
         //在Job完成或Ability取消时需要移除。取消时，Job被标记为已取消，但还在AbilityActivationReqSubsystem的Queue里，只有当轮到它执行时，才真正移除
         private readonly List<AbilityActivationReqJob> _activationReqJobs = new();
             
-        internal GameAbilitySystem System { get; private set; }
-        private bool _isActive;
-        private RefCountDisposableComponent _refCountDisposableComponent;
+        public GameAbilitySystem Sys { get; private set; }
         private bool _hasOnTickEntry;
-        private Action<GameAbility> _disposeMethod;
         
         /// <summary>
         /// 技能生效次数
@@ -77,27 +78,31 @@ namespace GAS.Logic
         internal int ActivatedCount { get; private set; }
         
         internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
-        
-        public string AbilityName => Asset?.abilityName ?? string.Empty;
-        
-        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityCreateParam param, Action<GameAbility> disposeMethod)
+
+        public string AbilityName { get; private set; }
+
+
+        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityInitParam param)
         {
-            ID = param.Id;
+            ID = param.CreateParam.Id;
             Asset = asset;
-            _instigator = param.Instigator;
-            Lv = param.Lv;
-            _disposeMethod = disposeMethod;
+            Instigator = param.CreateParam.Instigator;
+            Lv = param.CreateParam.Lv;
+            Handler = param.Handler;
             
             GraphController.Init(sys, Asset, this);
             
             State = EAbilityState.Initialized;
-            System = sys;
+            Sys = sys;
             
-            SignalVal1 = param.SignalVal1;
-            SignalVal2 = param.SignalVal2;
-            SignalVal3 = param.SignalVal3;
-            
-            _instigator?.OnUnitDestroyed.RegisterObserver(this, OnInstigatorDestroy);
+            SignalVal1 = param.CreateParam.SignalVal1;
+            SignalVal2 = param.CreateParam.SignalVal2;
+            SignalVal3 = param.CreateParam.SignalVal3;
+
+            if (sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(param.CreateParam.Instigator, out var instigator))
+            {
+                instigator.OnUnitDestroyed.RegisterObserver(this, OnInstigatorDestroy);
+            }
         }
 
         private void UnInit()
@@ -108,11 +113,16 @@ namespace GAS.Logic
             ResetCooldown();
             GraphController.UnInit();
             State = EAbilityState.UnInitialized;
-            Owner = null;
+            Owner = 0;
             _hasOnTickEntry = false;
-            _instigator?.OnUnitDestroyed.UnRegisterObserver(this);
-            _instigator = null;
+            
+            if (Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
+            {
+                instigator.OnUnitDestroyed.UnRegisterObserver(this);
+            }
+            Instigator = 0;
             Asset = null;
+            AbilityName = string.Empty;
         }
 
         public override string ToString()
@@ -128,12 +138,10 @@ namespace GAS.Logic
 
         public void OnTakeFromPool()
         {
-            _isActive = true;
         }
 
         public void OnReturnToPool()
         {
-            _isActive = false;
             UnInit();
         }
 
@@ -149,7 +157,7 @@ namespace GAS.Logic
         {
             if (IsInCooldown)
             {
-                CooldownCounter += System.DeltaTime;
+                CooldownCounter += Sys.DeltaTime;
                 if (CooldownCounter >= CooldownDuration)
                 {
                     ResetCooldown();
@@ -162,7 +170,7 @@ namespace GAS.Logic
             }
             else if (!IsInCooldown)
             {
-                System.AbilityInstanceSubsystem.RemoveFromTickList(this);
+                Sys.AbilityInstanceSubsystem.RemoveFromTickList(this);
             }
         }
         
@@ -179,8 +187,9 @@ namespace GAS.Logic
         //获得和移除Ability
         internal void OnAddAbility(GameUnit owner)
         {
-            Owner = owner;
-            GameLogger.Log($"On add ability: {AbilityName} of {Owner}");
+            Owner = owner.Handler;
+            AbilityName = $"{Asset.abilityName} of {owner}";
+            GameLogger.Log($"On add ability: {AbilityName}");
             State = EAbilityState.Available;
             
             if(GraphController.HasEntryNode(typeof(OnAddAbilityEntryNode)))
@@ -191,32 +200,36 @@ namespace GAS.Logic
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    System.GameEventSubsystem.RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    Sys.GameEventSubsystem.RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
 
             _hasOnTickEntry = GraphController.HasEntryNode(typeof(OnTickAbilityEntryNode));
             if (_hasOnTickEntry)
             {
-                System.AbilityInstanceSubsystem.AddToTickList(this);
+                Sys.AbilityInstanceSubsystem.AddToTickList(this);
             }
         }
 
         internal void OnRemoveAbility()
         {
-            GameLogger.Log($"On remove ability: {AbilityName} of {Owner}");
+            GameLogger.Log($"On remove ability: {AbilityName}");
             
             var gameEventNodeList = GraphController.GetRegisteredGameEventNodePairs();
             if (gameEventNodeList != null)
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    System.GameEventSubsystem.UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    Sys.GameEventSubsystem.UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
             
             if(GraphController.HasEntryNode(typeof(OnRemoveAbilityEntryNode)))
                 GraphController.RunGraph(typeof(OnRemoveAbilityEntryNode));
+        }
+
+        internal void MarkDestroy()
+        {
             State = EAbilityState.MarkDestroy;
         }
 
@@ -239,8 +252,10 @@ namespace GAS.Logic
             //Cost 
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
-                if (Owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
+                if(!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                    continue;
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
+                if (owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
                     return ECheckAbilityResult.CostFailed;
             }
 
@@ -254,10 +269,12 @@ namespace GAS.Logic
             
             foreach (var costElement in Asset.costs)
             {
-                var costNums = ValuePickerUtility.GetValue(costElement.costVal, Owner, Lv);
-                var attribute = Owner.GetSimpleAttribute(costElement.attributeType);
+                if(!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                    continue;
+                var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
+                var attribute = owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Owner.Sys.AttributeInstanceSubsystem.SetAttributeVal(Owner, costElement.attributeType, newVal);
+                Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, costElement.attributeType, newVal);
             }
         }
         
@@ -271,10 +288,13 @@ namespace GAS.Logic
 
         private void StartCooldown()
         {
-            CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, Owner, Lv);
+            if (!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                return;
+            
+            CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, owner, Lv);
             if (CooldownDuration > 0)
             {
-                System.AbilityInstanceSubsystem.AddToTickList(this);
+                Sys.AbilityInstanceSubsystem.AddToTickList(this);
                 IsInCooldown = true;
             }
         }
@@ -286,13 +306,13 @@ namespace GAS.Logic
         {
             if (_activateAbilityRunners.Count == 0)
             {
-                GameLogger.Log($"Cancel ability failed, not activated. {AbilityName} of {Owner}");
+                GameLogger.Log($"Cancel ability failed, not activated. {AbilityName}");
                 return;
             }
 
             foreach (var runner in _activateAbilityRunners)
             {
-                GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName} of {Owner}");
+                GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName}");
                 runner.CancelRunner();
             }
 
@@ -302,7 +322,8 @@ namespace GAS.Logic
         //结束Ability
         internal void EndAbility()
         {
-            Owner.RemoveAbility(this);
+            if(Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                owner.RemoveAbility(this);
         }
         
         private void OnActivateAbilityRunnerEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
@@ -317,7 +338,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartPreCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartPreCast succeeded. {AbilityName} of {Owner}");
+            GameLogger.Log($"Activate OnStartPreCast succeeded. {AbilityName}");
             var runner = GraphController.RunGraph(typeof(OnStartPreCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -327,7 +348,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartCast succeeded. {AbilityName} of {Owner}");
+            GameLogger.Log($"Activate OnStartCast succeeded. {AbilityName}");
             var runner = GraphController.RunGraph(typeof(OnStartCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -337,7 +358,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnStartPostCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnStartPostCast succeeded. {AbilityName} of {Owner}");
+            GameLogger.Log($"Activate OnStartPostCast succeeded. {AbilityName}");
             var runner = GraphController.RunGraph(typeof(OnStartPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -347,7 +368,7 @@ namespace GAS.Logic
             if(!GraphController.HasEntryNode(typeof(OnEndPostCastAbilityEntryNode)))
                 return;
             
-            GameLogger.Log($"Activate OnEndPostCast succeeded. {AbilityName} of {Owner}");
+            GameLogger.Log($"Activate OnEndPostCast succeeded. {AbilityName}");
             var runner = GraphController.RunGraph(typeof(OnEndPostCastAbilityEntryNode), param, OnActivateAbilityRunnerEnd);
             _activateAbilityRunners.Add(runner);
         }
@@ -367,13 +388,13 @@ namespace GAS.Logic
             
             CommitAbility();
             
-            if (Owner == null)
+            if (!Sys.GetRscFromHandler(Owner, out var owner))
             {
                 GameLogger.Log($"Add activation req job failed, owner is null. {AbilityName}");
                 return;
             }
             _activationReqJobs.Add(job);
-            System.AbilityActivationReqSubsystem.EnqueueJob(job);
+            Sys.AbilityActivationReqSubsystem.EnqueueJob(job);
         }
         
         private void CancelAllActivationReqJobs()
@@ -386,40 +407,13 @@ namespace GAS.Logic
         }
 
         #endregion
-
-        #region IRefCountDisposable
-
-        public RefCountDisposableComponent GetRefCountDisposableComponent()
-        {
-            return _refCountDisposableComponent ?? new RefCountDisposableComponent(this);
-        }
-
-        public bool IsDisposed()
-        {
-            return !_isActive;
-        }
-
-        public void ForceDisposeObj()
-        {
-            GetRefCountDisposableComponent().DisposeOwner();
-        }
-
-        public void OnObjDispose()
-        {
-            GameLogger.Log($"Release Ability: {AbilityName} of {Owner}");
-            Owner.GameAbilities.Remove(this);
-            _disposeMethod(this);
-        }
-
-        #endregion
-        
         
         private void OnInstigatorDestroy(EDestroyUnitReason reason)
         {
             if(!GraphController.HasEntryNode(typeof(OnInstigatorDestroyNode)))
                 return;
             
-            GameLogger.Log($"On instigator destroy. {AbilityName} of {Owner}");
+            GameLogger.Log($"On instigator destroy. {AbilityName}");
             GraphController.RunGraph(typeof(OnInstigatorDestroyNode));
         }
     }

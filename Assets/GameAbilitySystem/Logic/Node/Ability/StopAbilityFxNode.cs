@@ -29,12 +29,12 @@ namespace GAS.Logic
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var stopContext = new StopAbilityFxCueContext()
             {
-                UnitInstanceID = context.Ability.Owner.InstanceID,
-                AbilityInstanceID = context.Ability.InstanceID,
+                UnitHandler = context.Ability.Owner,
+                AbilityHandler = context.Ability.Handler,
                 GameCueName = _node.CueName,
             };
            
-            context.Ability.System.GameCueSubsystem.StopAbilityFxCue(ref stopContext);
+            context.Ability.Sys.GameCueSubsystem.StopAbilityFxCue(ref stopContext);
             Complete();
         }
 

@@ -60,11 +60,11 @@ namespace GAS.Logic
             }, (runner) =>
             {
                 customOnRunGraphDestroy?.Invoke(runner);
-                param.GetRefCountDisposableComponent().RemoveRefCount(graphRunner);
+                _system.GameEventSubsystem.GameEventResourceMgr.RemoveRefCount(param.Handler);
                 OnRunGraphDestroy(runner);
             }, _context);
             
-            param.GetRefCountDisposableComponent().AddRefCount(graphRunner);
+            _system.GameEventSubsystem.GameEventResourceMgr.AddRefCount(param.Handler);
             graphRunner.StartRunner();
             return graphRunner;
         }

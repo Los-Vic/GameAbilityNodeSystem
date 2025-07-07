@@ -35,18 +35,18 @@ namespace GAS.Logic
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
             var playContext = new PlayAbilityFxCueContext
             {
-                UnitInstanceID = context.Ability.Owner.InstanceID,
-                AbilityInstanceID = context.Ability.InstanceID,
+                UnitHandler = context.Ability.Owner,
+                AbilityHandler = context.Ability.Handler,
                 GameCueName = _node.CueName,
                 Param = GraphRunner.GetInPortVal<FP>(_node.InParam)
             };
             var target = GraphRunner.GetInPortVal<GameUnit>(_node.InTargetUnit);
             if (target != null)
             {
-                playContext.SubUnitInstanceID = target.InstanceID;
+                playContext.SubUnitHandler = target.Handler;
             }
            
-            context.Ability.System.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
+            context.Ability.Sys.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
             Complete();
         }
 
