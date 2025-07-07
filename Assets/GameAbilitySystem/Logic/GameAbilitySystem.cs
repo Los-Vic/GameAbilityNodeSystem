@@ -96,7 +96,7 @@ namespace GAS.Logic
             GameTagSubsystem = AddSubsystem<GameTagSubsystem>(false);
             AttributeInstanceSubsystem = AddSubsystem<AttributeInstanceSubsystem>(false);
             AbilityInstanceSubsystem = AddSubsystem<AbilityInstanceSubsystem>(true);
-            UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(true);
+            UnitInstanceSubsystem = AddSubsystem<UnitInstanceSubsystem>(false);
             EffectInstanceSubsystem = AddSubsystem<EffectInstanceSubsystem>(true);
             GameCueSubsystem = AddSubsystem<GameCueSubsystem>(false);
             AbilityActivationReqSubsystem = AddSubsystem<AbilityActivationReqSubsystem>(true);
@@ -194,12 +194,12 @@ namespace GAS.Logic
         
         public bool GetRscFromHandler(Handler<GameEffect> handler, out GameEffect effect)
         {
-            return EffectInstanceSubsystem.EffectResourceMgr.Dereference(handler, out effect);
+            return EffectInstanceSubsystem.EffectRscMgr.Dereference(handler, out effect);
         }
         
         public bool GetRscFromHandler(Handler<GameEventArg> handler, out GameEventArg eventArg)
         {
-            return GameEventSubsystem.GameEventResourceMgr.Dereference(handler, out eventArg);
+            return GameEventSubsystem.GameEventRscMgr.Dereference(handler, out eventArg);
         }
         
         #endregion

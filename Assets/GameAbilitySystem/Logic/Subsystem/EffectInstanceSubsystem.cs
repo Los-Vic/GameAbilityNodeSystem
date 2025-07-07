@@ -8,18 +8,17 @@ namespace GAS.Logic
     {
         private readonly List<GameEffect> _needTickEffects = new();
         private readonly List<GameEffect> _traverseEffectCache = new();
-        private readonly List<GameEffect> _pendingDestroyEffects = new();
-        internal HandlerResourceMgr<GameEffect> EffectResourceMgr { get; private set; }
+        internal HandlerRscMgr<GameEffect> EffectRscMgr { get; private set; }
 
         public override void Init()
         {
             base.Init();
-            EffectResourceMgr = new(1024);
+            EffectRscMgr = new(1024, DisposeEffect);
         }
 
         public override void Update(float deltaTime)
         {
-            if(_needTickEffects.Count == 0 && _pendingDestroyEffects.Count == 0)
+            if(_needTickEffects.Count == 0)
                 return;
 
             _traverseEffectCache.Clear();
@@ -29,15 +28,6 @@ namespace GAS.Logic
             {
                 a.OnTick();
             }
-
-            for (var i = _pendingDestroyEffects.Count - 1; i >= 0; i--)
-            {
-                var effect = _pendingDestroyEffects[i];
-                if (EffectResourceMgr.GetRefCount(effect.Handler) != 0)
-                    continue;
-                DisposeEffect(effect);
-                _pendingDestroyEffects.RemoveAt(i);
-            }
         }
 
         #region Effect Instance Create/Destroy
@@ -45,7 +35,7 @@ namespace GAS.Logic
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
             var effect = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEffect>();
-            var h = EffectResourceMgr.Create(effect);
+            var h = EffectRscMgr.CreateHandler(effect);
             var initParam = new GameEffectInitParam()
             {
                 CreateParam = param,
@@ -57,25 +47,20 @@ namespace GAS.Logic
         
         internal void DestroyEffect(GameEffect effect)
         {
-            if (effect.Handler == 0 || _pendingDestroyEffects.Contains(effect))
+            if (effect.Handler == 0 || effect.MarkDestroy)
                 return;
-            
-            if (EffectResourceMgr.GetRefCount(effect.Handler) == 0)
-            {
-                DisposeEffect(effect);
-            }
-            else
-            {
-                _pendingDestroyEffects.Add(effect);
-            }
+
+            effect.MarkDestroy = true;
+            EffectRscMgr.RemoveRefCount(effect.Handler);
         }
 
         private void DisposeEffect(GameEffect effect)
         {
-            if (!System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(effect.Owner, out var owner))
-                return;
-            GameLogger.Log($"Release Effect: {effect} of {owner}");
-            owner.GameEffects.Remove(effect);
+            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(effect.Owner, out var owner))
+            {
+                GameLogger.Log($"Release Effect: {effect} of {owner}");
+                owner.GameEffects.Remove(effect);
+            }
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(effect);
         }
 

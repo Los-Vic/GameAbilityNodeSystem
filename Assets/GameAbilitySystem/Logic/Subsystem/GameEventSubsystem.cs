@@ -11,12 +11,11 @@ namespace GAS.Logic
         private readonly Stack<GameEventArg> _eventStack = new();
         private const int StackDepthWarningThreshold = 20;
         private readonly List<GameEventCreateParam> _nextFrameEventsCache = new();
-        private readonly List<GameEventArg> _pendingDestroyEvents = new();
-        internal HandlerResourceMgr<GameEventArg> GameEventResourceMgr { get; private set; }
+        internal HandlerRscMgr<GameEventArg> GameEventRscMgr { get; private set; }
 
         public override void Init()
         {
-            GameEventResourceMgr = new(256);
+            GameEventRscMgr = new(256, DisposeGameEventArg);
         }
 
         public override void UnInit()
@@ -24,12 +23,11 @@ namespace GAS.Logic
             _gameEvents.Clear();
             _eventStack.Clear();
             _nextFrameEventsCache.Clear();
-            _pendingDestroyEvents.Clear();
         }
 
         public override void Update(float deltaTime)
         {
-            if (_nextFrameEventsCache.Count == 0 && _pendingDestroyEvents.Count == 0)
+            if (_nextFrameEventsCache.Count == 0)
                 return;
             
             foreach (var p in _nextFrameEventsCache)
@@ -38,15 +36,6 @@ namespace GAS.Logic
                 RealPostgameEvent(ref param);
             }
             _nextFrameEventsCache.Clear();
-
-            for (var i = _pendingDestroyEvents.Count - 1; i >= 0; i--)
-            {
-                var arg = _pendingDestroyEvents[i];
-                if(GameEventResourceMgr.GetRefCount(arg.Handler) > 0)
-                    continue;
-                DisposeGameEventArg(arg);
-                _pendingDestroyEvents.RemoveAt(i);
-            }
         }
 
         public void RegisterGameEvent(EGameEventType eventType, Action<GameEventArg> callback, int priority = 0)
@@ -80,7 +69,7 @@ namespace GAS.Logic
                 return;
             
             var eventArg = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEventArg>();
-            var h = GameEventResourceMgr.Create(eventArg);
+            var h = GameEventRscMgr.CreateHandler(eventArg);
             var initParam = new GameEventInitParam()
             {
                 CreateParam = param,
@@ -97,14 +86,7 @@ namespace GAS.Logic
             GameLogger.Log($"Pop game event, event type:{param.EventType}, stack depth:{_eventStack.Count}");
             _eventStack.Pop();
 
-            if (GameEventResourceMgr.GetRefCount(h) == 0)
-            {
-                DisposeGameEventArg(eventArg);
-            }
-            else
-            {
-                _pendingDestroyEvents.Add(eventArg);
-            }
+            GameEventRscMgr.RemoveRefCount(h);
         }
 
         private void DisposeGameEventArg(GameEventArg arg)

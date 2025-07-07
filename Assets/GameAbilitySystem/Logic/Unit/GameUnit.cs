@@ -124,6 +124,7 @@ namespace GAS.Logic
             }
             GameEffects.Clear();
             Status = EUnitStatus.Destroyed;
+            Handler = 0;
         }
 
         internal void MarkForDestroy(EDestroyUnitReason reason)

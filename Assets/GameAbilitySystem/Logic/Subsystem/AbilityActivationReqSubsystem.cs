@@ -58,7 +58,7 @@ namespace GAS.Logic
         {
             _system = system;
             Req = req;
-            system.GameEventSubsystem.GameEventResourceMgr.AddRefCount(req.EventArgs);
+            system.GameEventSubsystem.GameEventRscMgr.AddRefCount(req.EventArgs);
         }
 
         internal void StartJob()
@@ -86,7 +86,7 @@ namespace GAS.Logic
 
             GameLogger.Log($"Cancel activation job: {ability}");
             JobState = EActivationReqJobState.Cancelled;
-            _system.GameEventSubsystem.GameEventResourceMgr.RemoveRefCount(Req.EventArgs);
+            _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
         }
 
         internal void TickJob(FP tickTime)
@@ -198,7 +198,7 @@ namespace GAS.Logic
 
         public void OnReturnToPool()
         {
-            _system.GameEventSubsystem.GameEventResourceMgr.RemoveRefCount(Req.EventArgs);
+            _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
             CastState = EActivationJobInCastState.None;
             JobState = EActivationReqJobState.Waiting;
             _timeFromLastCastState = 0;

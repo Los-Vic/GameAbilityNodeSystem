@@ -73,6 +73,7 @@ namespace GAS.Logic
         public GameAbilitySystem Sys { get; private set; }
         private FP _modifyDiffVal;
         private FP _lifeTimeCounter;
+        internal bool MarkDestroy { get; set; }
         
         internal void Init(GameAbilitySystem system, ref GameEffectInitParam param)
         {
@@ -92,6 +93,7 @@ namespace GAS.Logic
             EffectName = string.Empty;
             EffectCfg = default;
             Handler = 0;
+            MarkDestroy = false;
         }
 
         public override string ToString()

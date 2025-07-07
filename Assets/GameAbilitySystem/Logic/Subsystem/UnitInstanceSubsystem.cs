@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
+﻿using GameplayCommonLibrary;
 using GameplayCommonLibrary.Handler; 
 
 namespace GAS.Logic
@@ -9,34 +8,18 @@ namespace GAS.Logic
     /// </summary>
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
-        public HandlerResourceMgr<GameUnit> UnitHandlerRscMgr { get; private set; }
-        private readonly List<Handler<GameUnit>> _pendingDestroyUnitList = new();
-
+        public HandlerRscMgr<GameUnit> UnitHandlerRscMgr { get; private set; }
+        
         public override void Init()
         {
             base.Init();
-            UnitHandlerRscMgr = new HandlerResourceMgr<GameUnit>(512);
+            UnitHandlerRscMgr = new HandlerRscMgr<GameUnit>(512, DisposeUnit);
         }
 
         public override void UnInit()
         {
-            UnitHandlerRscMgr.ForeachResource(DisposeUnit);
-            _pendingDestroyUnitList.Clear();
-        }
-
-        public override void Update(float deltaTime)
-        {
-            if (_pendingDestroyUnitList.Count == 0)
-                return;
-
-            for (var i = _pendingDestroyUnitList.Count - 1; i >= 0; i--)
-            {
-                var h = _pendingDestroyUnitList[i];
-                if (UnitHandlerRscMgr.GetRefCount(h) != 0 || !UnitHandlerRscMgr.Dereference(h, out var unit)) 
-                    continue;
-                DisposeUnit(unit);
-                _pendingDestroyUnitList.RemoveAt(i);
-            }
+            //UnitHandlerRscMgr.ForeachResource(DisposeUnit);
+            //UnitHandlerRscMgr.Reset();
         }
 
         public GameUnit[] GetAllUnits()
@@ -48,7 +31,7 @@ namespace GAS.Logic
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
             var unit = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameUnit>();
-            var h = UnitHandlerRscMgr.Create(unit);
+            var h = UnitHandlerRscMgr.CreateHandler(unit);
 
             var initParam = new GameUnitInitParam()
             {
@@ -71,7 +54,7 @@ namespace GAS.Logic
             return unit;
         }
         
-        internal void DestroyGameUnit(Handler<GameUnit> unitHandler, EDestroyUnitReason reason = EDestroyUnitReason.None)
+        internal void DestroyGameUnit(Handler<GameUnit> unitHandler, EDestroyUnitReason reason = EDestroyUnitReason.None, bool ignoreRefCount = false)
         {
             if (!UnitHandlerRscMgr.Dereference(unitHandler, out var unit))
             {
@@ -98,21 +81,13 @@ namespace GAS.Logic
                 Reason = reason,
                 Unit = unit
             });
-
-            if (UnitHandlerRscMgr.GetRefCount(unitHandler) > 0)
-            {
-                _pendingDestroyUnitList.Add(unitHandler);
-            }
-            else
-            {
-                DisposeUnit(unit);
-            }
+            
+            UnitHandlerRscMgr.RemoveRefCount(unitHandler);
         }
 
         private void DisposeUnit(GameUnit unit)
         {
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(unit);
-            UnitHandlerRscMgr.Release(unit.Handler);
         }
 
         #endregion

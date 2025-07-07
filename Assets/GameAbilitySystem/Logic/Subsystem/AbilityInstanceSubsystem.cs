@@ -9,27 +9,25 @@ namespace GAS.Logic
     {
         private readonly List<GameAbility> _needTickAbilities = new();
         private readonly List<GameAbility> _traverseAbilityCache = new();
-        private readonly List<GameAbility> _pendingDestroyAbilities = new();
         
-        public HandlerResourceMgr<GameAbility> AbilityHandlerRscMgr { get; private set; }
+        public HandlerRscMgr<GameAbility> AbilityHandlerRscMgr { get; private set; }
 
         public override void Init()
         {
             base.Init();
-            AbilityHandlerRscMgr = new(1024);
+            AbilityHandlerRscMgr = new(1024, DisposeAbility);
         }
 
         public override void UnInit()
         {
             _needTickAbilities.Clear();
             _traverseAbilityCache.Clear();
-            _pendingDestroyAbilities.Clear();
             base.UnInit();
         }
 
         public override void Update(float deltaTime)
         {
-            if(_needTickAbilities.Count == 0 && _pendingDestroyAbilities.Count == 0)
+            if(_needTickAbilities.Count == 0)
                 return;
 
             _traverseAbilityCache.Clear();
@@ -37,15 +35,6 @@ namespace GAS.Logic
             foreach (var a in _traverseAbilityCache)
             {
                 a.OnTick();
-            }
-
-            for (var i = _pendingDestroyAbilities.Count - 1; i >= 0; i--)
-            {
-                var h = _pendingDestroyAbilities[i].Handler;
-                if (AbilityHandlerRscMgr.GetRefCount(h) != 0)
-                    continue;
-                DisposeAbility(_pendingDestroyAbilities[i]);
-                _pendingDestroyAbilities.RemoveAt(i);
             }
         }
 
@@ -59,7 +48,7 @@ namespace GAS.Logic
             }
             
             var ability = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameAbility>();
-            var h = AbilityHandlerRscMgr.Create(ability);
+            var h = AbilityHandlerRscMgr.CreateHandler(ability);
 
             var initParam = new AbilityInitParam()
             {
@@ -76,14 +65,7 @@ namespace GAS.Logic
             
             ability.MarkDestroy();
             RemoveFromTickList(ability);
-            if (AbilityHandlerRscMgr.GetRefCount(ability.Handler) > 0)
-            {
-                _pendingDestroyAbilities.Add(ability);
-            }
-            else
-            {
-                DisposeAbility(ability);
-            }
+            AbilityHandlerRscMgr.RemoveRefCount(ability.Handler);
         }
 
         private void DisposeAbility(GameAbility ability)

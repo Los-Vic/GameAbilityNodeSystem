@@ -49,17 +49,9 @@ namespace GameplayCommonLibrary.Handler
         }
     }
     
-    public enum EReleaseHandlerResult
+    public class HandlerRscMgr<T>
     {
-        Success,
-        GenerationMismatch,
-        RefCountNotZero,
-        InvalidHandler,
-    }
-    
-    public class HandlerResourceMgr<T>
-    {
-        private T[] _dataArray;
+        private T[] _rscArray;
         private uint[] _generationArray;
         private uint[] _refCountArray;
         
@@ -70,22 +62,40 @@ namespace GameplayCommonLibrary.Handler
         //当_autoIncreaseCounter == dataArray.Count且_freeSlots.Count == 0时，说明dataArray已满，需要resize
         private uint _autoIncreaseCounter;
         private readonly Queue<uint> _freeSlots = new();
+
+        private readonly Action<T> _onHandlerReleased;
         
-        public HandlerResourceMgr(int arraySize)
+        public HandlerRscMgr(int arraySize, Action<T> onHandlerReleased)
         {
-            _dataArray = new T[arraySize];
+            _rscArray = new T[arraySize];
             _generationArray = new uint[arraySize];
             _refCountArray = new uint[arraySize];
             _compactDataArray = new uint[arraySize];
+            _onHandlerReleased = onHandlerReleased;
         }
 
-        public Handler<T> Create(T rsc)
+        public void Reset()
+        {
+            for (var i = 0; i < _rscArray.Length; i++)
+            {
+                _rscArray[i] = default;
+                _generationArray[i] = 0;
+                _refCountArray[i] = 0;
+                _compactDataArray[i] = 0;
+            }
+            _dataArrayToCompactArray.Clear();
+            _compactDataCount = 0;
+            _autoIncreaseCounter = 0;
+            _freeSlots.Clear();
+        }
+        
+        public Handler<T> CreateHandler(T rsc)
         {
             if (_freeSlots.Count == 0)
             {
                 while (true)
                 {
-                    if(_autoIncreaseCounter == _dataArray.Length)
+                    if(_autoIncreaseCounter == _rscArray.Length)
                         AutoResize();
 
                     //有可能已经被另一个Create方法绑定了资源了，则继续自增
@@ -96,39 +106,44 @@ namespace GameplayCommonLibrary.Handler
                     }
 
                     var slot = _autoIncreaseCounter++;
-                    _dataArray[slot] = rsc;
+                    _rscArray[slot] = rsc;
                     _dataArrayToCompactArray.Add(slot, _compactDataCount);
                     _compactDataArray[_compactDataCount++] = slot;
                     _generationArray[slot] = 1;
                     
-                    return new Handler<T>(slot, 1);
+                    var h =  new Handler<T>(slot, 1);
+                    AddRefCount(h);
+                    return h;
                 }
             }
 
             var freeSlot = _freeSlots.Dequeue();
-            _dataArray[freeSlot] = rsc;
+            _rscArray[freeSlot] = rsc;
             _dataArrayToCompactArray.Add(freeSlot, _compactDataCount);
             _compactDataArray[_compactDataCount++] = freeSlot;
-            
-            return new Handler<T>(freeSlot, _generationArray[freeSlot]);
+
+            var h1 = new Handler<T>(freeSlot, _generationArray[freeSlot]);
+            AddRefCount(h1);
+            return h1;
         }
 
         //指定rsc和对应的Handler值
-        public bool Create(T rsc, Handler<T> handler)
+        public bool CreateHandler(T rsc, Handler<T> handler)
         {
             if (_dataArrayToCompactArray.ContainsKey(handler.Index))
                 return false;
             
             var index = handler.Index;
-            if (_dataArray.Length <= index)
+            if (_rscArray.Length <= index)
             {
                 AutoResize(index);
             }
             
-            _dataArray[index] = rsc;
+            _rscArray[index] = rsc;
             _generationArray[index] = handler.Generation;
             _dataArrayToCompactArray.Add(index, _compactDataCount);
             _compactDataArray[_compactDataCount++] = index;
+            AddRefCount(handler);
             return true;
         }
         
@@ -136,62 +151,71 @@ namespace GameplayCommonLibrary.Handler
         {
             var index = handler.Index;
 
-            if (!handler.IsAssigned || index >= _dataArray.Length || _generationArray[index] != handler.Generation)
+            if (!handler.IsAssigned || index >= _rscArray.Length || _generationArray[index] != handler.Generation)
             {
                 rsc = default;
                 return false;
             }
 
-            rsc = _dataArray[index];
+            rsc = _rscArray[index];
             return true;
         }
 
         public bool IsRscValid(Handler<T> handler)
         {
             var index = handler.Index;
-            return handler.IsAssigned && index < _dataArray.Length && _generationArray[index] == handler.Generation;
+            return handler.IsAssigned && index < _rscArray.Length && _generationArray[index] == handler.Generation;
         }
-
-        //如果需要阻止Handler被Release，则可以给Handler增加引用计数。但切记要调用RemoveRefCount，否则Handler无法被Release
+        
         public void AddRefCount(Handler<T> handler)
         {
             if (!IsRscValid(handler))
                 return;
-            if(handler.Index >= _dataArray.Length)
+            if(handler.Index >= _rscArray.Length)
                 return;
             _refCountArray[handler.Index] += 1;
         }
 
         public void RemoveRefCount(Handler<T> handler)
         {
-            if(handler.Index >= _dataArray.Length)
+            if (!IsRscValid(handler))
                 return;
-            if (_refCountArray[handler.Index] != 0)
+            _refCountArray[handler.Index] -= 1;
+            
+            if (_refCountArray[handler.Index] == 0)
             {
-                _refCountArray[handler.Index] -= 1;
+                ReleaseHandler(handler);
             }
         }
 
-        public uint GetRefCount(Handler<T> handler)
-        {
-            if (handler.Index >= _dataArray.Length)
-                return 0;
-            return _refCountArray[handler.Index];
-        }
+        // private uint GetRefCount(Handler<T> handler)
+        // {
+        //     if (!IsRscValid(handler))
+        //         return 0;
+        //     if (handler.Index >= _dataArray.Length)
+        //         return 0;
+        //     return _refCountArray[handler.Index];
+        // }
         
-        public EReleaseHandlerResult Release(Handler<T> handler)
+        /// <summary>
+        /// Not check ref count here
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        private void ReleaseHandler(Handler<T> handler)
         {
             var index = handler.Index;
 
-            if (!handler.IsAssigned && index >= _dataArray.Length)
-                return EReleaseHandlerResult.InvalidHandler;
+            if (!handler.IsAssigned && index >= _rscArray.Length)
+                return;
             
             if (_generationArray[index] != handler.Generation)
-                return EReleaseHandlerResult.GenerationMismatch;
-
-            if (_refCountArray[index] != 0)
-                return EReleaseHandlerResult.RefCountNotZero;
-
+                return;
+            
+            //remain handler valid when call OnHandlerReleased
+            var rsc = _rscArray[index];
+            _onHandlerReleased?.Invoke(rsc);
+            
             var generation = _generationArray[index];
             if (generation == 0xffu)
             {
@@ -204,7 +228,7 @@ namespace GameplayCommonLibrary.Handler
             
             _generationArray[index] = generation;
             _freeSlots.Enqueue(index);
-            _dataArray[index] = default;
+            _rscArray[index] = default;
 
             _dataArrayToCompactArray.Remove(index, out var compactId);
             
@@ -212,8 +236,6 @@ namespace GameplayCommonLibrary.Handler
             _dataArrayToCompactArray[last] = compactId;
             _compactDataArray[compactId] = last;
             _compactDataCount--;
-            
-            return EReleaseHandlerResult.Success;
         }
 
         public T[] GetAllResources()
@@ -224,7 +246,7 @@ namespace GameplayCommonLibrary.Handler
             var rscArray = new T[_compactDataCount];
             for (var i = 0; i < _compactDataCount; i++)
             {
-                rscArray[i] = _dataArray[_compactDataArray[i]];
+                rscArray[i] = _rscArray[_compactDataArray[i]];
             }
             return rscArray;
         }
@@ -233,13 +255,13 @@ namespace GameplayCommonLibrary.Handler
         {
             for (var i = 0; i < _compactDataCount; i++)
             {
-                action(_dataArray[_compactDataArray[i]]);
+                action(_rscArray[_compactDataArray[i]]);
             }
         }
         
         private void AutoResize(uint toIncludeIndex = 0)
         {
-            var newSize = _dataArray.Length * 2;
+            var newSize = _rscArray.Length * 2;
             if (toIncludeIndex > 0)
             {
                 while (newSize <= toIncludeIndex)
@@ -249,8 +271,8 @@ namespace GameplayCommonLibrary.Handler
             }
             
             var newArray = new T[newSize];
-            _dataArray.CopyTo(newArray, 0);
-            _dataArray = newArray;
+            _rscArray.CopyTo(newArray, 0);
+            _rscArray = newArray;
             
             var newMagicNumberArray = new uint[newSize];
             _generationArray.CopyTo(newMagicNumberArray, 0);

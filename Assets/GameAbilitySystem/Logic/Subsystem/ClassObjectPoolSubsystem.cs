@@ -13,7 +13,7 @@ namespace GAS.Logic
         
         public override void UnInit()
         {
-            ClassObjectPoolMgr.Clear();
+            //ClassObjectPoolMgr.Clear();
         }
     }
 }
