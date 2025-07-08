@@ -17,9 +17,9 @@ namespace NS
 
         public void DeInit()
         {
-            foreach (var graphRunner in _graphRunners.ToArray())
+            for (var i = _graphRunners.Count - 1; i >= 0; i--)
             {
-                _system.DestroyGraphRunner(graphRunner);
+                _system.DestroyGraphRunner(_graphRunners[i]);
             }
             _graphRunners.Clear();
         }
@@ -31,13 +31,15 @@ namespace NS
             if(nodeId == null)
                 return;
             var graphRunner = _system.CreateGraphRunner();
-            graphRunner.Init(_system, _asset, nodeId, param, OnGraphRunEnd);
+            graphRunner.OnRunnerRunEnd += OnGraphRunEnd;
+            graphRunner.Init(_system, _asset, nodeId, param);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }
 
         private void OnGraphRunEnd(NodeGraphRunner runner, EGraphRunnerEnd type)
         {
+            _system.DestroyGraphRunner(runner);
             _graphRunners.Remove(runner);
         }
     }

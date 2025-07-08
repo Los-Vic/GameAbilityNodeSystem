@@ -43,7 +43,7 @@ namespace GAS.Logic
             var abilityAsset = System.AssetConfigProvider.GetAbilityAsset(param.Id);
             if (!abilityAsset)
             {
-                GameLogger.LogError($"Fail to get ActiveAbilityAsset of {param.Id}");
+                GameLogger.LogError($"Fail to get ActiveAbilityAsset:{param.Id}");
                 return null;
             }
             
@@ -70,12 +70,7 @@ namespace GAS.Logic
 
         private void DisposeAbility(GameAbility ability)
         {
-            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(ability.Owner, out var owner))
-            {
-                GameLogger.Log($"Release Ability: {ability}");
-                owner.GameAbilities.Remove(ability);
-            }
-            
+            GameLogger.Log($"Release ability:{ability}");
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(ability);
         }
 

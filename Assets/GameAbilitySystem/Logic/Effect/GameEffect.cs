@@ -78,7 +78,6 @@ namespace GAS.Logic
         internal void Init(GameAbilitySystem system, ref GameEffectInitParam param)
         {
             EffectCfg = param.CreateParam.EffectCfg;
-            EffectName = param.CreateParam.EffectCfg.Name;
             Instigator = param.CreateParam.Instigator;
             Handler = param.Handler;
             Sys = system;
@@ -117,7 +116,8 @@ namespace GAS.Logic
         internal void OnAddEffect(GameUnit owner)
         {
             Owner = owner.Handler;
-            GameLogger.Log($"On add effect: {EffectName} of {owner}");
+            EffectName = $"{EffectCfg.Name} of {owner}";
+            GameLogger.Log($"On add effect: {EffectName}");
             
             var oldAttributeVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType);
             var modifyOutputVal = GetModifyOutputVal(owner, EffectCfg.AttributeType, EffectCfg.ModifierOp, EffectCfg.ModifierVal);
@@ -157,7 +157,7 @@ namespace GAS.Logic
 
         internal void OnRemoveEffect()
         {
-            GameLogger.Log($"On remove effect: {EffectName} of {Owner}");
+            GameLogger.Log($"On remove effect: {EffectName}");
             Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner);
             
             switch (EffectCfg.RollbackPolicy)

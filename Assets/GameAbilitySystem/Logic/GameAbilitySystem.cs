@@ -6,8 +6,7 @@ using GAS.Logic.Target;
 using GAS.Logic.Value;
 using MissQ;
 using NS;
-using UnityEngine.Assertions;
-using UnityEngine.XR;
+using UnityEngine.Assertions; 
 
 namespace GAS.Logic
 {
@@ -246,12 +245,12 @@ namespace GAS.Logic
             attribute.OnPlayValChangeCue.UnRegisterObserver(observer);
         }
 
-        public void PlayAttributeOnChangeCue(SimpleAttribute attribute, AttributeChangeForCue changeForCue)
+        public void PlayAttributeOnChangeCue(SimpleAttribute attribute, ref AttributeChangeForCue changeForCue)
         {
             attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
         }
         
-        public void PlayAttributeOnChangeCue(CompositeAttribute attribute, AttributeChangeForCue changeForCue)
+        public void PlayAttributeOnChangeCue(CompositeAttribute attribute, ref AttributeChangeForCue changeForCue)
         {
             attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
         }

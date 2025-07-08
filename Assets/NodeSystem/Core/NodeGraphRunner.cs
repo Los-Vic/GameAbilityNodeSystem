@@ -33,9 +33,7 @@ namespace NS
         private readonly Stack<string> _runningLoopNodeIds = new();
 
         //Hook
-        private Action<NodeGraphRunner, EGraphRunnerEnd> _onRunnerRunEnd;
-        private Action<NodeGraphRunner> _onRunnerDestroy;
-        
+        public Action<NodeGraphRunner, EGraphRunnerEnd> OnRunnerRunEnd;
         
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
@@ -47,13 +45,11 @@ namespace NS
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
         public void Init(NodeSystem system, NodeGraphAsset asset, string entryNodeId, IEntryParam actionStartParam
-        , Action<NodeGraphRunner, EGraphRunnerEnd> onRunnerRunEnd, Action<NodeGraphRunner> onRunnerDestroy = null, NodeGraphRunnerContext context = null)
+        , NodeGraphRunnerContext context = null)
         {
             _nodeSystem = system;
             _asset = asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
-            _onRunnerRunEnd = onRunnerRunEnd;
-            _onRunnerDestroy = onRunnerDestroy;
             _entryNode = GraphAssetRuntimeData.GetNodeById(entryNodeId);
             Context = context;
             
@@ -76,9 +72,6 @@ namespace NS
 
         private void UnInit()
         {
-            _onRunnerDestroy?.Invoke(this);
-            _onRunnerDestroy = null;
-            
             TaskScheduler.CancelTasksOfGraphRunner(this);
 
             if (_curNodeRunner != null)
@@ -95,7 +88,7 @@ namespace NS
             _runningLoopNodeIds.Clear();
             
             _outPortResultCached.Clear();
-            _onRunnerRunEnd = null;
+            OnRunnerRunEnd = null;
             _asset = null;
             _entryNode = null;
             _isValid = false;
@@ -133,19 +126,19 @@ namespace NS
         private void CompleteRunner()
         {
             GameLogger.Log($"complete graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
+            OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
         }
 
         public void CancelRunner()
         {
             GameLogger.Log($"cancel graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
+            OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
         }
 
         public void AbortRunner()
         {
             GameLogger.Log($"abort graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            _onRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Aborted);
+            OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Aborted);
         }
         
         private void ExecuteRunner()

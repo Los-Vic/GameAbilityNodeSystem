@@ -32,6 +32,9 @@ namespace GAS
         private readonly Dictionary<uint, AbilityConfigElement> _abilityConfigMap = new();
         private readonly Dictionary<string, List<float>> _paramMap = new();
 
+        private GameCueAuthoring _cueAuthoring;
+        private List<TestUnit> _testUnits = new();
+
         private void Awake()
         {
             _debuggerTest = GetComponent<GameAbilitySystemDebuggerTest>();
@@ -50,6 +53,9 @@ namespace GAS
             _system.OnCreateSystem();
             _system.InitSystem();
             _debuggerTest.System = _system;
+            
+            _cueAuthoring = new GameCueAuthoring(_system);
+            _cueAuthoring.Init();
             
             if (configHub.abilityEffectParamConfig)
             {
@@ -75,6 +81,7 @@ namespace GAS
 
         private void OnDestroy()
         {
+            //_cueAuthoring.UnInit();
             _system.UnInitSystem();
         }
 
@@ -126,6 +133,11 @@ namespace GAS
                 ValEquation = valList => valList[0] + valList[1]
             });
             unit.AddTag(EGameTag.Unit);
+
+            var testUnit = new TestUnit();
+            testUnit.Init(_system, unit.Handler);
+            _testUnits.Add(testUnit);
+            
             return unit;
         }
 

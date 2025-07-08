@@ -53,20 +53,22 @@ namespace GAS
             if (context.AttributeType != ESimpleAttributeType.None)
             {
                 var attribute = unit.GetSimpleAttribute(context.AttributeType);
-                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, new AttributeChangeForCue()
+                var param = new AttributeChangeForCue()
                 {
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,
-                });
+                };
+                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
             }
             else
             {
                 var attribute = unit.GetCompositeAttribute(context.CompositeAttributeType);
-                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, new AttributeChangeForCue()
+                var param = new AttributeChangeForCue()
                 {
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,
-                });
+                };
+                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
             }
         }
         

@@ -56,11 +56,7 @@ namespace GAS.Logic
 
         private void DisposeEffect(GameEffect effect)
         {
-            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(effect.Owner, out var owner))
-            {
-                GameLogger.Log($"Release Effect: {effect} of {owner}");
-                owner.GameEffects.Remove(effect);
-            }
+            GameLogger.Log($"Release effect:{effect}");
             System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(effect);
         }
 

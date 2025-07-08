@@ -41,8 +41,7 @@ namespace GAS.Logic
         }
 
         internal NodeGraphRunner RunGraphGameEvent(EGameEventType eventTypeType, GameEventArg param,
-            Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null,
-            Action<NodeGraphRunner> customOnRunGraphDestroy = null)
+            Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null)
         {
             var nodeId = _runtimeData.GetEntryNodeId(typeof(GameEventEntryNode), (int)eventTypeType);
             if (nodeId == null)
@@ -53,29 +52,26 @@ namespace GAS.Logic
       
             var graphRunner = _system.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
-            graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
+            
+            if (customOnRunGraphEnd != null)
             {
-                customOnRunGraphEnd?.Invoke(runner, endType);
-                OnRunGraphEnd(runner, endType);
-            }, (runner) =>
+                graphRunner.OnRunnerRunEnd += customOnRunGraphEnd;
+            }
+            graphRunner.OnRunnerRunEnd += (runner, endType) =>
             {
-                customOnRunGraphDestroy?.Invoke(runner);
                 _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(param.Handler);
-                OnRunGraphDestroy(runner);
-            }, _context);
+                OnRunGraphEnd(runner, endType);
+            };
+            
+            graphRunner.Init(_system, _asset, nodeId, param, _context);
             
             _system.GameEventSubsystem.GameEventRscMgr.AddRefCount(param.Handler);
             graphRunner.StartRunner();
             return graphRunner;
         }
 
-        internal List<(int, string)> GetRegisteredGameEventNodePairs()=>_runtimeData.GetEntryNodePairList(typeof(GameEventEntryNode));
-
-        internal bool HasEntryNode(Type portalNodeType) => _runtimeData.GetEntryNodeId(portalNodeType) != null;
-
         internal NodeGraphRunner RunGraph(Type portalNodeType, GameEventArg param = null,
-            Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null,
-            Action<NodeGraphRunner> customOnRunGraphDestroy = null)
+            Action<NodeGraphRunner, EGraphRunnerEnd> customOnRunGraphEnd = null)
         {
             var nodeId = _runtimeData.GetEntryNodeId(portalNodeType);
             if (nodeId == null)
@@ -86,26 +82,25 @@ namespace GAS.Logic
 
             var graphRunner = _system.CreateGraphRunner();
             _graphRunners.Add(graphRunner);
-            graphRunner.Init(_system, _asset, nodeId, param, (runner, endType) =>
+
+            if (customOnRunGraphEnd != null)
             {
-                customOnRunGraphEnd?.Invoke(runner, endType);
-                OnRunGraphEnd(runner, endType);
-            }, (runner) =>
-            {
-                customOnRunGraphDestroy?.Invoke(runner);
-                OnRunGraphDestroy(runner);
-            }, _context);
+                graphRunner.OnRunnerRunEnd += customOnRunGraphEnd;
+            }
+            graphRunner.OnRunnerRunEnd += OnRunGraphEnd;
+
+            graphRunner.Init(_system, _asset, nodeId, param, _context);
             graphRunner.StartRunner();
             return graphRunner;
         }
+        
+        internal List<(int, string)> GetRegisteredGameEventNodePairs()=>_runtimeData.GetEntryNodePairList(typeof(GameEventEntryNode));
 
+        internal bool HasEntryNode(Type portalNodeType) => _runtimeData.GetEntryNodeId(portalNodeType) != null;
+        
         private void OnRunGraphEnd(NodeGraphRunner runner, EGraphRunnerEnd endType)
         {
             _system.DestroyGraphRunner(runner);
-        }
-
-        private void OnRunGraphDestroy(NodeGraphRunner runner)
-        {
             _graphRunners.Remove(runner);
         }
     }

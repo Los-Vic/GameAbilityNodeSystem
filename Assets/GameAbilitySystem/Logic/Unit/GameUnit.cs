@@ -108,21 +108,23 @@ namespace GAS.Logic
                 Sys.AttributeInstanceSubsystem.DestroyCompositeAttribute(attribute);
             }
             CompositeAttributes.Clear();
-            
+
             //Clear Abilities
-            foreach (var ability in GameAbilities)
+            for (var i = GameAbilities.Count - 1; i >= 0; i--)
             {
+                var ability = GameAbilities[i];
                 ability.OnRemoveAbility();
                 Sys.AbilityInstanceSubsystem.DestroyAbility(ability);
             }
-            GameAbilities.Clear();
+
             //Clear Effects
-            foreach (var effect in GameEffects)
+            for (var i = GameEffects.Count - 1; i > 0; i--)
             {
+                var effect = GameEffects[i];
                 effect.OnRemoveEffect();
                 Sys.EffectInstanceSubsystem.DestroyEffect(effect);
             }
-            GameEffects.Clear();
+            
             Status = EUnitStatus.Destroyed;
             Handler = 0;
         }
@@ -257,6 +259,7 @@ namespace GAS.Logic
 
         public void RemoveAbility(GameAbility ability)
         {
+            GameAbilities.Remove(ability);
             ability.OnRemoveAbility();
             Sys.AbilityInstanceSubsystem.DestroyAbility(ability);
         }
@@ -273,6 +276,7 @@ namespace GAS.Logic
 
         public void RemoveEffect(GameEffect effect)
         {
+            GameEffects.Remove(effect);
             effect.OnRemoveEffect();
             Sys.EffectInstanceSubsystem.DestroyEffect(effect);
         }
