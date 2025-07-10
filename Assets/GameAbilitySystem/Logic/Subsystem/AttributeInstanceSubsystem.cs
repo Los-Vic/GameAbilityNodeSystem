@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameplayCommonLibrary;
 using MissQ;
 
@@ -43,7 +42,7 @@ namespace GAS.Logic
 
         internal SimpleAttribute CreateSimpleAttribute(ref SimpleAttributeCreateParam param)
         {
-            var attribute = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<SimpleAttribute>();
+            var attribute = System.ClassObjectPoolSubsystem.Get<SimpleAttribute>();
             attribute.Init(ref param);
             GameLogger.Log($"Create simple attribute {param.Type}, default val {param.DefaultVal}");
             return attribute;
@@ -52,12 +51,12 @@ namespace GAS.Logic
         internal void DestroySimpleAttribute(SimpleAttribute attribute)
         {
             GameLogger.Log($"Destroy simple attribute {attribute.Type}, val {attribute.Val}");
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(attribute);
+            System.ClassObjectPoolSubsystem.Release(attribute);
         }
 
         internal CompositeAttribute CreateCompositeAttribute(ref CompositeAttributeCreateParam param)
         {
-            var attribute = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<CompositeAttribute>();
+            var attribute = System.ClassObjectPoolSubsystem.Get<CompositeAttribute>();
             attribute.Init(ref param);
             GameLogger.Log($"Create composite attribute {param.Type}");
             return attribute;
@@ -66,7 +65,7 @@ namespace GAS.Logic
         internal void DestroyCompositeAttribute(CompositeAttribute attribute)
         {
             GameLogger.Log($"Destroy composite attribute {attribute.Type}");
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(attribute);
+            System.ClassObjectPoolSubsystem.Release(attribute);
         }
 
         #endregion

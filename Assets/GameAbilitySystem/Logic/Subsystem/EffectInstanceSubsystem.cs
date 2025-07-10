@@ -34,14 +34,14 @@ namespace GAS.Logic
 
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
-            var effect = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEffect>();
+            var effect = System.ClassObjectPoolSubsystem.Get<GameEffect>();
             var h = EffectRscMgr.CreateHandler(effect);
             var initParam = new GameEffectInitParam()
             {
                 CreateParam = param,
                 Handler = h
             };
-            effect.Init(System, ref initParam);
+            effect.Init(ref initParam);
             return effect;
         }
         
@@ -57,7 +57,7 @@ namespace GAS.Logic
         private void DisposeEffect(GameEffect effect)
         {
             GameLogger.Log($"Release effect:{effect}");
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(effect);
+            System.ClassObjectPoolSubsystem.Release(effect);
         }
 
         #endregion

@@ -25,7 +25,7 @@ namespace GAS.Logic
     }
     
     [System.Serializable]
-    public class SimpleAttribute:IPoolClass
+    public class SimpleAttribute:GameAbilitySystemObject
     {
         public ESimpleAttributeType Type { get; private set; }
         
@@ -72,24 +72,12 @@ namespace GAS.Logic
         }
         
         #region Pool Interface
-
-        public void OnCreateFromPool()
-        {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
+        
+        public override void OnReturnToPool()
         {
             UnInit();
         }
-
-        public void OnDestroy()
-        {
-        }
-
+        
         #endregion
        
     }

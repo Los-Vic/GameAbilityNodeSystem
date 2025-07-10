@@ -39,7 +39,7 @@ namespace GAS.Logic
         UnInitialized,
     }
     
-    public class GameAbility :IPoolClass
+    public class GameAbility :GameAbilitySystemObject
     {
         public Handler<GameAbility> Handler { get; private set; }
         internal AbilityAsset Asset { get; private set; }
@@ -68,8 +68,7 @@ namespace GAS.Logic
         
         //在Job完成或Ability取消时需要移除。取消时，Job被标记为已取消，但还在AbilityActivationReqSubsystem的Queue里，只有当轮到它执行时，才真正移除
         private readonly List<AbilityActivationReqJob> _activationReqJobs = new();
-            
-        public GameAbilitySystem Sys { get; private set; }
+        
         private bool _hasOnTickEntry;
         
         /// <summary>
@@ -82,7 +81,7 @@ namespace GAS.Logic
         public string AbilityName { get; private set; }
 
 
-        internal void Init(GameAbilitySystem sys,  AbilityAsset asset, ref AbilityInitParam param)
+        internal void Init(AbilityAsset asset, ref AbilityInitParam param)
         {
             ID = param.CreateParam.Id;
             Asset = asset;
@@ -90,16 +89,15 @@ namespace GAS.Logic
             Lv = param.CreateParam.Lv;
             Handler = param.Handler;
             
-            GraphController.Init(sys, Asset, this);
+            GraphController.Init(System, Asset, this);
             
             State = EAbilityState.Initialized;
-            Sys = sys;
             
             SignalVal1 = param.CreateParam.SignalVal1;
             SignalVal2 = param.CreateParam.SignalVal2;
             SignalVal3 = param.CreateParam.SignalVal3;
 
-            if (sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(param.CreateParam.Instigator, out var instigator))
+            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(param.CreateParam.Instigator, out var instigator))
             {
                 instigator.OnUnitDestroyed.RegisterObserver(this, OnInstigatorDestroy);
             }
@@ -116,7 +114,7 @@ namespace GAS.Logic
             Owner = 0;
             _hasOnTickEntry = false;
             
-            if (Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
+            if (System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
             {
                 instigator.OnUnitDestroyed.UnRegisterObserver(this);
             }
@@ -131,22 +129,10 @@ namespace GAS.Logic
         }
 
         #region Object Pool
-
-        public void OnCreateFromPool()
-        {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
+        
+        public override void OnReturnToPool()
         {
             UnInit();
-        }
-
-        public void OnDestroy()
-        {
         }
 
         #endregion
@@ -157,7 +143,7 @@ namespace GAS.Logic
         {
             if (IsInCooldown)
             {
-                CooldownCounter += Sys.DeltaTime;
+                CooldownCounter += System.DeltaTime;
                 if (CooldownCounter >= CooldownDuration)
                 {
                     ResetCooldown();
@@ -170,7 +156,7 @@ namespace GAS.Logic
             }
             else if (!IsInCooldown)
             {
-                Sys.AbilityInstanceSubsystem.RemoveFromTickList(this);
+                System.AbilityInstanceSubsystem.RemoveFromTickList(this);
             }
         }
         
@@ -200,14 +186,14 @@ namespace GAS.Logic
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    Sys.GameEventSubsystem.RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    System.GameEventSubsystem.RegisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
 
             _hasOnTickEntry = GraphController.HasEntryNode(typeof(OnTickAbilityEntryNode));
             if (_hasOnTickEntry)
             {
-                Sys.AbilityInstanceSubsystem.AddToTickList(this);
+                System.AbilityInstanceSubsystem.AddToTickList(this);
             }
         }
 
@@ -220,7 +206,7 @@ namespace GAS.Logic
             {
                 foreach (var pair in gameEventNodeList)
                 {
-                    Sys.GameEventSubsystem.UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
+                    System.GameEventSubsystem.UnregisterGameEvent((EGameEventType)pair.Item1, OnGameEventInvoked);
                 }
             }
             
@@ -252,7 +238,7 @@ namespace GAS.Logic
             //Cost 
             foreach (var costElement in Asset.costs)
             {
-                if(!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                if(!System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
                     continue;
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
                 if (owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
@@ -269,12 +255,12 @@ namespace GAS.Logic
             
             foreach (var costElement in Asset.costs)
             {
-                if(!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+                if(!System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
                     continue;
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
                 var attribute = owner.GetSimpleAttribute(costElement.attributeType);
                 var newVal = attribute.Val - costNums;
-                Sys.AttributeInstanceSubsystem.SetAttributeVal(owner, costElement.attributeType, newVal);
+                System.AttributeInstanceSubsystem.SetAttributeVal(owner, costElement.attributeType, newVal);
             }
         }
         
@@ -288,13 +274,13 @@ namespace GAS.Logic
 
         private void StartCooldown()
         {
-            if (!Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+            if (!System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
                 return;
             
             CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, owner, Lv);
             if (CooldownDuration > 0)
             {
-                Sys.AbilityInstanceSubsystem.AddToTickList(this);
+                System.AbilityInstanceSubsystem.AddToTickList(this);
                 IsInCooldown = true;
             }
         }
@@ -322,7 +308,7 @@ namespace GAS.Logic
         //结束Ability
         internal void EndAbility()
         {
-            if(Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+            if(System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
                 owner.RemoveAbility(this);
         }
         
@@ -388,13 +374,13 @@ namespace GAS.Logic
             
             CommitAbility();
             
-            if (!Sys.GetRscFromHandler(Owner, out var owner))
+            if (!System.GetRscFromHandler(Owner, out var owner))
             {
                 GameLogger.Log($"Add activation req job failed, owner is null. {AbilityName}");
                 return;
             }
             _activationReqJobs.Add(job);
-            Sys.AbilityActivationReqSubsystem.EnqueueJob(job);
+            System.AbilityActivationReqSubsystem.EnqueueJob(job);
         }
         
         private void CancelAllActivationReqJobs()

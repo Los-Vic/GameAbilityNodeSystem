@@ -30,7 +30,7 @@ namespace GAS.Logic
         #region Game Unit Instance Create/Destroy
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var unit = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameUnit>();
+            var unit = System.ClassObjectPoolSubsystem.Get<GameUnit>();
             var h = UnitHandlerRscMgr.CreateHandler(unit);
 
             var initParam = new GameUnitInitParam()
@@ -38,7 +38,7 @@ namespace GAS.Logic
                 CreateParam = param,
                 Handler = h
             };
-            unit.Init(System, ref initParam);
+            unit.Init(ref initParam);
             
             System.OnUnitCreated.NotifyObservers(new GameUnitCreateObserve()
             {
@@ -87,7 +87,7 @@ namespace GAS.Logic
 
         private void DisposeUnit(GameUnit unit)
         {
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(unit);
+            System.ClassObjectPoolSubsystem.Release(unit);
         }
 
         #endregion

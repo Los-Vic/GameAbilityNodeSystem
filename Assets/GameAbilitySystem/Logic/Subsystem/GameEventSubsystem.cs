@@ -68,7 +68,7 @@ namespace GAS.Logic
             if(!CheckEventStack(ref param))
                 return;
             
-            var eventArg = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameEventArg>();
+            var eventArg = System.ClassObjectPoolSubsystem.Get<GameEventArg>();
             var h = GameEventRscMgr.CreateHandler(eventArg);
             var initParam = new GameEventInitParam()
             {
@@ -91,7 +91,7 @@ namespace GAS.Logic
 
         private void DisposeGameEventArg(GameEventArg arg)
         {
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(arg);
+            System.ClassObjectPoolSubsystem.Release(arg);
         }
         
         internal GameplayEvent<GameEventArg> GetGameEvent(EGameEventType gameEventType)
@@ -149,7 +149,7 @@ namespace GAS.Logic
 
             var srcHandler = arg.EventSrcUnit;
             if (!srcHandler.IsAssigned ||
-                !owner.Sys.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(srcHandler, out var src))
+                !owner.System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(srcHandler, out var src))
                 return false;
             
             foreach (var f in filters)

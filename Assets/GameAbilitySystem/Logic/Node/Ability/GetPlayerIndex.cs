@@ -22,7 +22,7 @@ namespace GAS.Logic
         public override void Execute()
         {
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            context.Ability.Sys.GetRscFromHandler(context.Ability.Owner, out var owner);
+            context.Ability.System.GetRscFromHandler(context.Ability.Owner, out var owner);
             GraphRunner.SetOutPortVal(_node.OutPortCount, owner.PlayerIndex);
         }
 

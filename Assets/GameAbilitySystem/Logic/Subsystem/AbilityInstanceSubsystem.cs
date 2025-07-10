@@ -47,7 +47,7 @@ namespace GAS.Logic
                 return null;
             }
             
-            var ability = System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Get<GameAbility>();
+            var ability = System.ClassObjectPoolSubsystem.Get<GameAbility>();
             var h = AbilityHandlerRscMgr.CreateHandler(ability);
 
             var initParam = new AbilityInitParam()
@@ -55,7 +55,7 @@ namespace GAS.Logic
                 CreateParam = param,
                 Handler = h
             };
-            ability.Init(System, abilityAsset, ref initParam);
+            ability.Init(abilityAsset, ref initParam);
             return ability;
         }
         internal void DestroyAbility(GameAbility ability)
@@ -71,7 +71,7 @@ namespace GAS.Logic
         private void DisposeAbility(GameAbility ability)
         {
             GameLogger.Log($"Release ability:{ability}");
-            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(ability);
+            System.ClassObjectPoolSubsystem.Release(ability);
         }
 
         internal void AddToTickList(GameAbility ability)

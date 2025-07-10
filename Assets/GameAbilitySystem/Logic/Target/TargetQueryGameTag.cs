@@ -21,7 +21,7 @@ namespace GAS.Logic.Target
             var hasWithAll = cfg.withAll is { Count: > 0 };
             if (hasWithAll)
             {
-                foreach (var o in ability.Sys.GameTagSubsystem.GetGameTagInstance(cfg.withAll[0]).Owners)
+                foreach (var o in ability.System.GameTagSubsystem.GetGameTagInstance(cfg.withAll[0]).Owners)
                 {
                     if(o is GameUnit u && IgnoreSelfCheck(u))
                         units.Add(u);
@@ -69,7 +69,7 @@ namespace GAS.Logic.Target
                 {
                     foreach (var t in cfg.withAny)
                     {
-                        foreach (var o in ability.Sys.GameTagSubsystem.GetGameTagInstance(t).Owners)
+                        foreach (var o in ability.System.GameTagSubsystem.GetGameTagInstance(t).Owners)
                         {
                             if(o is GameUnit u && IgnoreSelfCheck(u))
                                 units.Add(u);
@@ -83,7 +83,7 @@ namespace GAS.Logic.Target
             {
                 if (!hasWithAny && !hasWithAll)
                 {
-                    units.AddRange(ability.Sys.GetAllGameUnits());
+                    units.AddRange(ability.System.GetAllGameUnits());
                 }
                 
                 for (var i = units.Count - 1; i >= 0; i--)
@@ -106,7 +106,7 @@ namespace GAS.Logic.Target
 
             bool IgnoreSelfCheck(GameUnit u)
             {
-                u.Sys.GetRscFromHandler(ability.Owner, out var owner);
+                u.System.GetRscFromHandler(ability.Owner, out var owner);
                 return !ignoreSelf || u != owner;
             }
         }

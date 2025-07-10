@@ -60,10 +60,9 @@ namespace GAS.Logic
             base.Execute();
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
 
-            var job = context.Ability.Sys.ClassObjectPoolSubsystem.ClassObjectPoolMgr
-                .Get<AbilityActivationReqJob>();
+            var job = context.Ability.System.ClassObjectPoolSubsystem.Get<AbilityActivationReqJob>();
 
-            if (!context.Ability.Sys.GetRscFromHandler(context.Ability.Owner, out var owner))
+            if (!context.Ability.System.GetRscFromHandler(context.Ability.Owner, out var owner))
             {
                 GameLogger.LogError($"Failed to get owner of {context.Ability}");
                 Abort();
@@ -84,7 +83,7 @@ namespace GAS.Logic
                 postCast *= ratio;
             }
 
-            job.InitJob(context.Ability.Sys, new AbilityActivationReq()
+            job.InitJob(new AbilityActivationReq()
             {
                 Ability = context.Ability.Handler,
                 CastCfg = new AbilityCastCfg()

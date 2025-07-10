@@ -1,11 +1,10 @@
-﻿using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+﻿using GameplayCommonLibrary.Handler;
 using MissQ;
 using NS;
 
 namespace GAS.Logic
 {
-    public class GameEventArg:IEntryParam, IPoolClass
+    public class GameEventArg:GameAbilitySystemObject, IEntryParam
     {
         public EGameEventType EventType;
         
@@ -34,22 +33,5 @@ namespace GAS.Logic
             EventString = param.CreateParam.EventString;
             Handler = param.Handler;
         }
-        
-        #region IPoolObject
-        public void OnCreateFromPool()
-        {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
-        {
-        }
-        public void OnDestroy()
-        {
-        }
-        #endregion
     }
 }

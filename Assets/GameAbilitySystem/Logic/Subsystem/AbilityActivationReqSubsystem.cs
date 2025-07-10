@@ -45,25 +45,23 @@ namespace GAS.Logic
         public AbilityCastCfg CastCfg;
     }
 
-    public class AbilityActivationReqJob : IPoolClass
+    public class AbilityActivationReqJob : GameAbilitySystemObject
     {
         public AbilityActivationReq Req { get; private set; }
         public EActivationReqJobState JobState { get; private set; }
         public EActivationJobInCastState CastState { get; private set; }
 
         private FP _timeFromLastCastState;
-        private GameAbilitySystem _system;
 
-        internal void InitJob(GameAbilitySystem system, AbilityActivationReq req)
+        internal void InitJob(AbilityActivationReq req)
         {
-            _system = system;
             Req = req;
-            system.GameEventSubsystem.GameEventRscMgr.AddRefCount(req.EventArgs);
+            System.GameEventSubsystem.GameEventRscMgr.AddRefCount(req.EventArgs);
         }
 
         internal void StartJob()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 GameLogger.LogWarning($"Start Job failed, failed to get ability {Req.Ability}");
                 JobState = EActivationReqJobState.Aborted;
@@ -77,7 +75,7 @@ namespace GAS.Logic
 
         internal void CancelJob()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 GameLogger.LogWarning($"Cancel Job failed, failed to get ability {Req.Ability}");
                 JobState = EActivationReqJobState.Aborted;
@@ -86,7 +84,7 @@ namespace GAS.Logic
 
             GameLogger.Log($"Cancel activation job: {ability}");
             JobState = EActivationReqJobState.Cancelled;
-            _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
+            System.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
         }
 
         internal void TickJob(FP tickTime)
@@ -126,14 +124,14 @@ namespace GAS.Logic
 
         private void ExecuteStartPreCast()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 JobState = EActivationReqJobState.Aborted;
                 return;
             }
 
             CastState = EActivationJobInCastState.PreCast;
-            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartPreCast(eventArg);
             if (Req.CastCfg.PreCastTime > 0)
                 return;
@@ -142,14 +140,14 @@ namespace GAS.Logic
 
         private void ExecuteStartCast()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 JobState = EActivationReqJobState.Aborted;
                 return;
             }
 
             CastState = EActivationJobInCastState.Cast;
-            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartCast(eventArg);
             if (Req.CastCfg.CastTime > 0)
                 return;
@@ -158,14 +156,14 @@ namespace GAS.Logic
 
         private void ExecuteStartPostCast()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 JobState = EActivationReqJobState.Aborted;
                 return;
             }
 
             CastState = EActivationJobInCastState.PostCast;
-            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartPostCast(eventArg);
             if (Req.CastCfg.PostCastTime > 0)
                 return;
@@ -174,38 +172,26 @@ namespace GAS.Logic
 
         private void ExecuteEndPostCast()
         {
-            if (!_system.GetRscFromHandler(Req.Ability, out var ability))
+            if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
                 JobState = EActivationReqJobState.Aborted;
                 return;
             }
 
             CastState = EActivationJobInCastState.None;
-            _system.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
             ability.ActivateOnEndPostCast(eventArg);
             JobState = EActivationReqJobState.Completed;
 
             GameLogger.Log($"Complete activation job: {ability}");
         }
-
-        public void OnCreateFromPool()
+        
+        public override void OnReturnToPool()
         {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
-        {
-            _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
+            System.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
             CastState = EActivationJobInCastState.None;
             JobState = EActivationReqJobState.Waiting;
             _timeFromLastCastState = 0;
-        }
-
-        public void OnDestroy()
-        {
         }
     }
 
@@ -250,7 +236,7 @@ namespace GAS.Logic
                 if (job.JobState == EActivationReqJobState.Running)
                     break;
                 _worldQueue.Dequeue();
-                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                System.ClassObjectPoolSubsystem.Release(job);
             }
 
             //Player
@@ -263,7 +249,7 @@ namespace GAS.Logic
                     if (job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
-                    System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                    System.ClassObjectPoolSubsystem.Release(job);
                 }
             }
             //Unit
@@ -284,7 +270,7 @@ namespace GAS.Logic
                     if (job.JobState == EActivationReqJobState.Running)
                         break;
                     queue.Dequeue();
-                    System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                    System.ClassObjectPoolSubsystem.Release(job);
                 }
             }
 
@@ -301,7 +287,7 @@ namespace GAS.Logic
                 if (job.JobState == EActivationReqJobState.Running)
                     continue;
                 _independentJobList.Remove(job);
-                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                System.ClassObjectPoolSubsystem.Release(job);
             }
         }
 
@@ -332,7 +318,7 @@ namespace GAS.Logic
                             }
                             else
                             {
-                                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                                System.ClassObjectPoolSubsystem.Release(job);
                             }
                         }
                     }
@@ -365,7 +351,7 @@ namespace GAS.Logic
                             }
                             else
                             {
-                                System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                                System.ClassObjectPoolSubsystem.Release(job);
                             }
                         }
                     }
@@ -390,7 +376,7 @@ namespace GAS.Logic
                         }
                         else
                         {
-                            System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                            System.ClassObjectPoolSubsystem.Release(job);
                         }
                     }
 
@@ -403,7 +389,7 @@ namespace GAS.Logic
                     }
                     else
                     {
-                        System.ClassObjectPoolSubsystem.ClassObjectPoolMgr.Release(job);
+                        System.ClassObjectPoolSubsystem.Release(job);
                     }
 
                     break;

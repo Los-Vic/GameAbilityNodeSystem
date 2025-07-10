@@ -7,7 +7,7 @@ namespace GAS.Logic.Target
         public static bool GetTargetFromAbility(GameAbility ability, TargetQuerySingleBase cfg, out GameUnit target,
             bool ignoreSelf = false)
         {
-            return ability.Sys.TargetSearcher.GetTargetFromAbility(ability, cfg, out target, ignoreSelf);
+            return ability.System.TargetSearcher.GetTargetFromAbility(ability, cfg, out target, ignoreSelf);
         }
 
         public static bool GetTargetsFromAbility(GameAbility ability, TargetQueryMultipleBase cfg,
@@ -18,7 +18,7 @@ namespace GAS.Logic.Target
                 case TargetQueryGameTagMultiple t:
                     return TargetQueryGameTagUtility.GetQueryResult(ability, t, ref targets, ignoreSelf);
             }
-            return ability.Sys.TargetSearcher.GetTargetsFromAbility(ability, cfg, ref targets, ignoreSelf);
+            return ability.System.TargetSearcher.GetTargetsFromAbility(ability, cfg, ref targets, ignoreSelf);
         }
     }
 }

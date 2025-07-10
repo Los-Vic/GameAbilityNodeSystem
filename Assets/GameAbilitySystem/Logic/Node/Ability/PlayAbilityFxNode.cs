@@ -46,7 +46,7 @@ namespace GAS.Logic
                 playContext.SubUnitHandler = target.Handler;
             }
            
-            context.Ability.Sys.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
+            context.Ability.System.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
             Complete();
         }
 

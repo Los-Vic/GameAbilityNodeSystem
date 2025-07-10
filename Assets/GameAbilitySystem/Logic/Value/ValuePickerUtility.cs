@@ -16,7 +16,7 @@ namespace GAS.Logic.Value
                     return v.val;
             }
 
-            return unit.Sys.ValueProvider.GetValue(valuePicker, unit, lv);
+            return unit.System.ValueProvider.GetValue(valuePicker, unit, lv);
         }
     }
 }

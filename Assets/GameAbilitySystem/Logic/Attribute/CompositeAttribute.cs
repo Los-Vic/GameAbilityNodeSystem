@@ -12,7 +12,7 @@ namespace GAS.Logic
         public Func<List<FP>, FP> ValEquation;
     }
     
-    public class CompositeAttribute:IPoolClass
+    public class CompositeAttribute:GameAbilitySystemObject
     {
         public ECompositeAttributeType Type { get; private set; }
 
@@ -92,21 +92,9 @@ namespace GAS.Logic
         }
         
         #region Pool Interface
-        public void OnCreateFromPool()
-        {
-        }
-
-        public void OnTakeFromPool()
-        {
-        }
-
-        public void OnReturnToPool()
+        public override void OnReturnToPool()
         {
             UnInit();
-        }
-
-        public void OnDestroy()
-        {
         }
 
         #endregion
