@@ -94,7 +94,7 @@ namespace GAS.Logic
             System.ClassObjectPoolSubsystem.Release(arg);
         }
         
-        internal GameplayEvent<GameEventArg> GetGameEvent(EGameEventType gameEventType)
+        private GameplayEvent<GameEventArg> GetGameEvent(EGameEventType gameEventType)
         {
             if (_gameEvents.TryGetValue(gameEventType, out var gameEvent))
                 return gameEvent;

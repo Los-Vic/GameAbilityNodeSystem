@@ -16,17 +16,18 @@ namespace GAS.Logic
             //ClassObjectPoolMgr.Clear();
         }
 
-        public T Get<T>() where T : GameAbilitySystemObject, new()
+        internal T Get<T>() where T : GameAbilitySystemObject, new()
         {
             var instance =  _objectPoolMgr.Get<T>();
             instance.System = System;
             return instance;
         }
 
-        public void Release<T>(T obj) where T : GameAbilitySystemObject
+        internal void Release<T>(T obj) where T : GameAbilitySystemObject
         {
             _objectPoolMgr.Release(obj);
         }
-        
+
+        internal void Log() => _objectPoolMgr.Log();
     }
 }

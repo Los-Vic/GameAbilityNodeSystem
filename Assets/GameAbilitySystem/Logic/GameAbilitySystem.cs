@@ -202,7 +202,6 @@ namespace GAS.Logic
         }
         
         #endregion
-      
 
         #region  Observe Attribute OnValChange
 
@@ -265,7 +264,7 @@ namespace GAS.Logic
             GameLogger.Log("----------NodeObjectPool------------------");
             base.DumpObjectPool();
             GameLogger.Log("----------ObjectPool----------------------");
-            ClassObjectPoolSubsystem.ClassObjectPoolMgr.Log();
+            ClassObjectPoolSubsystem.Log();
             GameLogger.Log("----------Dump ObjectPools End------------");
         }
 
