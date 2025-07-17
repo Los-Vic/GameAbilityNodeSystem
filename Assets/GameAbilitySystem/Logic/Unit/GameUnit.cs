@@ -64,20 +64,20 @@ namespace GAS.Logic
         internal readonly Dictionary<ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
 
         //Abilities
-        public readonly List<GameAbility> GameAbilities = new();
+        public IReadOnlyList<GameAbility> GameAbilities => _gameAbilities;
+        private readonly List<GameAbility> _gameAbilities = new();
         
         //Effects
-        public readonly List<GameEffect> GameEffects = new();
+        public IReadOnlyList<GameEffect> GameEffects => _gameEffects;
+        private readonly List<GameEffect> _gameEffects = new();
         
         //Tag
         private TagContainerComponent _tagContainerComponent;
-        public readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
-        public readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
+        internal readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
+        internal readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
         //Status
         public EUnitStatus Status { get; private set; }
-        
-        private AbilityActivationReqSubsystem _abilityActivationReqSubsystem;
         
         internal void Init(ref GameUnitInitParam param)
         {
@@ -93,7 +93,7 @@ namespace GAS.Logic
         private void UnInit()
         {
             OnUnitDestroyed.Clear();
-            _abilityActivationReqSubsystem.RemoveGameUnitQueue(this);
+            System.AbilityActivationReqSubsystem.RemoveGameUnitQueue(this);
             _unitName = DefaultUnitName;
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
@@ -109,17 +109,17 @@ namespace GAS.Logic
             CompositeAttributes.Clear();
 
             //Clear Abilities
-            for (var i = GameAbilities.Count - 1; i >= 0; i--)
+            for (var i = _gameAbilities.Count - 1; i >= 0; i--)
             {
-                var ability = GameAbilities[i];
+                var ability = _gameAbilities[i];
                 ability.OnRemoveAbility();
                 System.AbilityInstanceSubsystem.DestroyAbility(ability);
             }
 
             //Clear Effects
-            for (var i = GameEffects.Count - 1; i > 0; i--)
+            for (var i = _gameEffects.Count - 1; i > 0; i--)
             {
-                var effect = GameEffects[i];
+                var effect = _gameEffects[i];
                 effect.OnRemoveEffect();
                 System.EffectInstanceSubsystem.DestroyEffect(effect);
             }
@@ -241,13 +241,13 @@ namespace GAS.Logic
             var ability = System.AbilityInstanceSubsystem.CreateAbility(ref param);
             if (ability == null)
                 return;
-            GameAbilities.Add(ability);
+            _gameAbilities.Add(ability);
             ability.OnAddAbility(this);
         }
 
         public void RemoveAbility(uint abilityId)
         {
-            foreach (var ability in GameAbilities)
+            foreach (var ability in _gameAbilities)
             {
                 if (abilityId != ability.ID) 
                     continue;
@@ -258,7 +258,7 @@ namespace GAS.Logic
 
         public void RemoveAbility(GameAbility ability)
         {
-            GameAbilities.Remove(ability);
+            _gameAbilities.Remove(ability);
             ability.OnRemoveAbility();
             System.AbilityInstanceSubsystem.DestroyAbility(ability);
         }
@@ -269,13 +269,13 @@ namespace GAS.Logic
 
         public void AddEffect(GameEffect effect)
         {
-            GameEffects.Add(effect);
+            _gameEffects.Add(effect);
             effect.OnAddEffect(this);
         }
 
         public void RemoveEffect(GameEffect effect)
         {
-            GameEffects.Remove(effect);
+            _gameEffects.Remove(effect);
             effect.OnRemoveEffect();
             System.EffectInstanceSubsystem.DestroyEffect(effect);
         }
@@ -283,7 +283,7 @@ namespace GAS.Logic
         public void RemoveEffectByName(string effectName)
         {
             var pendingRemoveEffects = new List<GameEffect>();
-            foreach (var e in GameEffects)
+            foreach (var e in _gameEffects)
             {
                 if(e.EffectName != effectName)
                     continue;

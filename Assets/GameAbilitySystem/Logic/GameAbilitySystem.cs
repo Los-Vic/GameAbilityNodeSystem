@@ -156,18 +156,11 @@ namespace GAS.Logic
         #endregion
 
         #region GameEvent
-
-        // public GameplayEvent<GameEventArg> GetGameEvent(EGameEventType type)
-        // {
-        //     return GetSubsystem<GameEventSubsystem>().GetGameEvent(type);
-        // }
-
         public void PostGameEvent(GameEventCreateParam param)
         {
             GameEventSubsystem.PostGameEvent(ref param);
         }
         
-
         #endregion
         
         #region GameUnit
@@ -176,6 +169,26 @@ namespace GAS.Logic
         public void DestroyGameUnit(Handler<GameUnit> unitHandler) => UnitInstanceSubsystem.DestroyGameUnit(unitHandler);
         public void DestroyGameUnit(GameUnit unit) => UnitInstanceSubsystem.DestroyGameUnit(unit.Handler);
         public GameUnit[] GetAllGameUnits() => UnitInstanceSubsystem.GetAllUnits();
+
+        public static void RegisterOnAddTag(GameUnit unit, object observer, Action<EGameTag> callback, int priority = 0)
+        {
+            unit.OnAddTag.RegisterObserver(observer, callback, priority);
+        }
+
+        public static void UnregisterOnAddTag(GameUnit unit, object observer)
+        {
+            unit.OnAddTag.UnRegisterObserver(observer);
+        }
+        
+        public static void RegisterOnRemoveTag(GameUnit unit, object observer, Action<EGameTag> callback, int priority = 0)
+        {
+            unit.OnRemoveTag.RegisterObserver(observer, callback, priority);
+        }
+
+        public static void UnregisterOnRemoveTag(GameUnit unit, object observer)
+        {
+            unit.OnRemoveTag.UnRegisterObserver(observer);
+        }
 
         #endregion
 
@@ -200,56 +213,71 @@ namespace GAS.Logic
         {
             return GameEventSubsystem.GameEventRscMgr.Dereference(handler, out eventArg);
         }
+
+        public void ForeachGameUnit(Action<GameUnit> method)
+        {
+            UnitInstanceSubsystem.UnitHandlerRscMgr.ForeachResource(method);
+        }
+        
+        public void ForeachGameAbility(Action<GameAbility> method)
+        {
+            AbilityInstanceSubsystem.AbilityHandlerRscMgr.ForeachResource(method);
+        }
+        
+        public void ForeachGameEffect(Action<GameEffect> method)
+        {
+            EffectInstanceSubsystem.EffectRscMgr.ForeachResource(method);
+        }
         
         #endregion
 
         #region  Observe Attribute OnValChange
 
-        public void RegisterAttributeOnValChange(object observer, SimpleAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
+        public static void RegisterAttributeOnValChange(object observer, SimpleAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
         {
             attribute.OnValChanged.RegisterObserver(observer, callback, priority);
         }
         
-        public void UnRegisterAttributeOnValChange(object observer, SimpleAttribute attribute)
+        public static void UnRegisterAttributeOnValChange(object observer, SimpleAttribute attribute)
         {
             attribute.OnValChanged.UnRegisterObserver(observer);
         }
 
-        public void RegisterAttributeOnValChange(object observer, CompositeAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
+        public static void RegisterAttributeOnValChange(object observer, CompositeAttribute attribute, Action<AttributeChangeMsg> callback, int priority = 0)
         {
             attribute.OnValChanged.RegisterObserver(observer, callback, priority);
         }
         
-        public void UnRegisterAttributeOnValChange(object observer, CompositeAttribute attribute)
+        public static void UnRegisterAttributeOnValChange(object observer, CompositeAttribute attribute)
         {
             attribute.OnValChanged.UnRegisterObserver(observer);
         }
         
-        public void RegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
+        public static void RegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
         {
             attribute.OnPlayValChangeCue.RegisterObserver(observer, callback, priority);
         }
         
-        public void UnRegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute)
+        public static void UnRegisterAttributeOnPlayValChangeCue(object observer, SimpleAttribute attribute)
         {
             attribute.OnPlayValChangeCue.UnRegisterObserver(observer);
         }
-        public void RegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
+        public static void RegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute, Action<AttributeChangeForCue> callback, int priority = 0)
         {
             attribute.OnPlayValChangeCue.RegisterObserver(observer, callback, priority);
         }
         
-        public void UnRegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute)
+        public static void UnRegisterAttributeOnPlayValChangeCue(object observer, CompositeAttribute attribute)
         {
             attribute.OnPlayValChangeCue.UnRegisterObserver(observer);
         }
 
-        public void PlayAttributeOnChangeCue(SimpleAttribute attribute, ref AttributeChangeForCue changeForCue)
+        public static void PlayAttributeOnChangeCue(SimpleAttribute attribute, ref AttributeChangeForCue changeForCue)
         {
             attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
         }
         
-        public void PlayAttributeOnChangeCue(CompositeAttribute attribute, ref AttributeChangeForCue changeForCue)
+        public static void PlayAttributeOnChangeCue(CompositeAttribute attribute, ref AttributeChangeForCue changeForCue)
         {
             attribute.OnPlayValChangeCue.NotifyObservers(changeForCue);
         }

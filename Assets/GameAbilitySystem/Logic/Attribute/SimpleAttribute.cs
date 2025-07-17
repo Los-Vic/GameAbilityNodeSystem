@@ -37,7 +37,7 @@ namespace GAS.Logic
         //for view, UI
         internal readonly Observable<AttributeChangeForCue> OnPlayValChangeCue = new();
         
-        public void Init(ref SimpleAttributeCreateParam param)
+        internal void Init(ref SimpleAttributeCreateParam param)
         {
             Type = param.Type;
             _valDecorators = param.Decorators;

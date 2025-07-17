@@ -16,7 +16,7 @@ namespace GAS
 
             system.GetRscFromHandler(unitHandler, out var unit);
             var mana = unit.GetSimpleAttribute(ESimpleAttributeType.Mana);
-            system.RegisterAttributeOnPlayValChangeCue(this, mana, OnManaChangeForCue);
+            GameAbilitySystem.RegisterAttributeOnPlayValChangeCue(this, mana, OnManaChangeForCue);
         }
 
         private void OnManaChangeForCue(AttributeChangeForCue data)

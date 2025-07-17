@@ -58,7 +58,7 @@ namespace GAS
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,
                 };
-                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
+                GameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
             }
             else
             {
@@ -68,7 +68,7 @@ namespace GAS
                     OldVal = context.OldVal,
                     NewVal = context.NewVal,
                 };
-                _gameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
+                GameAbilitySystem.PlayAttributeOnChangeCue(attribute, ref param);
             }
         }
         
