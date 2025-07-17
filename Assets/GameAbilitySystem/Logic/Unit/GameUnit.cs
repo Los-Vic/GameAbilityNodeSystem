@@ -52,7 +52,8 @@ namespace GAS.Logic
        
         private string _unitName = DefaultUnitName;
         public string UnitName => _unitName;
-        
+
+        //internal readonly UnitGameCue Cue = new();
         internal ECreateUnitReason CreateReason { get; private set; }
         internal EDestroyUnitReason DestroyReason { get; private set; }
 
@@ -86,6 +87,7 @@ namespace GAS.Logic
             Handler = param.Handler;
             Status = EUnitStatus.Normal;
             System.AbilityActivationReqSubsystem.CreateGameUnitQueue(this);
+            //Cue.Init(System, Handler);
         }
 
         private void UnInit()

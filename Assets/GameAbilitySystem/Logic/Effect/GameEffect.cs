@@ -39,7 +39,7 @@ namespace GAS.Logic
         public EModifierOp ModifierOp;
         public FP ModifierVal;
         public EModifyRollbackPolicy RollbackPolicy;
-        public bool NotInstant;
+        public bool IsPersistent;
         public FP LifetimeVal;
         public bool UseLifetimeVal;
         public bool LifeWithInstigator;
@@ -73,12 +73,14 @@ namespace GAS.Logic
         private FP _modifyDiffVal;
         private FP _lifeTimeCounter;
         internal bool MarkDestroy { get; set; }
+        internal EffectGameCue Cue = new();
         
         internal void Init(ref GameEffectInitParam param)
         {
             EffectCfg = param.CreateParam.EffectCfg;
             Instigator = param.CreateParam.Instigator;
             Handler = param.Handler;
+            Cue.Init(System, Handler);
         }
         
         private void UnInit()
@@ -122,7 +124,7 @@ namespace GAS.Logic
             System.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, modifyOutputVal, this);
             _modifyDiffVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - oldAttributeVal;
 
-            if (EffectCfg.NotInstant)
+            if (EffectCfg.IsPersistent)
             {
                 if (EffectCfg.UseLifetimeVal)
                 {
@@ -146,9 +148,10 @@ namespace GAS.Logic
                 {
                     EffectHandler = Handler,
                     GameCueName = EffectCfg.CueName,
-                    UnitHandler = Owner
+                    UnitHandler = Owner,
+                    IsPersistent = EffectCfg.IsPersistent
                 };
-                System.GameCueSubsystem.PlayEffectCue(ref cueContext);
+                Cue.PlayEffectCue(ref cueContext);
             }
           
         }
@@ -178,19 +181,19 @@ namespace GAS.Logic
                     break;
             }
             
-            if (!string.IsNullOrEmpty(EffectCfg.CueName))
+            if (EffectCfg.IsPersistent)
             {
-                var cueContext = new StopEffectFxCueContext()
+                if (!string.IsNullOrEmpty(EffectCfg.CueName))
                 {
-                    EffectHandler = Handler,
-                    GameCueName = EffectCfg.CueName,
-                    UnitHandler = Owner
-                };
-                System.GameCueSubsystem.StopEffectCue(ref cueContext);
-            }
-            
-            if (EffectCfg.NotInstant)
-            {
+                    var cueContext = new StopEffectFxCueContext()
+                    {
+                        EffectHandler = Handler,
+                        GameCueName = EffectCfg.CueName,
+                        UnitHandler = Owner
+                    };
+                    Cue.StopEffectCue(ref cueContext);
+                }
+                
                 if (EffectCfg.UseLifetimeVal || EffectCfg.LifeWithInstigator)
                 {
                     System.EffectInstanceSubsystem.RemoveFromTickList(this);

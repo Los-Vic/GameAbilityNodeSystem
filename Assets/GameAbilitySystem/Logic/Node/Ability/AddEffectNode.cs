@@ -29,7 +29,7 @@ namespace GAS.Logic
         [Exposed]
         public string EffectName;
         [Exposed]
-        public bool NotInstant;
+        public bool IsPersistent;
         
         [Header("Modifier")]
         [Exposed]
@@ -94,7 +94,7 @@ namespace GAS.Logic
                     LifetimeVal = lifetimeVal,
                     UseLifetimeVal = _node.UseLifetimeVal,
                     RollbackPolicy = _node.RollbackPolicy,
-                    NotInstant = _node.NotInstant,
+                    IsPersistent = _node.IsPersistent,
                     CueName = _node.CueName
                 }
             };
@@ -102,7 +102,7 @@ namespace GAS.Logic
             var effect = context.Ability.System.EffectInstanceSubsystem.CreateEffect(ref param);
             unit.AddEffect(effect);
 
-            if (!_node.NotInstant)
+            if (!_node.IsPersistent)
             {
                 unit.RemoveEffect(effect);
             }

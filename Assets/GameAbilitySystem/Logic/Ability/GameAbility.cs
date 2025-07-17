@@ -49,6 +49,8 @@ namespace GAS.Logic
         public Handler<GameUnit> Instigator { get; private set; }
         internal uint ID { get; private set; }
         internal EAbilityState State { get; private set; }
+
+        internal readonly AbilityGameCue AbilityCue = new();
         
         //Cooldown
         internal bool IsInCooldown;
@@ -90,6 +92,7 @@ namespace GAS.Logic
             Handler = param.Handler;
             
             GraphController.Init(System, Asset, this);
+            AbilityCue.Init(System, Handler);
             
             State = EAbilityState.Initialized;
             

@@ -18,6 +18,9 @@ namespace GAS.Logic
 
         [Exposed] 
         public string CueName;
+
+        [Exposed] 
+        public bool IsPersistent;
     }
     
     public sealed class PlayAbilityFxNodeRunner : FlowNodeRunner
@@ -38,7 +41,8 @@ namespace GAS.Logic
                 UnitHandler = context.Ability.Owner,
                 AbilityHandler = context.Ability.Handler,
                 GameCueName = _node.CueName,
-                Param = GraphRunner.GetInPortVal<FP>(_node.InParam)
+                Param = GraphRunner.GetInPortVal<FP>(_node.InParam),
+                IsPersistent = _node.IsPersistent
             };
             var target = GraphRunner.GetInPortVal<GameUnit>(_node.InTargetUnit);
             if (target != null)
@@ -46,7 +50,7 @@ namespace GAS.Logic
                 playContext.SubUnitHandler = target.Handler;
             }
            
-            context.Ability.System.GameCueSubsystem.PlayAbilityFxCue(ref playContext);
+            context.Ability.AbilityCue.PlayAbilityFxCue(ref playContext);
             Complete();
         }
 

@@ -19,6 +19,7 @@ namespace GAS.Logic
         public Handler<GameAbility> AbilityHandler;
         public FP Param;
         public Handler<GameUnit> SubUnitHandler;
+        public bool IsPersistent;
     }
 
     public struct StopAbilityFxCueContext
@@ -33,6 +34,7 @@ namespace GAS.Logic
         public string GameCueName;
         public Handler<GameUnit> UnitHandler;
         public Handler<GameEffect> EffectHandler;
+        public bool IsPersistent;
     }
 
     public struct StopEffectFxCueContext
@@ -51,4 +53,5 @@ namespace GAS.Logic
     {
         public Handler<GameUnit> UnitInstanceID;
     }
+    
 }
