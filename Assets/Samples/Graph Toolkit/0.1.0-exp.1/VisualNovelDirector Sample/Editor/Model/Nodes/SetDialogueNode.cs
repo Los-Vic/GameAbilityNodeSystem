@@ -42,7 +42,6 @@ namespace Unity.GraphToolkit.Samples.VisualNovelDirector.Editor
                 .Build();
             context.AddInputPort<string>(IN_PORT_DIALOGUE_NAME)
                 .Build();
-   
         }
     }
 }
