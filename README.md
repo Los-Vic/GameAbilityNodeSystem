@@ -1,3 +1,8 @@
+正在从GraphView升级到GraphToolkit ......
+
+GraphToolkit Requirement:
+Unity 6.2 or later
+
 # GameAbilitySystem
 ### 一、 简介
 基于Unity的GraphView package构建了一套比较粗糙的可编辑节点系统NodeGraphSystem。在此之上，技能AbilityAsset继承自NodeGraphAsset，支持节点编辑，并以此为中心构建了一套技能系统，即GameAbilitySystem。
