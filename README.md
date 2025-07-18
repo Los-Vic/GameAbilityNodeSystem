@@ -1,7 +1,14 @@
+
+看了下Sample, GTK功能还不全，暂时还是用GraphView
+
+---
+
 正在从GraphView升级到GraphToolkit ......
 
 GraphToolkit Requirement:
 Unity 6.2 or later
+
+---
 
 # GameAbilitySystem
 ### 一、 简介
