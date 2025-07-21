@@ -77,16 +77,20 @@ namespace GAS.Logic
         {
             if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
-                GameLogger.LogWarning($"Cancel Job failed, failed to get ability {Req.Ability}");
-                JobState = EActivationReqJobState.Aborted;
+                AbortJobForFailToGetAbility();
                 return;
             }
 
             GameLogger.Log($"Cancel activation job: {ability}");
             JobState = EActivationReqJobState.Cancelled;
-            System.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
         }
 
+        private void AbortJobForFailToGetAbility()
+        {
+            GameLogger.LogWarning($"Abort job, failed to get ability {Req.Ability}");
+            JobState = EActivationReqJobState.Aborted;
+        }
+        
         internal void TickJob(FP tickTime)
         {
             if (JobState != EActivationReqJobState.Running)
@@ -126,7 +130,7 @@ namespace GAS.Logic
         {
             if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
-                JobState = EActivationReqJobState.Aborted;
+                AbortJobForFailToGetAbility();
                 return;
             }
 
@@ -142,7 +146,7 @@ namespace GAS.Logic
         {
             if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
-                JobState = EActivationReqJobState.Aborted;
+                AbortJobForFailToGetAbility();
                 return;
             }
 
@@ -158,7 +162,7 @@ namespace GAS.Logic
         {
             if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
-                JobState = EActivationReqJobState.Aborted;
+                AbortJobForFailToGetAbility();
                 return;
             }
 
@@ -174,7 +178,7 @@ namespace GAS.Logic
         {
             if (!System.GetRscFromHandler(Req.Ability, out var ability))
             {
-                JobState = EActivationReqJobState.Aborted;
+                AbortJobForFailToGetAbility();
                 return;
             }
 
@@ -182,6 +186,7 @@ namespace GAS.Logic
             System.GetRscFromHandler(Req.EventArgs, out var eventArg);
             ability.ActivateOnEndPostCast(eventArg);
             JobState = EActivationReqJobState.Completed;
+            ability.RemoveActivationReqJob(this);
 
             GameLogger.Log($"Complete activation job: {ability}");
         }

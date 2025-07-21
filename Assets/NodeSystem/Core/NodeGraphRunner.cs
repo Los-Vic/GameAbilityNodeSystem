@@ -18,6 +18,9 @@ namespace NS
     
     public class NodeGraphRunner:IPoolClass
     {
+        //Hook
+        public Action<NodeGraphRunner, EGraphRunnerEnd> OnRunnerRunEnd;
+
         private NodeGraphAsset _asset;
         private NodeSystem _nodeSystem;
         private bool _isValid;
@@ -31,15 +34,11 @@ namespace NS
         private FlowNodeRunner _curNodeRunner;
         private readonly Dictionary<string, LoopNodeRunner> _loopNodeRunnerMap = new();
         private readonly Stack<string> _runningLoopNodeIds = new();
-
-        //Hook
-        public Action<NodeGraphRunner, EGraphRunnerEnd> OnRunnerRunEnd;
         
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
         public string EntryName => _entryNode?.DisplayName() ?? "";
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
-
         public NodeGraphRunnerContext Context { get; private set; }
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
@@ -86,8 +85,8 @@ namespace NS
             }
             _loopNodeRunnerMap.Clear();
             _runningLoopNodeIds.Clear();
-            
             _outPortResultCached.Clear();
+            
             OnRunnerRunEnd = null;
             _asset = null;
             _entryNode = null;

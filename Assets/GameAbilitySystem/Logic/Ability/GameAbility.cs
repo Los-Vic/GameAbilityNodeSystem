@@ -77,8 +77,8 @@ namespace GAS.Logic
         /// 技能生效次数
         /// </summary>
         internal int ActivatedCount { get; private set; }
-        
-        internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0;
+
+        internal bool IsAbilityInActivating => _activateAbilityRunners.Count > 0 || _activationReqJobs.Count > 0;
 
         public string AbilityName { get; private set; }
 
@@ -384,6 +384,11 @@ namespace GAS.Logic
             }
             _activationReqJobs.Add(job);
             System.AbilityActivationReqSubsystem.EnqueueJob(job);
+        }
+
+        internal void RemoveActivationReqJob(AbilityActivationReqJob job)
+        {
+            _activationReqJobs.Remove(job);
         }
         
         private void CancelAllActivationReqJobs()
