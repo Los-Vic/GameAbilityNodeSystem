@@ -57,10 +57,11 @@ namespace GAS.Logic
     public sealed class AddEffectNodeRunner : FlowNodeRunner
     {
         private AddEffectNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (AddEffectNode)nodeAsset;
+            base.Init(ref context);
+            _node = (AddEffectNode)context.Node;
         }
 
         public override void Execute()

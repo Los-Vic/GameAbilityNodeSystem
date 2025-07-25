@@ -12,10 +12,11 @@
     public sealed class BoolNodeRunner:NodeRunner
     {
         private BoolNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = ((BoolNode)nodeAsset);
+            base.Init(ref context);
+            _node = (BoolNode)context.Node;
         }
 
         public override void Execute()

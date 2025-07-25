@@ -18,12 +18,12 @@ namespace GAS.Logic
     public sealed class StopAbilityFxNodeRunner : FlowNodeRunner
     {
         private StopAbilityFxNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
-        {
-            base.Init(nodeAsset, graphRunner);
-            _node = (StopAbilityFxNode)nodeAsset;
-        }
 
+        public override void Init(ref NodeRunnerInitContext context)
+        {
+            base.Init(ref context);
+            _node = (StopAbilityFxNode)context.Node;
+        }
         public override void Execute()
         {
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;

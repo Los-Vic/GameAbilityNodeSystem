@@ -38,10 +38,11 @@ namespace GAS.Logic
     public sealed class AddAbilityNodeRunner : FlowNodeRunner
     {
         private AddAbilityNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (AddAbilityNode)nodeAsset;
+            base.Init(ref context);
+            _node = (AddAbilityNode)context.Node;
         }
 
         public override void Execute()

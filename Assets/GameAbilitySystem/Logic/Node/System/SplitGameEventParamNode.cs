@@ -34,12 +34,12 @@ namespace GAS.Logic
     public sealed class SplitGameEventParamNodeRunner : NodeRunner
     {
         private SplitGameEventParamNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (SplitGameEventParamNode)nodeAsset;
+            base.Init(ref context);
+            _node = (SplitGameEventParamNode)context.Node;
         }
-
+        
         public override void Execute()
         {
             var inVal = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal);

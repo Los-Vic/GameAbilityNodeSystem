@@ -49,15 +49,12 @@ namespace GAS.Logic
         private const string DefaultUnitName = "UnkownUnit";
         public Handler<GameUnit> Handler { get; private set; }
         public int PlayerIndex { get; private set; }
-       
-        private string _unitName = DefaultUnitName;
-        public string UnitName => _unitName;
+
+        public string UnitName { get; private set; } = DefaultUnitName;
 
         //internal readonly UnitGameCue Cue = new();
         internal ECreateUnitReason CreateReason { get; private set; }
         internal EDestroyUnitReason DestroyReason { get; private set; }
-
-        internal readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new();
         
         //Attributes
         internal readonly Dictionary<ESimpleAttributeType, SimpleAttribute> SimpleAttributes = new();
@@ -73,16 +70,19 @@ namespace GAS.Logic
         
         //Tag
         private TagContainerComponent _tagContainerComponent;
-        internal readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
-        internal readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
         
         //Status
         public EUnitStatus Status { get; private set; }
         
+        //Logic hooks
+        internal readonly Observable<EDestroyUnitReason> OnUnitDestroyed = new();
+        internal readonly Observable<EGameTag> OnAddTag = new Observable<EGameTag>();
+        internal readonly Observable<EGameTag> OnRemoveTag = new Observable<EGameTag>();
+        
         internal void Init(ref GameUnitInitParam param)
         {
             PlayerIndex = param.CreateParam.PlayerIndex;
-            _unitName = param.CreateParam.UnitName;
+            UnitName = param.CreateParam.UnitName;
             CreateReason = param.CreateParam.Reason;
             Handler = param.Handler;
             Status = EUnitStatus.Normal;
@@ -94,7 +94,7 @@ namespace GAS.Logic
         {
             OnUnitDestroyed.Clear();
             System.AbilityActivationReqSubsystem.RemoveGameUnitQueue(this);
-            _unitName = DefaultUnitName;
+            UnitName = DefaultUnitName;
             //Clear Attributes
             foreach (var attribute in SimpleAttributes.Values)
             {
@@ -136,7 +136,7 @@ namespace GAS.Logic
         
         public override string ToString()
         {
-            return _unitName;
+            return UnitName;
         }
 
         #region Attributes

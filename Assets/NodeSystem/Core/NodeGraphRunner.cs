@@ -188,7 +188,12 @@ namespace NS
         {
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
             var runner = _nodeSystem.CreateNodeRunner(n.GetType());
-            runner.Init(n, this);
+            var context = new NodeRunnerInitContext()
+            {
+                Node = n,
+                GraphRunner = this,
+            };
+            runner.Init(ref context);
             return runner;
         }
 

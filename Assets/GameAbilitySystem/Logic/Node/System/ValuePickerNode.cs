@@ -26,15 +26,15 @@ namespace GAS.Logic
     {
         private GameUnit _unit;
         private ValuePickerNode _node;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (ValuePickerNode)nodeAsset;
+            base.Init(ref context);
+            _node = (ValuePickerNode)context.Node;
             
             _unit = GraphRunner.GetInPortVal<GameUnit>(_node.InPortUnit);
         }
-
+        
         public override void Execute()
         {
             var lv = GraphRunner.GetInPortVal<FP>(_node.InPortLv);

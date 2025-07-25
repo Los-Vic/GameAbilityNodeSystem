@@ -25,12 +25,12 @@ namespace GAS.Logic
     public sealed class AddTagNodeRunner : FlowNodeRunner
     {
         private AddTagNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (AddTagNode)nodeAsset;
+            base.Init(ref context);
+            _node = (AddTagNode)context.Node;
         }
-        
         public override void Execute()
         {
             base.Execute();

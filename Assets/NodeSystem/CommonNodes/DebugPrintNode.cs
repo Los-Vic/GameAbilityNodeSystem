@@ -18,10 +18,11 @@ namespace NS
     public sealed class DebugPrintFlowNodeRunner:FlowNodeRunner
     {
         private DebugPrintNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (DebugPrintNode)nodeAsset;
+            base.Init(ref context);
+            _node = (DebugPrintNode)context.Node;
         }
 
         public override void Execute()

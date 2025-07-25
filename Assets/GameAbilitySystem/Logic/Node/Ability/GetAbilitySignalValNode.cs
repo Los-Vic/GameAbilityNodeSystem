@@ -24,10 +24,10 @@ namespace GAS.Logic
     {
         private GetAbilitySignalValNode _node;
 
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (GetAbilitySignalValNode)nodeAsset;
+            base.Init(ref context);
+            _node = (GetAbilitySignalValNode)context.Node;
         }
 
         public override void Execute()

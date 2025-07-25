@@ -13,10 +13,11 @@
     public sealed class RerouteNodeRunner:NodeRunner
     {
         private RerouteNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (RerouteNode)nodeAsset;
+            base.Init(ref context);
+            _node = (RerouteNode)context.Node;
         }
 
         public override void Execute()

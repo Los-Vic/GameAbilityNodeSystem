@@ -66,16 +66,16 @@ namespace GAS.Logic
     {
         private string _nextNode;
         private AbilityEntryNode _node;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (AbilityEntryNode)nodeAsset;
-            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            base.Init(ref context);
+            _node = (AbilityEntryNode)context.Node;
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
             
-            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             _nextNode = connectPort.belongNodeId;
         }
         
@@ -101,16 +101,16 @@ namespace GAS.Logic
     {
         private string _nextNode;
         private OnActivateAbilityEntryNode _node;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (OnActivateAbilityEntryNode)nodeAsset;
-            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            base.Init(ref context);
+            _node = (OnActivateAbilityEntryNode)context.Node;
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
             
-            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             _nextNode = connectPort.belongNodeId;
         }
 

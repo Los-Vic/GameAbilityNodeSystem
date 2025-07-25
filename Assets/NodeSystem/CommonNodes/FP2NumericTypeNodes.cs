@@ -15,10 +15,11 @@ namespace NS
     public sealed class FP2IntNodeRunner:NodeRunner
     {
         private FP2IntNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (FP2IntNode)nodeAsset;
+            base.Init(ref context);
+            _node = (FP2IntNode)context.Node;
         }
 
         public override void Execute()
@@ -47,12 +48,13 @@ namespace NS
     public sealed class FP2FloatNodeRunner:NodeRunner
     {
         private FP2FloatNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
-        {
-            base.Init(nodeAsset, graphRunner);
-            _node = (FP2FloatNode)nodeAsset;
-        }
 
+        public override void Init(ref NodeRunnerInitContext context)
+        {
+            base.Init(ref context);
+            _node = (FP2FloatNode)context.Node;
+        }
+        
         public override void Execute()
         {
             var val = GraphRunner.GetInPortVal<FP>(_node.InPortVal);

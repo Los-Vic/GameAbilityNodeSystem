@@ -26,12 +26,13 @@ namespace GAS.Logic
     public sealed class PlayAbilityFxNodeRunner : FlowNodeRunner
     {
         private PlayAbilityFxNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
-        {
-            base.Init(nodeAsset, graphRunner);
-            _node = (PlayAbilityFxNode)nodeAsset;
-        }
 
+        public override void Init(ref NodeRunnerInitContext context)
+        {
+            base.Init(ref context);
+            _node = (PlayAbilityFxNode)context.Node;
+        }
+        
         public override void Execute()
         {
             base.Execute();

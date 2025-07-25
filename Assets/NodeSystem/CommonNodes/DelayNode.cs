@@ -21,11 +21,11 @@ namespace NS
         private FP _delay;
         private float _elapsedTime;
         private const string DelayTaskName = "DelayNodeTask";
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (DelayNode)nodeAsset;
+            base.Init(ref context);
+            _node = (DelayNode)context.Node;
         }
 
         public override void Execute()

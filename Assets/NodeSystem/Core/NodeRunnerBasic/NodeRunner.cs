@@ -2,15 +2,21 @@
 
 namespace NS
 {
+    public struct NodeRunnerInitContext
+    {
+        public Node Node;
+        public NodeGraphRunner GraphRunner;
+    }
+    
     public class NodeRunner:IPoolClass
     {
         public static readonly NodeRunner DefaultRunner = new();
         protected NodeGraphRunner GraphRunner { get; private set; }
         public string NodeId { get; private set; }
-        public virtual void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        public virtual void Init(ref NodeRunnerInitContext context)
         {
-            NodeId = nodeAsset.Id;
-            GraphRunner = graphRunner;
+            NodeId = context.Node.Id;
+            GraphRunner = context.GraphRunner;
         }
         
         public virtual void Execute()

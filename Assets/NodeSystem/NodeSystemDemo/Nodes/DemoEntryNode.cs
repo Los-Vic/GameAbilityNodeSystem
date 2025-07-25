@@ -38,20 +38,20 @@ namespace NS
     {
         private string _nextNode;
         private DemoPortalNode _node;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (DemoPortalNode)nodeAsset;
+            base.Init(ref context);
+            _node = (DemoPortalNode)context.Node;
             
-            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
             
-            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             _nextNode = connectPort.belongNodeId;
         }
-
+        
         public override void SetEntryParam(IEntryParam paramBase)
         {
             if (paramBase is not NodeDemoEntryParam param) 

@@ -25,10 +25,11 @@ namespace GAS.Logic.Command
      public sealed class CmdSpawnUnitNodeRunner : FlowNodeRunner
     {
         private CmdSpawnUnitNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (CmdSpawnUnitNode)nodeAsset;
+            base.Init(ref context);
+            _node = (CmdSpawnUnitNode)context.Node;
         }
 
         public override void Execute()

@@ -16,10 +16,11 @@ namespace GAS.Logic
     public sealed class CancelAbilityNodeRunner : FlowNodeRunner
     {
         private CancelAbilityNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (CancelAbilityNode)nodeAsset;
+            base.Init(ref context);
+            _node = (CancelAbilityNode)context.Node;
         }
 
         public override void Execute()

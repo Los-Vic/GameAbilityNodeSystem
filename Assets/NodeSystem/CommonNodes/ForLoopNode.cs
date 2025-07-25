@@ -27,11 +27,11 @@
         private int _endIndex;
         private int _curIndex;
         private string _outPortId;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (ForLoopNode)nodeAsset;
+            base.Init(ref context);
+            _node = (ForLoopNode)context.Node;
         }
         
         public override void Execute()

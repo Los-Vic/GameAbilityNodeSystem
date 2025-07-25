@@ -73,7 +73,7 @@ namespace GAS.Logic
         private FP _modifyDiffVal;
         private FP _lifeTimeCounter;
         internal bool MarkDestroy { get; set; }
-        internal EffectGameCue Cue = new();
+        internal readonly EffectGameCue Cue = new();
         
         internal void Init(ref GameEffectInitParam param)
         {

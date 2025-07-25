@@ -25,16 +25,16 @@ namespace GAS.Logic
     {
         private string _nextNode;
         private GameEventEntryNode _node;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (GameEventEntryNode)nodeAsset;
-            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            base.Init(ref context);
+            _node = (GameEventEntryNode)context.Node;
+            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
             if(!port.IsConnected())
                 return;
             
-            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             _nextNode = connectPort.belongNodeId;
         }
 

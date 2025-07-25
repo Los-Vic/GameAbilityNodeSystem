@@ -31,13 +31,13 @@ namespace NS
         private IEnumerator _enumerator;
         private string _outPortId;
         private bool _started;
-       
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
-        {
-            base.Init(nodeAsset, graphRunner);
-            _node = (ForEachNode)nodeAsset;
-        }
 
+        public override void Init(ref NodeRunnerInitContext context)
+        {
+            base.Init(ref context);
+            _node = (ForEachNode)context.Node;
+        }
+        
         public override void Execute()
         {
             base.Execute();

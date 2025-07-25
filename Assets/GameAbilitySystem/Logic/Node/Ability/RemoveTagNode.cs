@@ -25,10 +25,11 @@ namespace GAS.Logic
     public sealed class RemoveTagNodeRunner : FlowNodeRunner
     {
         private RemoveTagNode _node;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (RemoveTagNode)nodeAsset;
+            base.Init(ref context);
+            _node = (RemoveTagNode)context.Node;
         }
         
         public override void Execute()

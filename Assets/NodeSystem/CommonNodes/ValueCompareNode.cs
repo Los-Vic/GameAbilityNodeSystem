@@ -32,10 +32,10 @@ namespace NS
     {
         private ValueCompareNode _node;
 
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (ValueCompareNode)nodeAsset;
+            base.Init(ref context);
+            _node = (ValueCompareNode)context.Node;
         }
         
         public override void Execute()

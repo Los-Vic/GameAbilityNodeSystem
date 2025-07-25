@@ -20,11 +20,11 @@
     {
         private BranchNode _node;
         private bool _condition;
-        
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (BranchNode)nodeAsset;
+            base.Init(ref context);
+            _node = (BranchNode)context.Node;
         }
 
         public override void Execute()

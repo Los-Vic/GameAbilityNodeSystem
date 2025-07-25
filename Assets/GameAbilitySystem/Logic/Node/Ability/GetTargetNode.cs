@@ -58,10 +58,11 @@ namespace GAS.Logic
     {
         private GetTargetNode _node;
         private bool _found;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (GetTargetNode)nodeAsset;
+            base.Init(ref context);
+            _node = (GetTargetNode)context.Node;
             _found = false;
         }
 
@@ -105,10 +106,11 @@ namespace GAS.Logic
     {
         private GetTargetsNode _node;
         private bool _found;
-        public override void Init(Node nodeAsset, NodeGraphRunner graphRunner)
+
+        public override void Init(ref NodeRunnerInitContext context)
         {
-            base.Init(nodeAsset, graphRunner);
-            _node = (GetTargetsNode)nodeAsset;
+            base.Init(ref context);
+            _node = (GetTargetsNode)context.Node;
             _found = false;
         }
 
