@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace GameplayCommonLibrary.Handler
 {
-    
     /// <summary>
     ///  1 - 8 bit: Generation ,9 - 32 bit : index
     /// </summary>
@@ -23,7 +22,7 @@ namespace GameplayCommonLibrary.Handler
 
         public uint Index => _val >> 8;
         public uint Generation => _val & 0xff;
-        public bool IsAssigned => _val != 0;
+        public bool IsAssigned => _val != 0; // generation不为0
         
         public static implicit operator uint(Handler<T> handler) => handler._val;
         public static implicit operator Handler<T>(uint val) => new Handler<T>(val);
@@ -49,102 +48,84 @@ namespace GameplayCommonLibrary.Handler
         }
     }
     
+    /// <summary>
+    /// 句柄资源管理类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class HandlerRscMgr<T>
     {
         private T[] _rscArray;
         private uint[] _generationArray;
         private uint[] _refCountArray;
         
-        private uint[] _compactDataArray;  // compactArray -> dataArray , faster to iterate
-        private uint _compactDataCount;
-        private readonly Dictionary<uint, uint> _dataArrayToCompactArray = new(); // dataArray -> compactArray
+        private uint[] _compactDataArray;  // compactArray -> rscArray , faster to iterate , no stable order
+        private uint _compactDataCount;  //compactArray中index小于该值的value才是有效的资源
 
-        //当_autoIncreaseCounter == dataArray.Count且_freeSlots.Count == 0时，说明dataArray已满，需要resize
+        private uint[] _rscArrayToCompactArrayLookUp; //needed when release handler, rscArray -> compactArray
+
+        //当_autoIncreaseCounter == rscArray.Count且_freeSlots.Count == 0时，说明rscArray已满，需要resize
         private uint _autoIncreaseCounter;
-        private readonly Queue<uint> _freeSlots = new();
+        private readonly Queue<uint> _freeSlots;
 
+        //当handler释放时的回调，用来处理资源释放
         private readonly Action<T> _onHandlerReleased;
         
-        public HandlerRscMgr(int arraySize, Action<T> onHandlerReleased)
+        public HandlerRscMgr(int arraySize = 64, Action<T> onHandlerReleased = null)
         {
             _rscArray = new T[arraySize];
             _generationArray = new uint[arraySize];
             _refCountArray = new uint[arraySize];
             _compactDataArray = new uint[arraySize];
+            _rscArrayToCompactArrayLookUp = new uint[arraySize];
             _onHandlerReleased = onHandlerReleased;
+            _freeSlots = new Queue<uint>(arraySize / 4);
         }
 
-        public void Reset()
+        public void Clear()
         {
-            for (var i = 0; i < _rscArray.Length; i++)
+            foreach (var rsc in _rscArray)
             {
-                _rscArray[i] = default;
-                _generationArray[i] = 0;
-                _refCountArray[i] = 0;
-                _compactDataArray[i] = 0;
+                _onHandlerReleased?.Invoke(rsc);
             }
-            _dataArrayToCompactArray.Clear();
+            
+            Array.Clear(_rscArray, 0, _rscArray.Length);
+            Array.Clear(_generationArray, 0, _generationArray.Length);
+            Array.Clear(_refCountArray, 0, _refCountArray.Length);
+            _freeSlots.Clear();
+            
+            //没必要清理
+            //Array.Clear(_compactDataArray, 0, _compactDataArray.Length);
+            //Array.Clear(_rscArrayToCompactArrayLookUp, 0,  _rscArrayToCompactArrayLookUp.Length);
+            
             _compactDataCount = 0;
             _autoIncreaseCounter = 0;
-            _freeSlots.Clear();
         }
         
         public Handler<T> CreateHandler(T rsc)
         {
             if (_freeSlots.Count == 0)
             {
-                while (true)
-                {
-                    if(_autoIncreaseCounter == _rscArray.Length)
-                        AutoResize();
+                if(_autoIncreaseCounter == _rscArray.Length)
+                    AutoResize();
 
-                    //有可能已经被另一个Create方法绑定了资源了，则继续自增
-                    if (_dataArrayToCompactArray.ContainsKey(_autoIncreaseCounter))
-                    {
-                        _autoIncreaseCounter += 1;
-                        continue;
-                    }
-
-                    var slot = _autoIncreaseCounter++;
-                    _rscArray[slot] = rsc;
-                    _dataArrayToCompactArray.Add(slot, _compactDataCount);
-                    _compactDataArray[_compactDataCount++] = slot;
-                    _generationArray[slot] = 1;
-                    
-                    var h =  new Handler<T>(slot, 1);
-                    AddRefCount(h);
-                    return h;
-                }
+                var slot = _autoIncreaseCounter++;
+                _rscArray[slot] = rsc;
+                _rscArrayToCompactArrayLookUp[slot] = _compactDataCount;
+                _compactDataArray[_compactDataCount++] = slot;
+                _generationArray[slot] = 1;
+                var h =  new Handler<T>(slot, 1);
+                AddRefCount(h);
+                return h;
             }
 
             var freeSlot = _freeSlots.Dequeue();
             _rscArray[freeSlot] = rsc;
-            _dataArrayToCompactArray.Add(freeSlot, _compactDataCount);
+            _rscArrayToCompactArrayLookUp[freeSlot] = _compactDataCount;
             _compactDataArray[_compactDataCount++] = freeSlot;
 
             var h1 = new Handler<T>(freeSlot, _generationArray[freeSlot]);
             AddRefCount(h1);
             return h1;
-        }
-
-        //指定rsc和对应的Handler值
-        public bool CreateHandler(T rsc, Handler<T> handler)
-        {
-            if (_dataArrayToCompactArray.ContainsKey(handler.Index))
-                return false;
-            
-            var index = handler.Index;
-            if (_rscArray.Length <= index)
-            {
-                AutoResize(index);
-            }
-            
-            _rscArray[index] = rsc;
-            _generationArray[index] = handler.Generation;
-            _dataArrayToCompactArray.Add(index, _compactDataCount);
-            _compactDataArray[_compactDataCount++] = index;
-            AddRefCount(handler);
-            return true;
         }
         
         public bool Dereference(Handler<T> handler, out T rsc)
@@ -229,11 +210,10 @@ namespace GameplayCommonLibrary.Handler
             _generationArray[index] = generation;
             _freeSlots.Enqueue(index);
             _rscArray[index] = default;
-
-            _dataArrayToCompactArray.Remove(index, out var compactId);
-            
+            //_rscArrayToCompactArrayLookUp[index] = 0;
+            var compactId = _rscArrayToCompactArrayLookUp[index];
             var last = _compactDataArray[_compactDataCount - 1];
-            _dataArrayToCompactArray[last] = compactId;
+            _rscArrayToCompactArrayLookUp[last] = compactId;
             _compactDataArray[compactId] = last;
             _compactDataCount--;
         }
@@ -259,32 +239,14 @@ namespace GameplayCommonLibrary.Handler
             }
         }
         
-        private void AutoResize(uint toIncludeIndex = 0)
+        private void AutoResize()
         {
             var newSize = _rscArray.Length * 2;
-            if (toIncludeIndex > 0)
-            {
-                while (newSize <= toIncludeIndex)
-                {
-                    newSize *= 2;
-                }
-            }
-            
-            var newArray = new T[newSize];
-            _rscArray.CopyTo(newArray, 0);
-            _rscArray = newArray;
-            
-            var newMagicNumberArray = new uint[newSize];
-            _generationArray.CopyTo(newMagicNumberArray, 0);
-            _generationArray = newMagicNumberArray;
-            
-            var newRefCountArray = new uint[newSize];
-            _refCountArray.CopyTo(newRefCountArray, 0);
-            _refCountArray = newRefCountArray;
-            
-            var newCompactDataArray = new uint[newSize];
-            _compactDataArray.CopyTo(newCompactDataArray, 0);
-            _compactDataArray = newCompactDataArray;
+            Array.Resize(ref _rscArray, newSize);
+            Array.Resize(ref _generationArray, newSize);
+            Array.Resize(ref _refCountArray, newSize);
+            Array.Resize(ref _compactDataArray, newSize);
+            Array.Resize(ref _rscArrayToCompactArrayLookUp, newSize);
         }
     }
     

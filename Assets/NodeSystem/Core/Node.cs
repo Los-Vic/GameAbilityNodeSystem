@@ -31,6 +31,26 @@ namespace NS
             set => position = value;
         }
         
+        public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
+        
+        public bool IsActionNode()
+        {
+            return nodeFunctionType == ENodeFunctionType.Action;
+        }
+        
+        public bool IsValueNode()
+        {
+            return nodeFunctionType == ENodeFunctionType.Value;
+        }
+        
+        public bool IsEntryNode()
+        {
+            return nodeFunctionType == ENodeFunctionType.Entry;
+        }
+        
+        public virtual string DisplayName() => nodeName;
+        
+        
 #if UNITY_EDITOR
 
         public void InitNode()
@@ -52,24 +72,5 @@ namespace NS
             nodeName = $"{nodeAttribute.Title}_{postfix}";
         }
 #endif
-        
-        public static bool IsValidNodeId(string nodeId) => !string.IsNullOrEmpty(nodeId);
-        
-        public bool IsActionNode()
-        {
-            return nodeFunctionType == ENodeFunctionType.Action;
-        }
-        
-        public bool IsValueNode()
-        {
-            return nodeFunctionType == ENodeFunctionType.Value;
-        }
-        
-        public bool IsEntryNode()
-        {
-            return nodeFunctionType == ENodeFunctionType.Entry;
-        }
-        
-        public virtual string DisplayName() => nodeName;
     }
 }
