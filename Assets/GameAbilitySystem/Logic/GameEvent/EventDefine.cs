@@ -1,5 +1,5 @@
 ﻿using System;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using MissQ;
 
 namespace GAS.Logic

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using MissQ;
 
 namespace GAS.Logic
@@ -56,12 +55,12 @@ namespace GAS.Logic
         internal void InitJob(AbilityActivationReq req)
         {
             Req = req;
-            System.GameEventSubsystem.GameEventRscMgr.AddRefCount(req.EventArgs);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.AddRefCount(req.EventArgs);
         }
 
         internal void StartJob()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 GameLogger.LogWarning($"Start Job failed, failed to get ability {Req.Ability}");
                 JobState = EActivationReqJobState.Aborted;
@@ -75,7 +74,7 @@ namespace GAS.Logic
 
         internal void CancelJob()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 AbortJobForFailToGetAbility();
                 return;
@@ -128,14 +127,14 @@ namespace GAS.Logic
 
         private void ExecuteStartPreCast()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 AbortJobForFailToGetAbility();
                 return;
             }
 
             CastState = EActivationJobInCastState.PreCast;
-            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartPreCast(eventArg);
             if (Req.CastCfg.PreCastTime > 0)
                 return;
@@ -144,14 +143,14 @@ namespace GAS.Logic
 
         private void ExecuteStartCast()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 AbortJobForFailToGetAbility();
                 return;
             }
 
             CastState = EActivationJobInCastState.Cast;
-            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartCast(eventArg);
             if (Req.CastCfg.CastTime > 0)
                 return;
@@ -160,14 +159,14 @@ namespace GAS.Logic
 
         private void ExecuteStartPostCast()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 AbortJobForFailToGetAbility();
                 return;
             }
 
             CastState = EActivationJobInCastState.PostCast;
-            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(Req.EventArgs, out var eventArg);
             ability.ActivateOnStartPostCast(eventArg);
             if (Req.CastCfg.PostCastTime > 0)
                 return;
@@ -176,14 +175,14 @@ namespace GAS.Logic
 
         private void ExecuteEndPostCast()
         {
-            if (!System.GetRscFromHandler(Req.Ability, out var ability))
+            if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(Req.Ability, out var ability))
             {
                 AbortJobForFailToGetAbility();
                 return;
             }
 
             CastState = EActivationJobInCastState.None;
-            System.GetRscFromHandler(Req.EventArgs, out var eventArg);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(Req.EventArgs, out var eventArg);
             ability.ActivateOnEndPostCast(eventArg);
             JobState = EActivationReqJobState.Completed;
             ability.RemoveActivationReqJob(this);
@@ -193,7 +192,7 @@ namespace GAS.Logic
         
         public override void OnReturnToPool()
         {
-            System.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(Req.EventArgs);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.RemoveRefCount(Req.EventArgs);
             CastState = EActivationJobInCastState.None;
             JobState = EActivationReqJobState.Waiting;
             _timeFromLastCastState = 0;
@@ -302,10 +301,10 @@ namespace GAS.Logic
             {
                 case EActivationQueueType.Unit:
                 {
-                    if (!System.GetRscFromHandler(job.Req.Ability, out var ability))
+                    if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(job.Req.Ability, out var ability))
                         break;
 
-                    if (!System.GetRscFromHandler(ability.Owner, out var unit))
+                    if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(ability.Owner, out var unit))
                         break;
 
                     if (_unitQueues.TryGetValue(unit, out var unitQueue))
@@ -336,9 +335,9 @@ namespace GAS.Logic
                 }
                 case EActivationQueueType.Player:
                 {
-                    if (!System.GetRscFromHandler(job.Req.Ability, out var ability))
+                    if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(job.Req.Ability, out var ability))
                         break;
-                    if (!System.GetRscFromHandler(ability.Owner, out var owner))
+                    if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(ability.Owner, out var owner))
                         break;
                     var playerIndex = owner.PlayerIndex;
                     if (_playerQueues.TryGetValue(playerIndex, out var playerQueue))

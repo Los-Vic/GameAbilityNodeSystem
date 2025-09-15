@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic; 
 
-namespace GameplayCommonLibrary.Handler
+namespace GCL
 {
     /// <summary>
     ///  1 - 8 bit: Generation ,9 - 32 bit : index
+    /// generate: 1 ~ 255
+    /// index: 0 ~ 16,777,216
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public readonly struct Handler<T> : IEquatable<Handler<T>>
@@ -47,45 +49,54 @@ namespace GameplayCommonLibrary.Handler
             return _val.ToString();
         }
     }
-    
+
     /// <summary>
-    /// 句柄资源管理类
+    /// 句柄集合类
+    /// 功能：使用句柄来管理类的引用，提供引用计数机制，提供索引数组便于遍历
+    /// 句柄值有利于记录
+    /// 代价：额外的空间，多一次检索（跳转），是否值得？
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class HandlerRscMgr<T>
+    /// <typeparam name="T">必须是引用类型，实际对象的内存还是由GC管理的，无法减少CacheMiss</typeparam>
+    public class HandlerMgr<T> where T : class, new()
     {
         private T[] _rscArray;
         private uint[] _generationArray;
         private uint[] _refCountArray;
-        
         private uint[] _compactDataArray;  // compactArray -> rscArray , faster to iterate , no stable order
         private uint _compactDataCount;  //compactArray中index小于该值的value才是有效的资源
-
         private uint[] _rscArrayToCompactArrayLookUp; //needed when release handler, rscArray -> compactArray
 
         //当_autoIncreaseCounter == rscArray.Count且_freeSlots.Count == 0时，说明rscArray已满，需要resize
         private uint _autoIncreaseCounter;
-        private readonly Queue<uint> _freeSlots;
+        private Queue<uint> _freeSlots;
 
+        //当handler创建时，申请资源
+        private Func<T> _createItemFunc;
         //当handler释放时的回调，用来处理资源释放
-        private readonly Action<T> _onHandlerReleased;
+        private Action<T> _onReleaseItem;
+        private bool _inited;
         
-        public HandlerRscMgr(int arraySize = 64, Action<T> onHandlerReleased = null)
+        public void Init(Func<T> createItemFunc, Action<T> onReleaseItem, int arraySize = 64)
         {
+            _inited = true;
             _rscArray = new T[arraySize];
             _generationArray = new uint[arraySize];
             _refCountArray = new uint[arraySize];
             _compactDataArray = new uint[arraySize];
             _rscArrayToCompactArrayLookUp = new uint[arraySize];
-            _onHandlerReleased = onHandlerReleased;
+            _onReleaseItem = onReleaseItem;
+            _createItemFunc = createItemFunc;
             _freeSlots = new Queue<uint>(arraySize / 4);
         }
 
         public void Clear()
         {
+            if (!IsInitialized())
+                return;
+            
             foreach (var rsc in _rscArray)
             {
-                _onHandlerReleased?.Invoke(rsc);
+                _onReleaseItem?.Invoke(rsc);
             }
             
             Array.Clear(_rscArray, 0, _rscArray.Length);
@@ -101,8 +112,16 @@ namespace GameplayCommonLibrary.Handler
             _autoIncreaseCounter = 0;
         }
         
-        public Handler<T> CreateHandler(T rsc)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Handler<T> CreateHandler()
         {
+            if (!IsInitialized())
+                return 0;
+
+            var rsc = _createItemFunc();
             if (_freeSlots.Count == 0)
             {
                 if(_autoIncreaseCounter == _rscArray.Length)
@@ -128,13 +147,23 @@ namespace GameplayCommonLibrary.Handler
             return h1;
         }
         
-        public bool Dereference(Handler<T> handler, out T rsc)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="rsc"></param>
+        /// <returns></returns>
+        public bool DeRef(Handler<T> handler, out T rsc)
         {
+            rsc = null;
+            
+            if (!IsInitialized())
+                return false;
+            
             var index = handler.Index;
 
             if (!handler.IsAssigned || index >= _rscArray.Length || _generationArray[index] != handler.Generation)
             {
-                rsc = default;
                 return false;
             }
 
@@ -144,12 +173,17 @@ namespace GameplayCommonLibrary.Handler
 
         public bool IsRscValid(Handler<T> handler)
         {
+            if (!IsInitialized())
+                return false;
+            
             var index = handler.Index;
             return handler.IsAssigned && index < _rscArray.Length && _generationArray[index] == handler.Generation;
         }
         
         public void AddRefCount(Handler<T> handler)
         {
+            if (!IsInitialized())
+                return;
             if (!IsRscValid(handler))
                 return;
             if(handler.Index >= _rscArray.Length)
@@ -159,7 +193,7 @@ namespace GameplayCommonLibrary.Handler
 
         public void RemoveRefCount(Handler<T> handler)
         {
-            if (!IsRscValid(handler))
+            if (!IsInitialized() || !IsRscValid(handler))
                 return;
             _refCountArray[handler.Index] -= 1;
             
@@ -169,6 +203,42 @@ namespace GameplayCommonLibrary.Handler
             }
         }
 
+        public void ForceRelease(Handler<T> handler)
+        {
+            if (!IsInitialized() || !IsRscValid(handler))
+                return;
+            ReleaseHandler(handler);
+        }
+
+        //ReSharper restore Unity.ExpensiveCode
+        public T[] GetAllRsc()
+        {
+            if(!IsInitialized() || _compactDataCount == 0)
+                return Array.Empty<T>();
+            
+            var rscArray = new T[_compactDataCount];
+            for (var i = 0; i < _compactDataCount; i++)
+            {
+                rscArray[i] = _rscArray[_compactDataArray[i]];
+            }
+            return rscArray;
+        }
+
+        public void ForeachRsc(Action<T> action)
+        {
+            if (!IsInitialized())
+                return;
+            for (var i = 0; i < _compactDataCount; i++)
+            {
+                action(_rscArray[_compactDataArray[i]]);
+            }
+        }
+
+        public bool IsInitialized()
+        {
+            return _inited;
+        }
+        
         // private uint GetRefCount(Handler<T> handler)
         // {
         //     if (!IsRscValid(handler))
@@ -195,7 +265,7 @@ namespace GameplayCommonLibrary.Handler
             
             //remain handler valid when call OnHandlerReleased
             var rsc = _rscArray[index];
-            _onHandlerReleased?.Invoke(rsc);
+            _onReleaseItem(rsc);
             
             var generation = _generationArray[index];
             if (generation == 0xffu)
@@ -209,7 +279,7 @@ namespace GameplayCommonLibrary.Handler
             
             _generationArray[index] = generation;
             _freeSlots.Enqueue(index);
-            _rscArray[index] = default;
+            _rscArray[index] = null;
             //_rscArrayToCompactArrayLookUp[index] = 0;
             var compactId = _rscArrayToCompactArrayLookUp[index];
             var last = _compactDataArray[_compactDataCount - 1];
@@ -217,28 +287,8 @@ namespace GameplayCommonLibrary.Handler
             _compactDataArray[compactId] = last;
             _compactDataCount--;
         }
-
-        public T[] GetAllResources()
-        {
-            if(_compactDataCount == 0)
-                return Array.Empty<T>();
-            
-            var rscArray = new T[_compactDataCount];
-            for (var i = 0; i < _compactDataCount; i++)
-            {
-                rscArray[i] = _rscArray[_compactDataArray[i]];
-            }
-            return rscArray;
-        }
-
-        public void ForeachResource(Action<T> action)
-        {
-            for (var i = 0; i < _compactDataCount; i++)
-            {
-                action(_rscArray[_compactDataArray[i]]);
-            }
-        }
         
+        //ReSharper restore Unity.ExpensiveCode
         private void AutoResize()
         {
             var newSize = _rscArray.Length * 2;
@@ -249,5 +299,4 @@ namespace GameplayCommonLibrary.Handler
             Array.Resize(ref _rscArrayToCompactArrayLookUp, newSize);
         }
     }
-    
 }

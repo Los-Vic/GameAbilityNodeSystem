@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     public interface IGameLoggerHandler
     {

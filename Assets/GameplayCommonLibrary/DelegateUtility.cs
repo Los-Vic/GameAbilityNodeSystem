@@ -1,5 +1,5 @@
 ﻿using System;
-namespace GameplayCommonLibrary
+namespace GCL
 {
     public static class DelegateUtility
     {

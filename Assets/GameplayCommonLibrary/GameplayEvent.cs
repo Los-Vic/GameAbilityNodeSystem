@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     public class GameplayEvent<T>
     {

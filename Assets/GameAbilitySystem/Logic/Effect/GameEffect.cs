@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using MissQ;
 using UnityEngine;
 
@@ -109,7 +108,7 @@ namespace GAS.Logic
             if (_lifeTimeCounter < EffectCfg.LifetimeVal) 
                 return;
             
-            if(System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+            if(Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
                 owner.RemoveEffect(this);
         }
         
@@ -131,7 +130,7 @@ namespace GAS.Logic
                     System.EffectInstanceSubsystem.AddToTickList(this);
                 }
 
-                if (EffectCfg.LifeWithInstigator && System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
+                if (EffectCfg.LifeWithInstigator && Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Instigator, out var instigator))
                 {
                     instigator.OnUnitDestroyed.RegisterObserver(this, (EDestroyUnitReason reason)=> owner.RemoveEffect(this));
                 }
@@ -159,7 +158,7 @@ namespace GAS.Logic
         internal void OnRemoveEffect()
         {
             GameLogger.Log($"On remove effect: {EffectName}");
-            System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner);
+            Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner);
             
             switch (EffectCfg.RollbackPolicy)
             {
@@ -199,7 +198,7 @@ namespace GAS.Logic
                     System.EffectInstanceSubsystem.RemoveFromTickList(this);
                 }
 
-                if (EffectCfg.LifeWithInstigator && System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Instigator, out var instigator))
+                if (EffectCfg.LifeWithInstigator && Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Instigator, out var instigator))
                 {
                     instigator.OnUnitDestroyed.UnRegisterObserver(this);
                 }
@@ -232,7 +231,7 @@ namespace GAS.Logic
         
         private void OnDeadEventCall(GameEventArg arg)
         {
-            if (!System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(Owner, out var owner))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
                 return;
             
             if(!GameEventSubsystem.CheckEventFilters(owner, arg, EffectCfg.EventFilters))

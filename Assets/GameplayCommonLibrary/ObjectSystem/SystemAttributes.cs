@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
 
     [AttributeUsage(AttributeTargets.Class)]

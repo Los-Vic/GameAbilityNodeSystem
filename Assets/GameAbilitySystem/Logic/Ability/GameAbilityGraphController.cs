@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary;
+using GCL;
 using NS;
 
 namespace GAS.Logic
@@ -47,10 +47,10 @@ namespace GAS.Logic
             }
             graphRunner.OnRunnerRunEnd += (runner, endType) =>
             {
-                _system.GameEventSubsystem.GameEventRscMgr.RemoveRefCount(param.Handler);
+                Singleton<HandlerMgr<GameEventArg>>.Instance.RemoveRefCount(param.Handler);
             };
             
-            _system.GameEventSubsystem.GameEventRscMgr.AddRefCount(param.Handler);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.AddRefCount(param.Handler);
             graphRunner.StartRunner();
             return graphRunner;
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using GAS.Logic.Target;
 using GAS.Logic.Value;
 using MissQ;
@@ -70,7 +69,6 @@ namespace GAS.Logic
         public AbilityActivationReqSubsystem AbilityActivationReqSubsystem { get; private set; }
 
         #endregion
-        
         
         public GameAbilitySystem(GameAbilitySystemCreateParam param)
         {
@@ -190,45 +188,6 @@ namespace GAS.Logic
             unit.OnRemoveTag.UnRegisterObserver(observer);
         }
 
-        #endregion
-
-        #region Handler
-
-        public bool GetRscFromHandler(Handler<GameUnit> handler, out GameUnit unit)
-        {
-            return UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(handler, out unit);
-        }
-        
-        public bool GetRscFromHandler(Handler<GameAbility> handler, out GameAbility ability)
-        {
-            return AbilityInstanceSubsystem.AbilityHandlerRscMgr.Dereference(handler, out ability);
-        }
-        
-        public bool GetRscFromHandler(Handler<GameEffect> handler, out GameEffect effect)
-        {
-            return EffectInstanceSubsystem.EffectRscMgr.Dereference(handler, out effect);
-        }
-        
-        public bool GetRscFromHandler(Handler<GameEventArg> handler, out GameEventArg eventArg)
-        {
-            return GameEventSubsystem.GameEventRscMgr.Dereference(handler, out eventArg);
-        }
-
-        public void ForeachGameUnit(Action<GameUnit> method)
-        {
-            UnitInstanceSubsystem.UnitHandlerRscMgr.ForeachResource(method);
-        }
-        
-        public void ForeachGameAbility(Action<GameAbility> method)
-        {
-            AbilityInstanceSubsystem.AbilityHandlerRscMgr.ForeachResource(method);
-        }
-        
-        public void ForeachGameEffect(Action<GameEffect> method)
-        {
-            EffectInstanceSubsystem.EffectRscMgr.ForeachResource(method);
-        }
-        
         #endregion
 
         #region  Observe Attribute OnValChange

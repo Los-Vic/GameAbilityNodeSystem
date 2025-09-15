@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     //不允许继承，希望Entity就是一个比较单纯的数据容器。
     //拓展数据通过添加Component实现。

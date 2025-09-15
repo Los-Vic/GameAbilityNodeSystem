@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using GAS.Logic;
 using Sirenix.OdinInspector;
 using UnityEngine; 
@@ -136,7 +136,7 @@ namespace GAS
         {
             if (System == null)
                 return;
-            if (!System.GetRscFromHandler((Handler<GameUnit>)setAttributeValContext.unitHandler, out var u))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(setAttributeValContext.unitHandler, out var u))
                 return;
             System.AttributeInstanceSubsystem.SetAttributeVal(u, setAttributeValContext.type,
                 setAttributeValContext.newVal);
@@ -151,7 +151,7 @@ namespace GAS
         {
             if (System == null)
                 return;
-            if (!System.GetRscFromHandler((Handler<GameUnit>)addAbilityContext.unitHandler, out var u))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(addAbilityContext.unitHandler, out var u))
                 return;
             
             u.AddAbility(new AbilityCreateParam()

@@ -1,5 +1,4 @@
-﻿using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler; 
+﻿using GCL;
 
 namespace GAS.Logic
 {
@@ -8,12 +7,10 @@ namespace GAS.Logic
     /// </summary>
     public class UnitInstanceSubsystem:GameAbilitySubsystem
     {
-        public HandlerRscMgr<GameUnit> UnitHandlerRscMgr { get; private set; }
-        
         public override void Init()
         {
             base.Init();
-            UnitHandlerRscMgr = new HandlerRscMgr<GameUnit>(512, DisposeUnit);
+            Singleton<HandlerMgr<GameUnit>>.Instance.Init(GetUnit, DisposeUnit, 512);
         }
 
         public override void UnInit()
@@ -24,15 +21,15 @@ namespace GAS.Logic
 
         public GameUnit[] GetAllUnits()
         {
-            return UnitHandlerRscMgr.GetAllResources();
+            return Singleton<HandlerMgr<GameUnit>>.Instance.GetAllRsc();
         }
 
         #region Game Unit Instance Create/Destroy
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var unit = System.ClassObjectPoolSubsystem.Get<GameUnit>();
-            var h = UnitHandlerRscMgr.CreateHandler(unit);
-
+            var h = Singleton<HandlerMgr<GameUnit>>.Instance.CreateHandler();
+            Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(h, out var unit);
+            
             var initParam = new GameUnitInitParam()
             {
                 CreateParam = param,
@@ -56,7 +53,7 @@ namespace GAS.Logic
         
         internal void DestroyGameUnit(Handler<GameUnit> unitHandler, EDestroyUnitReason reason = EDestroyUnitReason.None, bool ignoreRefCount = false)
         {
-            if (!UnitHandlerRscMgr.Dereference(unitHandler, out var unit))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitHandler, out var unit))
             {
                 GameLogger.LogError($"Destroy game unit failed, unit handler generation mismatch. {unitHandler}");
                 return;
@@ -82,11 +79,17 @@ namespace GAS.Logic
                 Unit = unit
             });
             
-            UnitHandlerRscMgr.RemoveRefCount(unitHandler);
+            Singleton<HandlerMgr<GameUnit>>.Instance.RemoveRefCount(unitHandler);
         }
 
+        private GameUnit GetUnit()
+        {
+            return System.ClassObjectPoolSubsystem.Get<GameUnit>();
+        }
+        
         private void DisposeUnit(GameUnit unit)
         {
+            GameLogger.Log($"Release unit:{unit}");
             System.ClassObjectPoolSubsystem.Release(unit);
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using GameplayCommonLibrary;
+using GCL;
 
 namespace NS
 {
@@ -10,7 +10,7 @@ namespace NS
         #region Class Reference
 
         public INodeSystemTaskScheduler TaskScheduler { get; private set; }
-        public ClassObjectPoolMgr NodePoolMgr { get; private set; }
+        public ClassObjectPoolCollection NodePoolCollection { get; private set; }
 
         #endregion
         
@@ -29,7 +29,7 @@ namespace NS
         
         public virtual void OnCreateSystem()
         {
-            NodePoolMgr = new ClassObjectPoolMgr();
+            NodePoolCollection = new ClassObjectPoolCollection();
             TaskScheduler = CreateTaskScheduler();
         }
         
@@ -40,7 +40,7 @@ namespace NS
         
         public virtual void UnInitSystem()
         {
-            NodePoolMgr.Clear();
+            NodePoolCollection.Clear();
             TaskScheduler.Clear();
             _cachedNodeToNodeRunnerTypeMap.Clear();
             _graphAssetRuntimeDataMap.Clear();
@@ -53,19 +53,19 @@ namespace NS
         
         protected virtual INodeSystemTaskScheduler CreateTaskScheduler()
         {
-            return new NodeTaskScheduler(NodePoolMgr);
+            return new NodeTaskScheduler(NodePoolCollection);
         }
 
         #region Graph Runner
 
         public virtual NodeGraphRunner CreateGraphRunner()
         {
-            return NodePoolMgr.Get<NodeGraphRunner>() ;
+            return NodePoolCollection.Get<NodeGraphRunner>() ;
         }
 
         public virtual void DestroyGraphRunner(NodeGraphRunner runner)
         {
-            NodePoolMgr.Release(runner);
+            NodePoolCollection.Release(runner);
         }
 
         #endregion
@@ -90,7 +90,7 @@ namespace NS
                 _cachedNodeToNodeRunnerTypeMap.Add(type, runnerType);
             }
 
-            var runner = NodePoolMgr.Get(runnerType) as NodeRunner;
+            var runner = NodePoolCollection.Get(runnerType) as NodeRunner;
             return runner ?? NodeRunner.DefaultRunner;
         }
 
@@ -98,7 +98,7 @@ namespace NS
         {
             if(runner == NodeRunner.DefaultRunner)
                 return;
-            NodePoolMgr.Release(runner);
+            NodePoolCollection.Release(runner);
         }
 
         #endregion
@@ -117,7 +117,7 @@ namespace NS
         
         public virtual void DumpObjectPool()
         {
-            NodePoolMgr.Log();
+            NodePoolCollection.Log();
         }
     }
 }

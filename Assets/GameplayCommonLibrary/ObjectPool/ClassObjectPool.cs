@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     public interface IPoolClass
     {
@@ -104,11 +105,8 @@ namespace GameplayCommonLibrary
 
         #endregion
     }
-
-    /// <summary>
-    /// 对象池管理器，对象池实例都在这里
-    /// </summary>
-    public class ClassObjectPoolMgr
+    
+    public class ClassObjectPoolCollection
     {
         private readonly Dictionary<Type, ClassObjectPool> _objectPoolMap = new();
         private const int DefaultCapacity = 32;
@@ -181,6 +179,26 @@ namespace GameplayCommonLibrary
             {
                 pool.LogState();
             }
+        }
+    }
+
+    public static class ClassObjectPoolMgr
+    {
+        private static ConcurrentDictionary<int, ClassObjectPoolCollection> _objectPoolCollections = new();
+        
+        public static ClassObjectPoolCollection Get(int worldId)
+        {
+            if (_objectPoolCollections.TryGetValue(worldId, out var poolCollection)) 
+                return poolCollection;
+            
+            poolCollection = new ClassObjectPoolCollection();
+            _objectPoolCollections.TryAdd(worldId, poolCollection);
+            return poolCollection;
+        }
+
+        public static void Release(int worldId)
+        {
+            _objectPoolCollections.TryRemove(worldId, out var poolCollection);
         }
     }
 }

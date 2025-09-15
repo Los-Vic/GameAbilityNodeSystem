@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     //GameWorld里大部分Logic应该都在System里实现
     //OnCreate -> Init -> UnInit -> OnDestroy

@@ -1,4 +1,4 @@
-﻿using GameplayCommonLibrary;
+﻿using GCL;
 using GAS.Logic.Value;
 using NS;
 using UnityEngine;
@@ -62,7 +62,7 @@ namespace GAS.Logic
 
             var job = context.Ability.System.ClassObjectPoolSubsystem.Get<AbilityActivationReqJob>();
 
-            if (!context.Ability.System.GetRscFromHandler(context.Ability.Owner, out var owner))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
             {
                 GameLogger.LogError($"Failed to get owner of {context.Ability}");
                 Abort();

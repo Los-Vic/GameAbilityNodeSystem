@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 
 namespace GAS.Logic
 {
@@ -9,19 +8,18 @@ namespace GAS.Logic
     {
         private readonly List<GameAbility> _needTickAbilities = new();
         private readonly List<GameAbility> _traverseAbilityCache = new();
-        
-        public HandlerRscMgr<GameAbility> AbilityHandlerRscMgr { get; private set; }
 
         public override void Init()
         {
             base.Init();
-            AbilityHandlerRscMgr = new(1024, DisposeAbility);
+            Singleton<HandlerMgr<GameAbility>>.Instance.Init(GetAbility, DisposeAbility, 1024);
         }
 
         public override void UnInit()
         {
             _needTickAbilities.Clear();
             _traverseAbilityCache.Clear();
+            Singleton<HandlerMgr<GameAbility>>.Instance.Clear();
             base.UnInit();
         }
 
@@ -47,8 +45,8 @@ namespace GAS.Logic
                 return null;
             }
             
-            var ability = System.ClassObjectPoolSubsystem.Get<GameAbility>();
-            var h = AbilityHandlerRscMgr.CreateHandler(ability);
+            var h = Singleton<HandlerMgr<GameAbility>>.Instance.CreateHandler();
+            Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(h, out var ability);
 
             var initParam = new AbilityInitParam()
             {
@@ -65,9 +63,14 @@ namespace GAS.Logic
             
             ability.MarkDestroy();
             RemoveFromTickList(ability);
-            AbilityHandlerRscMgr.RemoveRefCount(ability.Handler);
+            Singleton<HandlerMgr<GameAbility>>.Instance.RemoveRefCount(ability.Handler);
         }
 
+        private GameAbility GetAbility()
+        {
+            return System.ClassObjectPoolSubsystem.Get<GameAbility>();
+        }
+        
         private void DisposeAbility(GameAbility ability)
         {
             GameLogger.Log($"Release ability:{ability}");
@@ -88,6 +91,6 @@ namespace GAS.Logic
         }
 
         internal bool GetAbilityByHandler(Handler<GameAbility> h, out GameAbility ability) =>
-            AbilityHandlerRscMgr.Dereference(h, out ability);
+            Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(h, out ability);
     }
 }

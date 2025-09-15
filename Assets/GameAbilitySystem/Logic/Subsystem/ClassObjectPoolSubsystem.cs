@@ -1,14 +1,14 @@
-﻿using GameplayCommonLibrary;
+﻿using GCL;
 
 namespace GAS.Logic
 {
     public class ClassObjectPoolSubsystem:GameAbilitySubsystem
     {
-        private ClassObjectPoolMgr _objectPoolMgr;
+        private ClassObjectPoolCollection _objectPoolCollection;
 
         public override void Init()
         {
-            _objectPoolMgr = new ClassObjectPoolMgr();
+            _objectPoolCollection = new ClassObjectPoolCollection();
         }
         
         public override void UnInit()
@@ -18,16 +18,16 @@ namespace GAS.Logic
 
         internal T Get<T>() where T : GameAbilitySystemObject, new()
         {
-            var instance =  _objectPoolMgr.Get<T>();
+            var instance =  _objectPoolCollection.Get<T>();
             instance.System = System;
             return instance;
         }
 
         internal void Release<T>(T obj) where T : GameAbilitySystemObject
         {
-            _objectPoolMgr.Release(obj);
+            _objectPoolCollection.Release(obj);
         }
 
-        internal void Log() => _objectPoolMgr.Log();
+        internal void Log() => _objectPoolCollection.Log();
     }
 }

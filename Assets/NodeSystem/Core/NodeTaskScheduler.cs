@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary;
+using GCL;
 
 namespace NS
 {
@@ -23,7 +23,7 @@ namespace NS
     
     public class NodeTaskScheduler:INodeSystemTaskScheduler
     {
-        protected readonly ClassObjectPoolMgr PoolMgr;
+        protected readonly ClassObjectPoolCollection PoolCollection;
 
         private readonly List<NodeTask> _allTasks = new List<NodeTask>();
         private readonly List<NodeTask> _updateList = new();
@@ -34,9 +34,9 @@ namespace NS
         private readonly Dictionary<NodeGraphRunner, List<NodeTask>> _graphRunnerTasksMap = new();
         private readonly Dictionary<NodeTask, NodeGraphRunner> _taskGraphRunnerMap = new();
         
-        public NodeTaskScheduler(ClassObjectPoolMgr poolMgr)
+        public NodeTaskScheduler(ClassObjectPoolCollection poolCollection)
         {
-            PoolMgr = poolMgr;
+            PoolCollection = poolCollection;
         }
 
         public void Clear()
@@ -45,13 +45,13 @@ namespace NS
             _updateList.Clear();
             _pendingAddToUpdateList.Clear();
             _pendingDestroyList.Clear();
-            PoolMgr.Clear();
+            PoolCollection.Clear();
         }
 
         public NodeTask CreateTask(string taskName, NodeGraphRunner runner, Func<ETaskStatus> startTask, Action endTask, Action cancelTask, 
             Func<float, ETaskStatus> updateTask = null)
         {
-            var task = PoolMgr.Get<NodeTask>();
+            var task = PoolCollection.Get<NodeTask>();
             _allTasks.Add(task);
             
             taskName = $"{taskName}_{runner.AssetName}_{runner.EntryName}";
@@ -132,7 +132,7 @@ namespace NS
                 if(_graphRunnerTasksMap[runner].Count == 0)
                     _graphRunnerTasksMap.Remove(runner);
                 
-                PoolMgr.Release(t);
+                PoolCollection.Release(t);
             }
             _pendingDestroyList.Clear();
         }

@@ -1,4 +1,5 @@
 ﻿using GAS.Logic;
+using GCL;
 
 namespace GAS
 {
@@ -48,7 +49,7 @@ namespace GAS
         private void OnAttributeChange(PlayAttributeValChangeCueContext context)
         {
             //forward event directly
-            if (!_gameAbilitySystem.GetRscFromHandler(context.UnitHandler, out var unit))
+            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.UnitHandler, out var unit))
                 return;
             if (context.AttributeType != ESimpleAttributeType.None)
             {

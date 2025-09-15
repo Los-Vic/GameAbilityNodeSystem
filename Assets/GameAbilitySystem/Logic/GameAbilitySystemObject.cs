@@ -1,4 +1,4 @@
-﻿using GameplayCommonLibrary;
+﻿using GCL;
 
 namespace GAS.Logic
 {

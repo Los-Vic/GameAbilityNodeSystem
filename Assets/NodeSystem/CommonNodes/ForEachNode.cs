@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using GameplayCommonLibrary;
+using GCL;
 
 namespace NS
 {

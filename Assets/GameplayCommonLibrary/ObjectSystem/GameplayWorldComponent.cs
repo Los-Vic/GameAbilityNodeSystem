@@ -1,4 +1,4 @@
-﻿namespace GameplayCommonLibrary
+﻿namespace GCL
 {
     public class GameplayWorldComponent
     {

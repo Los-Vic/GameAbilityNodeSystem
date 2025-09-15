@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.Pool;
 
-namespace GameplayCommonLibrary
+namespace GCL
 {
     public class DefaultEntityMgr:IEntityMgr
     {

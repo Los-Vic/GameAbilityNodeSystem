@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 using MissQ;
 
 namespace GAS.Logic

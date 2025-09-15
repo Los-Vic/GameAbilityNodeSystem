@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 
 namespace GAS.Logic
 {
@@ -11,11 +10,10 @@ namespace GAS.Logic
         private readonly Stack<GameEventArg> _eventStack = new();
         private const int StackDepthWarningThreshold = 20;
         private readonly List<GameEventCreateParam> _nextFrameEventsCache = new();
-        internal HandlerRscMgr<GameEventArg> GameEventRscMgr { get; private set; }
 
         public override void Init()
         {
-            GameEventRscMgr = new(256, DisposeGameEventArg);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.Init(GetGameEventArg, DisposeGameEventArg, 256);
         }
 
         public override void UnInit()
@@ -68,8 +66,9 @@ namespace GAS.Logic
             if(!CheckEventStack(ref param))
                 return;
             
-            var eventArg = System.ClassObjectPoolSubsystem.Get<GameEventArg>();
-            var h = GameEventRscMgr.CreateHandler(eventArg);
+            var h = Singleton<HandlerMgr<GameEventArg>>.Instance.CreateHandler();
+            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(h, out var eventArg);
+            
             var initParam = new GameEventInitParam()
             {
                 CreateParam = param,
@@ -86,11 +85,17 @@ namespace GAS.Logic
             GameLogger.Log($"Pop game event, event type:{param.EventType}, stack depth:{_eventStack.Count}");
             _eventStack.Pop();
 
-            GameEventRscMgr.RemoveRefCount(h);
+            Singleton<HandlerMgr<GameEventArg>>.Instance.RemoveRefCount(h);
         }
 
+        private GameEventArg GetGameEventArg()
+        {
+            return System.ClassObjectPoolSubsystem.Get<GameEventArg>();
+        }
+        
         private void DisposeGameEventArg(GameEventArg arg)
         {
+            GameLogger.Log($"Release game event, event type:{arg.EventType}");
             System.ClassObjectPoolSubsystem.Release(arg);
         }
         
@@ -149,7 +154,7 @@ namespace GAS.Logic
 
             var srcHandler = arg.EventSrcUnit;
             if (!srcHandler.IsAssigned ||
-                !owner.System.UnitInstanceSubsystem.UnitHandlerRscMgr.Dereference(srcHandler, out var src))
+                !Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(srcHandler, out var src))
                 return false;
             
             foreach (var f in filters)

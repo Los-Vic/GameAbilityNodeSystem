@@ -1,5 +1,4 @@
-﻿using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+﻿using GCL;
 using GAS.Logic;
 
 namespace GAS
@@ -14,7 +13,7 @@ namespace GAS
             GameAbilitySystem = system;
             UnitHandler = unitHandler;
 
-            system.GetRscFromHandler(unitHandler, out var unit);
+            Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitHandler, out var unit);
             var mana = unit.GetSimpleAttribute(ESimpleAttributeType.Mana);
             GameAbilitySystem.RegisterAttributeOnPlayValChangeCue(this, mana, OnManaChangeForCue);
         }

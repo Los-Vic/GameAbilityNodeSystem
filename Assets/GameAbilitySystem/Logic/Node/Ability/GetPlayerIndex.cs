@@ -1,4 +1,5 @@
-﻿using NS;
+﻿using GCL;
+using NS;
 
 namespace GAS.Logic
 {
@@ -23,8 +24,10 @@ namespace GAS.Logic
         public override void Execute()
         {
             var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            context.Ability.System.GetRscFromHandler(context.Ability.Owner, out var owner);
-            GraphRunner.SetOutPortVal(_node.OutPortCount, owner.PlayerIndex);
+            if (Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
+            {
+                GraphRunner.SetOutPortVal(_node.OutPortCount, owner.PlayerIndex);
+            }
         }
 
         public override void OnReturnToPool()

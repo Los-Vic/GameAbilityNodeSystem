@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameplayCommonLibrary;
-using GameplayCommonLibrary.Handler;
+using GCL;
 
 namespace GAS.Logic
 {
@@ -8,12 +7,11 @@ namespace GAS.Logic
     {
         private readonly List<GameEffect> _needTickEffects = new();
         private readonly List<GameEffect> _traverseEffectCache = new();
-        internal HandlerRscMgr<GameEffect> EffectRscMgr { get; private set; }
 
         public override void Init()
         {
             base.Init();
-            EffectRscMgr = new(1024, DisposeEffect);
+            Singleton<HandlerMgr<GameEffect>>.Instance.Init(GetEffect, DisposeEffect, 1024);
         }
 
         public override void Update(float deltaTime)
@@ -34,8 +32,8 @@ namespace GAS.Logic
 
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
-            var effect = System.ClassObjectPoolSubsystem.Get<GameEffect>();
-            var h = EffectRscMgr.CreateHandler(effect);
+            var h = Singleton<HandlerMgr<GameEffect>>.Instance.CreateHandler();
+            Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(h, out var effect);
             var initParam = new GameEffectInitParam()
             {
                 CreateParam = param,
@@ -51,9 +49,14 @@ namespace GAS.Logic
                 return;
 
             effect.MarkDestroy = true;
-            EffectRscMgr.RemoveRefCount(effect.Handler);
+            Singleton<HandlerMgr<GameEffect>>.Instance.RemoveRefCount(effect.Handler);
         }
 
+        private GameEffect GetEffect()
+        {
+            return System.ClassObjectPoolSubsystem.Get<GameEffect>();
+        }
+        
         private void DisposeEffect(GameEffect effect)
         {
             GameLogger.Log($"Release effect:{effect}");

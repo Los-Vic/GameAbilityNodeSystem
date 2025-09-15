@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GCL;
 
 namespace GAS.Logic.Target
 {
@@ -11,7 +12,7 @@ namespace GAS.Logic.Target
         public List<EGameTag> withNone;
     }
 
-    public class TargetQueryGameTagUtility
+    public static class TargetQueryGameTagUtility
     {
         public static bool GetQueryResult(GameAbility ability, TargetQueryGameTagMultiple cfg, ref List<GameUnit> units, bool ignoreSelf = false)
         {
@@ -106,7 +107,7 @@ namespace GAS.Logic.Target
 
             bool IgnoreSelfCheck(GameUnit u)
             {
-                u.System.GetRscFromHandler(ability.Owner, out var owner);
+                Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(ability.Owner, out var owner);
                 return !ignoreSelf || u != owner;
             }
         }
