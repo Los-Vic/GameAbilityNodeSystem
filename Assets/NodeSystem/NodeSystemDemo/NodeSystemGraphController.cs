@@ -32,7 +32,14 @@ namespace NS
                 return;
             var graphRunner = _system.CreateGraphRunner();
             graphRunner.OnRunnerRunEnd += OnGraphRunEnd;
-            graphRunner.Init(_system, _asset, nodeId, param);
+            var initParam = new NodeGraphRunnerInitContext()
+            {
+                System = _system,
+                EntryParam = param,
+                Asset = _asset,
+                EntryNodeId = nodeId
+            };
+            graphRunner.Init(ref initParam);
             graphRunner.StartRunner();
             _graphRunners.Add(graphRunner);
         }

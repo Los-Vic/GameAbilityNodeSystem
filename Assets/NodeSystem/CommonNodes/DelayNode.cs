@@ -34,8 +34,8 @@ namespace NS
             _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
             GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.EntryName}");
             
-            var task = TaskScheduler.CreateTask(DelayTaskName, GraphRunner, OnStartTask, OnCompleteTask, OnCancelTask, OnUpdateTask);
-            TaskScheduler.StartTask(task);
+            var task = GraphRunner.TaskScheduler.CreateTask(DelayTaskName, GraphRunner, OnStartTask, OnCompleteTask, OnCancelTask, OnUpdateTask);
+            GraphRunner.TaskScheduler.StartTask(task);
         }
         
         public override string GetNextNode()

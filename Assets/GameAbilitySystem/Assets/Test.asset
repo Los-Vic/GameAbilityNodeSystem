@@ -92,10 +92,10 @@ MonoBehaviour:
         guid: 76c8b6e2-75d0-4bf3-ac5e-c392c9f2e24b
         position:
           serializedVersion: 2
-          x: 419
-          y: -26
-          width: 208
-          height: 406
+          x: 419.2
+          y: -25.6
+          width: 210.39996
+          height: 390.4
         nodeName: ReqActivateAbility
         nodeFunctionType: 1
         QueueType: 0
@@ -158,7 +158,7 @@ MonoBehaviour:
         InLifetimeValPort: 1dea1d24-0888-4462-8f57-513df34f287b
         OutFlowPort: cf6b12cd-12b3-4b1c-85a1-38451cf70e14
         EffectName: AddMana
-        NotInstant: 0
+        IsPersistent: 0
         AttributeType: 100
         ModifierType: 1
         RollbackPolicy: 0

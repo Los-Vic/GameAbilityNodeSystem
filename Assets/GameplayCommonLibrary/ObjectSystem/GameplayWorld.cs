@@ -20,6 +20,7 @@ namespace GCL
             EntityMgr = new DefaultEntityMgr();
             EntityMgr.OnCreate();
             CreateSystems();
+            SortSystem();
         }
 
         public virtual void CreateSystems()
@@ -85,12 +86,10 @@ namespace GCL
             system.OnCreate(this);
             _systems.Add(registerType, system);
             _orderedSystems.Add(system);
-            _orderedSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
 
             if (system is GameplayWorldTickableSystem tickableSystem)
             {
                 _tickableSystems.Add(tickableSystem);
-                _tickableSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
             }
 
             return true;
@@ -120,7 +119,13 @@ namespace GCL
             var sys = GetSystem(typeof(T));
             return sys as T;
         }
-
+        
+        private void SortSystem()
+        {
+            _orderedSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
+            _tickableSystems.Sort((x, y) => x.GetExecuteOrder() - y.GetExecuteOrder());
+        }
+        
         #endregion
     }
 }

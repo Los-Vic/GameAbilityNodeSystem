@@ -11,6 +11,15 @@ namespace NS
         Aborted,
         UnInit,
     }
+
+    public struct NodeGraphRunnerInitContext
+    {
+        public NodeSystem System;
+        public NodeGraphAsset Asset;
+        public string EntryNodeId;
+        public IEntryParam EntryParam;
+        public NodeGraphRunnerContext Context;
+    }
     
     public abstract class NodeGraphRunnerContext
     {
@@ -43,28 +52,26 @@ namespace NS
         /// <summary>
         /// Graph Runner需要以一个事件节点作为起点
         /// </summary>
-        public void Init(NodeSystem system, NodeGraphAsset asset, string entryNodeId, IEntryParam actionStartParam
-        , NodeGraphRunnerContext context = null)
+        public void Init(ref NodeGraphRunnerInitContext initContext)
         {
-            _nodeSystem = system;
-            _asset = asset;
-            GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(asset);
-            _entryNode = GraphAssetRuntimeData.GetNodeById(entryNodeId);
-            Context = context;
+            _nodeSystem = initContext.System;
+            _asset = initContext.Asset;
+            GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(initContext.Asset);
+            _entryNode = GraphAssetRuntimeData.GetNodeById(initContext.EntryNodeId);
+            Context = initContext.Context;
             
             if (!_entryNode.IsEntryNode())
             {
-                GameLogger.LogError($"not valid entry node:{entryNodeId} of {asset.name}");
+                GameLogger.LogError($"not valid entry node:{initContext.EntryNodeId} of {_asset.name}");
                 return;
             }
 
-            var entryNodeRunner = CreateNodeRunner(entryNodeId) as EntryNodeRunner;
-            if (entryNodeRunner == null)
+            if (CreateNodeRunner(initContext.EntryNodeId) is not EntryNodeRunner entryNodeRunner)
             {
-                GameLogger.LogError($"not valid entry node runner:{entryNodeId} of {asset.name}");
+                GameLogger.LogError($"not valid entry node runner:{initContext.EntryNodeId} of {_asset.name}");
                 return;
             }
-            entryNodeRunner.SetEntryParam(actionStartParam);
+            entryNodeRunner.SetEntryParam(initContext.EntryParam);
             _curNodeRunner = entryNodeRunner;
             _isValid = true;
         }

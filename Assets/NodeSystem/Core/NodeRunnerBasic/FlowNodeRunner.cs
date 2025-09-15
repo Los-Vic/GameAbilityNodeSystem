@@ -3,8 +3,6 @@
     public class FlowNodeRunner:NodeRunner
     {
         private bool _dependentValNodesExecuted;
-        protected INodeSystemTaskScheduler TaskScheduler => GraphRunner.TaskScheduler;
-        
         public virtual string GetNextNode()
         {
             return null;
