@@ -51,10 +51,14 @@ namespace GAS.Logic
         public EActivationJobInCastState CastState { get; private set; }
 
         private FP _timeFromLastCastState;
+        private FP _timeFromStart;
+        private FP _duration;
 
         internal void InitJob(AbilityActivationReq req)
         {
             Req = req;
+            _duration = req.CastCfg.PreCastTime + req.CastCfg.CastTime + req.CastCfg.PostCastTime;
+            _timeFromStart = 0;
             Singleton<HandlerMgr<GameEventArg>>.Instance.AddRefCount(req.EventArgs);
         }
 
@@ -84,6 +88,9 @@ namespace GAS.Logic
             JobState = EActivationReqJobState.Cancelled;
         }
 
+        internal FP GetRemainingDuration() => _duration - _timeFromStart;
+        internal FP GetElapsedTime() => _timeFromStart;
+        
         private void AbortJobForFailToGetAbility()
         {
             GameLogger.LogWarning($"Abort job, failed to get ability {Req.Ability}");
@@ -96,6 +103,7 @@ namespace GAS.Logic
                 return;
 
             _timeFromLastCastState += tickTime;
+            _timeFromStart += tickTime;
             switch (CastState)
             {
                 case EActivationJobInCastState.PreCast:

@@ -102,12 +102,6 @@ namespace GAS.Logic
             
             var effect = context.Ability.System.EffectInstanceSubsystem.CreateEffect(ref param);
             unit.AddEffect(effect);
-
-            if (!_node.IsPersistent)
-            {
-                unit.RemoveEffect(effect);
-            }
-            
             Complete();
         }
 

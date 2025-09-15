@@ -165,7 +165,7 @@ namespace GCL
             return default;
         }
 
-        public static TResult SafeInvoke<T1, T2, TResult>(this Func<T1, TResult> func, T1 t1, T2 t2,
+        public static TResult SafeInvoke<T1, T2, TResult>(this Func<T1, T2, TResult> func, T1 t1, T2 t2,
             Action<T1, T2> onException = null)
         {
             foreach (var d in func.GetInvocationList())

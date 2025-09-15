@@ -60,12 +60,12 @@ namespace GAS.Logic
         internal readonly Dictionary<ECompositeAttributeType, CompositeAttribute> CompositeAttributes = new();
 
         //Abilities
-        public IReadOnlyList<GameAbility> GameAbilities => _gameAbilities;
-        private readonly List<GameAbility> _gameAbilities = new();
+        public IReadOnlyList<Handler<GameAbility>> GameAbilities => _gameAbilities;
+        private readonly List<Handler<GameAbility>> _gameAbilities = new();
         
         //Effects
-        public IReadOnlyList<GameEffect> GameEffects => _gameEffects;
-        private readonly List<GameEffect> _gameEffects = new();
+        public IReadOnlyList<Handler<GameEffect>> GameEffects => _gameEffects;
+        private readonly List<Handler<GameEffect>> _gameEffects = new();
         
         //Tag
         private TagContainerComponent _tagContainerComponent;
@@ -110,18 +110,24 @@ namespace GAS.Logic
             //Clear Abilities
             for (var i = _gameAbilities.Count - 1; i >= 0; i--)
             {
-                var ability = _gameAbilities[i];
+                var abilityHandler = _gameAbilities[i];
+                if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability)) 
+                    continue;
                 ability.OnRemoveAbility();
                 System.AbilityInstanceSubsystem.DestroyAbility(ability);
             }
+            _gameAbilities.Clear();
 
             //Clear Effects
             for (var i = _gameEffects.Count - 1; i > 0; i--)
             {
-                var effect = _gameEffects[i];
+                var effectHandler = _gameEffects[i];
+                if (!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(effectHandler, out var effect)) 
+                    continue;
                 effect.OnRemoveEffect();
                 System.EffectInstanceSubsystem.DestroyEffect(effect);
             }
+            _gameEffects.Clear();
             
             Status = EUnitStatus.Destroyed;
             Handler = 0;
@@ -240,24 +246,25 @@ namespace GAS.Logic
             var ability = System.AbilityInstanceSubsystem.CreateAbility(ref param);
             if (ability == null)
                 return;
-            _gameAbilities.Add(ability);
+            _gameAbilities.Add(ability.Handler);
             ability.OnAddAbility(this);
         }
 
         public void RemoveAbility(uint abilityId)
         {
-            foreach (var ability in _gameAbilities)
+            foreach (var abilityHandler in _gameAbilities)
             {
+                if(!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability))
+                    continue;
                 if (abilityId != ability.ID) 
                     continue;
                 RemoveAbility(ability);
-                break;
             }
         }
 
         public void RemoveAbility(GameAbility ability)
         {
-            _gameAbilities.Remove(ability);
+            _gameAbilities.Remove(ability.Handler);
             ability.OnRemoveAbility();
             System.AbilityInstanceSubsystem.DestroyAbility(ability);
         }
@@ -268,13 +275,13 @@ namespace GAS.Logic
 
         public void AddEffect(GameEffect effect)
         {
-            _gameEffects.Add(effect);
+            _gameEffects.Add(effect.Handler);
             effect.OnAddEffect(this);
         }
 
         public void RemoveEffect(GameEffect effect)
         {
-            _gameEffects.Remove(effect);
+            _gameEffects.Remove(effect.Handler);
             effect.OnRemoveEffect();
             System.EffectInstanceSubsystem.DestroyEffect(effect);
         }
@@ -282,11 +289,13 @@ namespace GAS.Logic
         public void RemoveEffectByName(string effectName)
         {
             var pendingRemoveEffects = new List<GameEffect>();
-            foreach (var e in _gameEffects)
+            foreach (var handler in _gameEffects)
             {
-                if(e.EffectName != effectName)
+                if(!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(handler, out var effect))
                     continue;
-                pendingRemoveEffects.Add(e);
+                if(effect.EffectName != effectName)
+                    continue;
+                pendingRemoveEffects.Add(effect);
             }
 
             foreach (var e in pendingRemoveEffects)

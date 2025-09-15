@@ -123,6 +123,18 @@ namespace GAS.Logic
             System.AttributeInstanceSubsystem.SetAttributeVal(owner, EffectCfg.AttributeType, modifyOutputVal, this);
             _modifyDiffVal = owner.GetSimpleAttributeVal(EffectCfg.AttributeType) - oldAttributeVal;
 
+            if (!string.IsNullOrEmpty(EffectCfg.CueName))
+            {
+                var cueContext = new PlayEffectFxCueContext()
+                {
+                    EffectHandler = Handler,
+                    GameCueName = EffectCfg.CueName,
+                    UnitHandler = Owner,
+                    IsPersistent = EffectCfg.IsPersistent
+                };
+                Cue.PlayEffectCue(ref cueContext);
+            }
+            
             if (EffectCfg.IsPersistent)
             {
                 if (EffectCfg.UseLifetimeVal)
@@ -140,19 +152,10 @@ namespace GAS.Logic
                     System.GameEventSubsystem.RegisterGameEvent(EffectCfg.DeadEvent, OnDeadEventCall);
                 }
             }
-
-            if (!string.IsNullOrEmpty(EffectCfg.CueName))
+            else
             {
-                var cueContext = new PlayEffectFxCueContext()
-                {
-                    EffectHandler = Handler,
-                    GameCueName = EffectCfg.CueName,
-                    UnitHandler = Owner,
-                    IsPersistent = EffectCfg.IsPersistent
-                };
-                Cue.PlayEffectCue(ref cueContext);
+                owner.RemoveEffect(this);
             }
-          
         }
 
         internal void OnRemoveEffect()

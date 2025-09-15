@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic; 
 using GAS.Logic;
+using GCL;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -154,8 +155,11 @@ namespace GAS.Editor
                     });
                 }
 
-                foreach (var ability in unit.GameAbilities)
+                foreach (var abilityHandler in unit.GameAbilities)
                 {
+                    if(!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability))
+                        continue;
+                    
                     editorObj.abilities.Add(new GameUnitEditorAbility()
                     {
                         name = ability.AbilityName,
@@ -163,8 +167,11 @@ namespace GAS.Editor
                     });
                 }
 
-                foreach (var effect in unit.GameEffects)
+                foreach (var effectHandler in unit.GameEffects)
                 {
+                    if(!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(effectHandler, out var effect))
+                        continue;
+                    
                     editorObj.effects.Add(new GameUnitEditorEffect()
                     {
                         name = effect.EffectName

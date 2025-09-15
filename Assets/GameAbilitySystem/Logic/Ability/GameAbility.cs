@@ -399,6 +399,14 @@ namespace GAS.Logic
             _activationReqJobs.Clear();
         }
 
+        internal EActivationJobInCastState GetActivationReqJobState(int index)
+        {
+            if (index < 0 || index >= _activationReqJobs.Count)
+                return EActivationJobInCastState.None;
+            var job = _activationReqJobs[index];
+            return job.CastState;
+        }
+
         #endregion
         
         private void OnInstigatorDestroy(EDestroyUnitReason reason)
