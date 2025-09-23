@@ -13,27 +13,14 @@ namespace GAS.Logic
     
     public sealed class GetPlayerIndexNodeRunner : FlowNodeRunner
     {
-        private GetPlayerIndexNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (GetPlayerIndexNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
+            var n = (GetPlayerIndexNode)node;
             if (Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
             {
-                GraphRunner.SetOutPortVal(_node.OutPortCount, owner.PlayerIndex);
+                graphRunner.SetOutPortVal(n.OutPortCount, owner.PlayerIndex);
             }
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

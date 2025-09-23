@@ -15,34 +15,21 @@ namespace GAS.Logic
     
     public sealed class CancelAbilityNodeRunner : FlowNodeRunner
     {
-        private CancelAbilityNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (CancelAbilityNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             context.Ability.CancelAbility();
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n = (CancelAbilityNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

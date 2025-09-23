@@ -22,39 +22,26 @@ namespace GAS.Logic.Command
         public string UnitName;
     }
     
-     public sealed class CmdSpawnUnitNodeRunner : FlowNodeRunner
+    public sealed class CmdSpawnUnitNodeRunner : FlowNodeRunner
     {
-        private CmdSpawnUnitNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (CmdSpawnUnitNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            base.Execute();
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            var playerIndex = GraphRunner.GetInPortVal<int>(_node.InPlayerIndex);
-            var unit = context.Ability.System.CommandDelegator.SpawnUnit(_node.UnitName, playerIndex);
-            GraphRunner.SetOutPortVal(_node.OutPortUnit, unit);
-            
-            Complete();
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            base.Execute(graphRunner, node);
+            var n = (CmdSpawnUnitNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
+            var playerIndex = graphRunner.GetInPortVal<int>(n.InPlayerIndex);
+            var unit = context.Ability.System.CommandDelegator.SpawnUnit(n.UnitName, playerIndex);
+            graphRunner.SetOutPortVal(n.OutPortUnit, unit);
+            graphRunner.Forward();
         }
         
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n = (CmdSpawnUnitNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

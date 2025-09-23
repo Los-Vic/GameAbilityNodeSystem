@@ -14,8 +14,8 @@ namespace GAS.Logic
         
         [Port(EPortDirection.Output, typeof(GameEventArg), "EventParam")]
         public string OutParam1;
-        
-        public override string DisplayName()
+
+        public override string ToString()
         {
             return nodeEventType.ToString();
         }
@@ -23,43 +23,31 @@ namespace GAS.Logic
     
     public sealed class GameEventEntryNodeRunner:EntryNodeRunner
     {
-        private string _nextNode;
-        private GameEventEntryNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
-        {
-            base.Init(ref context);
-            _node = (GameEventEntryNode)context.Node;
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
-            if(!port.IsConnected())
-                return;
-            
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
-            _nextNode = connectPort.belongNodeId;
-        }
-
-        public override void SetEntryParam(IEntryParam paramBase)
+        public override void SetEntryParam(NodeGraphRunner graphRunner, Node node, IEntryParam paramBase)
         {
             if (paramBase is not GameEventArg param) 
                 return;
-            GraphRunner.SetOutPortVal(_node.OutParam1, param);
+            if(node is not GameEventEntryNode n)
+                return;
+            graphRunner.SetOutPortVal(n.OutParam1, param);
         }
 
-        public override void Execute()
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            return _nextNode;
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
-            _nextNode = null;
+            if(node is not GameEventEntryNode n)
+                return null;
+            
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
+            if(!port.IsConnected())
+                return null;
+            
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            return connectPort.belongNodeId;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GCL
 {
-    public interface IPoolClass
+    public interface IPoolObject
     {
         void OnCreateFromPool();
         void OnTakeFromPool();
@@ -16,13 +16,13 @@ namespace GCL
     public class ClassObjectPool
     {
         //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
-        private readonly UnityEngine.Pool.ObjectPool<IPoolClass> _pool;
+        private readonly UnityEngine.Pool.ObjectPool<IPoolObject> _pool;
         private readonly Type _poolObjectType;
 
         //Constructor
         public ClassObjectPool(Type type, int capacity, int maxSize)
         {
-            var t = typeof(IPoolClass);
+            var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
             {
                 GameLogger.LogError(
@@ -32,19 +32,19 @@ namespace GCL
 
             GameLogger.Log($"[ObjectPool]create object pool success: type [{type}]");
             _poolObjectType = type;
-            _pool = new UnityEngine.Pool.ObjectPool<IPoolClass>(CreateItem, OnTakeFromPool, OnReturnToPool,
+            _pool = new UnityEngine.Pool.ObjectPool<IPoolObject>(CreateItem, OnTakeFromPool, OnReturnToPool,
                 OnDestroyItem,
                 true, capacity, maxSize);
         }
 
-        public IPoolClass Get()
+        public IPoolObject Get()
         {
             var obj = _pool.Get();
             obj.OnTakeFromPool();
             return obj;
         }
 
-        public void Release(IPoolClass obj)
+        public void Release(IPoolObject obj)
         {
             if (_poolObjectType != obj.GetType())
             {
@@ -63,9 +63,9 @@ namespace GCL
         
         #region Pool Callback
 
-        private IPoolClass CreateItem()
+        private IPoolObject CreateItem()
         {
-            var obj = Activator.CreateInstance(_poolObjectType) as IPoolClass;
+            var obj = Activator.CreateInstance(_poolObjectType) as IPoolObject;
 
             if (obj == null)
             {
@@ -78,15 +78,15 @@ namespace GCL
             return obj;
         }
 
-        private static void OnTakeFromPool(IPoolClass obj)
+        private static void OnTakeFromPool(IPoolObject obj)
         {
         }
 
-        private static void OnReturnToPool(IPoolClass obj)
+        private static void OnReturnToPool(IPoolObject obj)
         {
         }
 
-        private static void OnDestroyItem(IPoolClass obj)
+        private static void OnDestroyItem(IPoolObject obj)
         {
             obj.OnDestroy();
         }
@@ -112,7 +112,7 @@ namespace GCL
         private const int DefaultCapacity = 32;
         private const int DefaultMaxSize = 10000;
 
-        public T Get<T>() where T : class, IPoolClass, new()
+        public T Get<T>() where T : class, IPoolObject, new()
         {
             var type = typeof(T);
             if (!_objectPoolMap.TryGetValue(type, out var pool))
@@ -124,9 +124,9 @@ namespace GCL
             return pool.Get() as T;
         }
 
-        public IPoolClass Get(Type type)
+        public IPoolObject Get(Type type)
         {
-            var t = typeof(IPoolClass);
+            var t = typeof(IPoolObject);
             if (!t.IsAssignableFrom(type))
             {
                 GameLogger.LogError($"create object failed: type {type} can not assign to IPoolObject");
@@ -142,7 +142,7 @@ namespace GCL
             return pool.Get();
         }
 
-        public void Release(IPoolClass obj)
+        public void Release(IPoolObject obj)
         {
             var type = obj.GetType();
             if (!_objectPoolMap.TryGetValue(type, out var pool))

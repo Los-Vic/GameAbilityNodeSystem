@@ -11,24 +11,15 @@ namespace GAS.Logic
     
     public sealed class AbilityOwnerNodeRunner:NodeRunner
     {
-        private AbilityOwnerNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (AbilityOwnerNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            GraphRunner.SetOutPortVal(_node.OutPortUnit, context.Ability.Owner);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            if (node is not AbilityOwnerNode n)
+            {
+                graphRunner.Abort();
+                return;
+            }
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
+            graphRunner.SetOutPortVal(n.OutPortUnit, context.Ability.Owner);
         }
     }
 }

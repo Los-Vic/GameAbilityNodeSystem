@@ -17,40 +17,29 @@ namespace GAS.Logic
     
     public sealed class StopAbilityFxNodeRunner : FlowNodeRunner
     {
-        private StopAbilityFxNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (StopAbilityFxNode)context.Node;
-        }
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var n = (StopAbilityFxNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var stopContext = new StopAbilityFxCueContext()
             {
                 UnitHandler = context.Ability.Owner,
                 AbilityHandler = context.Ability.Handler,
-                GameCueName = _node.CueName,
+                GameCueName = n.CueName,
             };
            
             context.Ability.AbilityCue.StopAbilityFxCue(ref stopContext);
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n  = (StopAbilityFxNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

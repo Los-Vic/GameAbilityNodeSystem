@@ -30,21 +30,14 @@ namespace NS
 
     public sealed class ValueCompareNodeRunner : NodeRunner
     {
-        private ValueCompareNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (ValueCompareNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            var a = GraphRunner.GetInPortVal<FP>(_node.InPortA);
-            var b = GraphRunner.GetInPortVal<FP>(_node.InPortB);
+            var n = (ValueCompareNode)node;
+            var a = graphRunner.GetInPortVal<FP>(n.InPortA);
+            var b = graphRunner.GetInPortVal<FP>(n.InPortB);
             var res = false;
 
-            switch (_node.Op)
+            switch (n.Op)
             {
                 case EValueCompareType.EqualTo:
                     res = a == b;
@@ -65,13 +58,7 @@ namespace NS
                     res = a <= b;
                     break;
             }
-            GraphRunner.SetOutPortVal(_node.OutPortVal, res);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            graphRunner.SetOutPortVal(n.OutPortVal, res);
         }
     }
 

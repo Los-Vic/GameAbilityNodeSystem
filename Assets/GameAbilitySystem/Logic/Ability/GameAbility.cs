@@ -301,7 +301,7 @@ namespace GAS.Logic
             foreach (var runner in _activateAbilityRunners)
             {
                 GameLogger.Log($"Cancel ability runner, portal name:{runner.EntryName}. {AbilityName}");
-                runner.CancelRunner();
+                runner.Cancel();
             }
 
             CancelAllActivationReqJobs();

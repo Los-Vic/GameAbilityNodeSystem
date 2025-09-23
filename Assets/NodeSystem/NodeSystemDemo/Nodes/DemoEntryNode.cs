@@ -28,7 +28,7 @@ namespace NS
         [Port(EPortDirection.Output, typeof(int), "IntParam2")]
         public string OutIntParam2;
 
-        public override string DisplayName()
+        public override string ToString()
         {
             return NodeDemoEntry.ToString();
         }
@@ -36,38 +36,29 @@ namespace NS
     
     public class EntryEntryNodeRunner:EntryNodeRunner
     {
-        private string _nextNode;
-        private DemoPortalNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void SetEntryParam(NodeGraphRunner graphRunner, Node node, IEntryParam entryParam)
         {
-            base.Init(ref context);
-            _node = (DemoPortalNode)context.Node;
-            
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            if (entryParam is not NodeDemoEntryParam param) 
+                return;
+            var n = (DemoPortalNode)node;
+            graphRunner.SetOutPortVal(n.OutIntParam1, param.IntParam1);
+            graphRunner.SetOutPortVal(n.OutIntParam2, param.IntParam2);
+        }
+
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
+        {
+            graphRunner.Forward();
+        }
+
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
+        {
+            var n = (DemoPortalNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
-                return;
+                return null;
             
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
-            _nextNode = connectPort.belongNodeId;
-        }
-        
-        public override void SetEntryParam(IEntryParam paramBase)
-        {
-            if (paramBase is not NodeDemoEntryParam param) 
-                return;
-            GraphRunner.SetOutPortVal(_node.OutIntParam1, param.IntParam1);
-            GraphRunner.SetOutPortVal(_node.OutIntParam2, param.IntParam2);
-        }
-
-        public override void Execute()
-        {
-            Complete();
-        }
-
-        public override string GetNextNode()
-        {
-            return _nextNode;
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            return connectPort.belongNodeId;
         }
         
     }

@@ -56,68 +56,56 @@ namespace GAS.Logic
     
     public sealed class AddEffectNodeRunner : FlowNodeRunner
     {
-        private AddEffectNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (AddEffectNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            base.Execute();
+            var n = (AddEffectNode)node;
+            base.Execute(graphRunner, node);
             
-            var unit = GraphRunner.GetInPortVal<GameUnit>(_node.InUnitPort);
+            var unit = graphRunner.GetInPortVal<GameUnit>(n.InUnitPort);
             if (unit == null)
             {
                 GameLogger.LogWarning("Add effect failed, unit is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
 
-            var modiferVal = GraphRunner.GetInPortVal<FP>(_node.InModifierValPort);
-            var lifetimeVal = GraphRunner.GetInPortVal<FP>(_node.InLifetimeValPort);
+            var modiferVal = graphRunner.GetInPortVal<FP>(n.InModifierValPort);
+            var lifetimeVal = graphRunner.GetInPortVal<FP>(n.InLifetimeValPort);
             
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var param = new GameEffectCreateParam()
             {
                 Instigator = context.Ability.Owner,
                 EffectCfg = new GameEffectCfg()
                 {
-                    Name = _node.EffectName,
-                    AttributeType = _node.AttributeType,
-                    ModifierOp = _node.ModifierType,
-                    LifeWithInstigator = _node.LifeWithInstigator,
-                    DeadEvent = _node.DeadEvent,
-                    EventFilters = _node.EventFilters,
+                    Name = n.EffectName,
+                    AttributeType = n.AttributeType,
+                    ModifierOp = n.ModifierType,
+                    LifeWithInstigator = n.LifeWithInstigator,
+                    DeadEvent = n.DeadEvent,
+                    EventFilters = n.EventFilters,
                     ModifierVal = modiferVal,
                     LifetimeVal = lifetimeVal,
-                    UseLifetimeVal = _node.UseLifetimeVal,
-                    RollbackPolicy = _node.RollbackPolicy,
-                    IsPersistent = _node.IsPersistent,
-                    CueName = _node.CueName
+                    UseLifetimeVal = n.UseLifetimeVal,
+                    RollbackPolicy = n.RollbackPolicy,
+                    IsPersistent = n.IsPersistent,
+                    CueName = n.CueName
                 }
             };
             
             var effect = context.Ability.System.EffectInstanceSubsystem.CreateEffect(ref param);
             unit.AddEffect(effect);
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutFlowPort);
+            var n = (AddEffectNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutFlowPort);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-
-        public override void OnReturnToPool()
-        {
-            _node = null;
-            base.OnReturnToPool();
         }
     }
 }

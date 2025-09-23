@@ -17,33 +17,30 @@ namespace NS
     
     public sealed class DelayFlowNodeRunner:FlowNodeRunner
     {
-        private DelayNode _node;
         private FP _delay;
         private float _elapsedTime;
         private const string DelayTaskName = "DelayNodeTask";
+        private NodeGraphRunner _graphRunner;
 
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (DelayNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            base.Execute();
-            _delay = GraphRunner.GetInPortVal<FP>(_node.InPortFP);
-            GameLogger.Log($"Start delay [{_delay}], asset:{GraphRunner.AssetName}, portal:{GraphRunner.EntryName}");
+            base.Execute(graphRunner, node);
+            _graphRunner = graphRunner;
+            var n = (DelayNode)node;
+            _delay = graphRunner.GetInPortVal<FP>(n.InPortFP);
+            GameLogger.Log($"Start delay [{_delay}], asset:{graphRunner.AssetName}, portal:{graphRunner.EntryName}");
             
-            var task = GraphRunner.TaskScheduler.CreateTask(DelayTaskName, GraphRunner, OnStartTask, OnCompleteTask, OnCancelTask, OnUpdateTask);
-            GraphRunner.TaskScheduler.StartTask(task);
+            var task = graphRunner.TaskScheduler.CreateTask(DelayTaskName, graphRunner, OnStartTask, OnCompleteTask, OnCancelTask, OnUpdateTask);
+            graphRunner.TaskScheduler.StartTask(task);
         }
         
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var  n = (DelayNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
-                return default;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+                return null;
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
         
@@ -62,7 +59,7 @@ namespace NS
 
         private void OnCompleteTask()
         {
-           Complete();
+            _graphRunner.Forward();
         }
 
         private ETaskStatus OnStartTask()
@@ -74,7 +71,7 @@ namespace NS
         public override void OnReturnToPool()
         {
             base.OnReturnToPool();
-            _node = null;
+            _graphRunner = null;
         }
     }
 }

@@ -25,49 +25,37 @@ namespace GAS.Logic
 
     public sealed class RemoveAbilityNodeRunner : FlowNodeRunner
     {
-        private RemoveAbilityNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (RemoveAbilityNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            base.Execute();
-            if (!_node.AbilityAsset)
+            base.Execute(graphRunner, node);
+            var n = (RemoveAbilityNode)node;
+            if (!n.AbilityAsset)
             {
                 GameLogger.LogWarning("Remove ability failed, ability asset is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
             
-            var target = GraphRunner.GetInPortVal<GameUnit>(_node.InPortTarget);
+            var target = graphRunner.GetInPortVal<GameUnit>(n.InPortTarget);
             if (target == null)
             {
                 GameLogger.LogWarning("Remove ability failed, target is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
             
-            target.RemoveAbility(_node.AbilityAsset.id);
+            target.RemoveAbility(n.AbilityAsset.id);
             
-            Complete();
+            graphRunner.Forward();
         }
         
-        public override void OnReturnToPool()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            base.OnReturnToPool();
-            _node = null;
-        }
-        
-        public override string GetNextNode()
-        {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n = (RemoveAbilityNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

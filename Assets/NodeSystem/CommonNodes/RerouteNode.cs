@@ -12,24 +12,15 @@
     
     public sealed class RerouteNodeRunner:NodeRunner
     {
-        private RerouteNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (RerouteNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var inVal = GraphRunner.GetInPortVal<object>(_node.InPortVal);
-            GraphRunner.SetOutPortVal(_node.OutPortVal, inVal);
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            if (node is not RerouteNode rerouteNode)
+            {
+                graphRunner.Abort();
+                return;
+            }
+            var inVal = graphRunner.GetInPortVal<object>(rerouteNode.InPortVal);
+            graphRunner.SetOutPortVal(rerouteNode.OutPortVal, inVal);
         }
     }
 }

@@ -56,91 +56,75 @@ namespace GAS.Logic
 
     public sealed class GetTargetNodeRunner : FlowNodeRunner
     {
-        private GetTargetNode _node;
         private bool _found;
 
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Init(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (GetTargetNode)context.Node;
             _found = false;
         }
 
-        public override void Execute()
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Execute();
+            base.Execute(graphRunner, node);
+            var n = (GetTargetNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            
-            _found = TargetQueryUtility.GetTargetFromAbility(context.Ability, _node.TargetSingleCfg,
-                out var target, _node.IgnoreSelf);
+            _found = TargetQueryUtility.GetTargetFromAbility(context.Ability, n.TargetSingleCfg,
+                out var target, n.IgnoreSelf);
 
             if(_found)
-                GraphRunner.SetOutPortVal(_node.OutUnit, target);
+                graphRunner.SetOutPortVal(n.OutUnit, target);
             
             GameLogger.Log(_found
                 ? $"Ability {context.Ability} found target {target}"
                 : $"Ability {context.Ability} found target failed");
-            Complete();   
+            graphRunner.Forward();   
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_found
-                ? _node.OutFlowPort
-                : _node.OutFlowPortFail);
+            var n = (GetTargetNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_found
+                ? n.OutFlowPort
+                : n.OutFlowPortFail);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-        
-        public override void OnReturnToPool()
-        {
-            _node = null;
-            base.OnReturnToPool();
         }
     }
     
     public sealed class GetTargetsNodeRunner : FlowNodeRunner
     {
-        private GetTargetsNode _node;
         private bool _found;
 
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Init(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (GetTargetsNode)context.Node;
             _found = false;
         }
 
-        public override void Execute()
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Execute();
-            
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            base.Execute(graphRunner, node);
+            var n = (GetTargetsNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var targets = new List<GameUnit>();
 
             _found = TargetQueryUtility.GetTargetsFromAbility(context.Ability,
-                _node.TargetMultipleCfg, ref targets, _node.IgnoreSelf);
+                n.TargetMultipleCfg, ref targets, n.IgnoreSelf);
             
-            GraphRunner.SetOutPortVal(_node.OutUnitList, targets);
+            graphRunner.SetOutPortVal(n.OutUnitList, targets);
             GameLogger.Log($"Ability {context.Ability} found targets count {targets.Count}");
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_found ? _node.OutFlowPort: _node.OutFlowPortFail);
+            var n = (GetTargetsNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(_found ? n.OutFlowPort: n.OutFlowPortFail);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-        
-        public override void OnReturnToPool()
-        {
-            _node = null;
-            base.OnReturnToPool();
         }
     }
 }

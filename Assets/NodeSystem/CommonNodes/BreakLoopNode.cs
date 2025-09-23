@@ -9,18 +9,17 @@
     
     public class BreakLoopNodeRunner:FlowNodeRunner
     {
-        public override void Execute()
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            var loopNode = GraphRunner.GetCurLoopNode();
+            var loopNode = graphRunner.GetCurLoopNodeRunner();
             if (loopNode != null)
                 loopNode.IsLoopEnd = true;
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var loopNode = GraphRunner.GetCurLoopNode();
-            return loopNode?.NodeId;
+            return graphRunner.GetCurLoopNode();
         }
     }
 }

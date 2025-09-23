@@ -47,31 +47,24 @@ namespace GAS.Logic
 
     public sealed class ReqActivateAbilityNodeRunner : FlowNodeRunner
     {
-        private ReqActivateAbilityNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (ReqActivateAbilityNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            base.Execute();
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            base.Execute(graphRunner, node);
+            var n = (ReqActivateAbilityNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
 
             var job = context.Ability.System.ClassObjectPoolSubsystem.Get<AbilityActivationReqJob>();
 
             if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
             {
                 GameLogger.LogError($"Failed to get owner of {context.Ability}");
-                Abort();
+                graphRunner.Abort();
             }
             
-            var preCast = ValuePickerUtility.GetValue(_node.PreCastTime, owner, context.Ability.Lv);
-            var cast = ValuePickerUtility.GetValue(_node.CastTime, owner, context.Ability.Lv);
-            var postCast = ValuePickerUtility.GetValue(_node.PostCastTime, owner, context.Ability.Lv);
-            var clamp = ValuePickerUtility.GetValue(_node.CastProcessClampTime, owner,
+            var preCast = ValuePickerUtility.GetValue(n.PreCastTime, owner, context.Ability.Lv);
+            var cast = ValuePickerUtility.GetValue(n.CastTime, owner, context.Ability.Lv);
+            var postCast = ValuePickerUtility.GetValue(n.PostCastTime, owner, context.Ability.Lv);
+            var clamp = ValuePickerUtility.GetValue(n.CastProcessClampTime, owner,
                 context.Ability.Lv);
 
             var total = preCast + cast + postCast;
@@ -92,28 +85,22 @@ namespace GAS.Logic
                     CastTime = cast,
                     PostCastTime = postCast,
                 },
-                EventArgs = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal)?.Handler ?? 0,
-                QueueType = _node.QueueType
+                EventArgs = graphRunner.GetInPortVal<GameEventArg>(n.InPortVal)?.Handler ?? 0,
+                QueueType = n.QueueType
             });
 
             context.Ability.AddActivationReqJob(job);
-
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n =  (ReqActivateAbilityNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

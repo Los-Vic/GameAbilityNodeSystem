@@ -24,42 +24,30 @@ namespace GAS.Logic
 
     public sealed class AddTagNodeRunner : FlowNodeRunner
     {
-        private AddTagNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (AddTagNode)context.Node;
-        }
-        public override void Execute()
-        {
-            base.Execute();
+            var n = (AddTagNode)node;
+            base.Execute(graphRunner, node);
             
-            var target = GraphRunner.GetInPortVal<GameUnit>(_node.InPortTarget);
+            var target = graphRunner.GetInPortVal<GameUnit>(n.InPortTarget);
             if (target == null)
             {
                 GameLogger.LogWarning("Add tag failed, target is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
             
-            target.AddTag(_node.Tag);
-            
-            Complete();
+            target.AddTag(n.Tag);
+            graphRunner.Forward();
         }
         
-        public override void OnReturnToPool()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            base.OnReturnToPool();
-            _node = null;
-        }
-        
-        public override string GetNextNode()
-        {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n = (AddTagNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

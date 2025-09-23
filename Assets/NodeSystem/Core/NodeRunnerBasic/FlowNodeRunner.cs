@@ -3,37 +3,27 @@
     public class FlowNodeRunner:NodeRunner
     {
         private bool _dependentValNodesExecuted;
-        public virtual string GetNextNode()
+        public virtual string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
             return null;
         }
-
-        protected void Complete()
+        
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            GraphRunner.ForwardRunner();
+            ExecuteDependentValNodes(graphRunner, node);
         }
 
-        protected void Abort()
-        {
-            GraphRunner.AbortRunner();
-        }
-
-        public override void Execute()
-        {
-            ExecuteDependentValNodes(NodeId);
-        }
-
-        private void ExecuteDependentValNodes(string flowNodeId)
+        private void ExecuteDependentValNodes(NodeGraphRunner graphRunner, Node node)
         {
             if(_dependentValNodesExecuted)
                 return;
             
-            var nodeList = GraphRunner.GraphAssetRuntimeData.GetDependentNodeIds(flowNodeId);
+            var nodeList = graphRunner.GraphAssetRuntimeData.GetDependentNodeIds(node.Id);
             for (var i = nodeList.Count - 1; i >= 0; i--)
             {
-                var runner = GraphRunner.CreateNodeRunner(nodeList[i]);
-                runner.Execute();
-                GraphRunner.DestroyNodeRunner(runner);
+                var runner = graphRunner.CreateNodeRunner(nodeList[i]);
+                runner.Execute(graphRunner, node);
+                graphRunner.DestroyNodeRunner(runner);
             }
 
             _dependentValNodesExecuted = true;

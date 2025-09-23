@@ -33,34 +33,22 @@ namespace GAS.Logic
 
     public sealed class SplitGameEventParamNodeRunner : NodeRunner
     {
-        private SplitGameEventParamNode _node;
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (SplitGameEventParamNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            var inVal = GraphRunner.GetInPortVal<GameEventArg>(_node.InPortVal);
+            var n = (SplitGameEventParamNode)node;
+            var inVal = graphRunner.GetInPortVal<GameEventArg>(n.InPortVal);
             if(inVal == null)
                 return;
             
-            GraphRunner.SetOutPortVal(_node.OutPortEventType, inVal.EventType);
-            GraphRunner.SetOutPortVal(_node.OutPortSrcUnit, inVal.EventSrcUnit);
-            GraphRunner.SetOutPortVal(_node.OutPortSrcAbility, inVal.EventSrcAbility);
-            GraphRunner.SetOutPortVal(_node.OutPortSrcEffect, inVal.EventSrcEffect);
-            GraphRunner.SetOutPortVal(_node.OutPortTargetUnit, inVal.EventTargetUnit);
-            GraphRunner.SetOutPortVal(_node.OutPortVal1, inVal.EventValue1);
-            GraphRunner.SetOutPortVal(_node.OutPortVal2, inVal.EventValue2);
-            GraphRunner.SetOutPortVal(_node.OutPortVal3, inVal.EventValue3);
-            GraphRunner.SetOutPortVal(_node.OutPortString, inVal.EventString);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            graphRunner.SetOutPortVal(n.OutPortEventType, inVal.EventType);
+            graphRunner.SetOutPortVal(n.OutPortSrcUnit, inVal.EventSrcUnit);
+            graphRunner.SetOutPortVal(n.OutPortSrcAbility, inVal.EventSrcAbility);
+            graphRunner.SetOutPortVal(n.OutPortSrcEffect, inVal.EventSrcEffect);
+            graphRunner.SetOutPortVal(n.OutPortTargetUnit, inVal.EventTargetUnit);
+            graphRunner.SetOutPortVal(n.OutPortVal1, inVal.EventValue1);
+            graphRunner.SetOutPortVal(n.OutPortVal2, inVal.EventValue2);
+            graphRunner.SetOutPortVal(n.OutPortVal3, inVal.EventValue3);
+            graphRunner.SetOutPortVal(n.OutPortString, inVal.EventString);
         }
     }
     

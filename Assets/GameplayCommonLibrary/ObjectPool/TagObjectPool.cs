@@ -5,24 +5,16 @@ using UnityEngine.Pool;
 
 namespace GCL
 {
-    public interface ITagPoolObject
-    {
-        void OnCreateFromPool();
-        void OnTakeFromPool();
-        void OnReturnToPool();
-        void OnDestroy();
-    }
-    
     public class TagObjectPoolMgr
     {
-        private readonly Dictionary<string, ObjectPool<ITagPoolObject>> _pools = new();
+        private readonly Dictionary<string, ObjectPool<IPoolObject>> _pools = new();
 
-        public void RegisterPool(string tag, Func<ITagPoolObject> createFunc, int defaultCapacity = 10, int maxSize = 10000)
+        public void RegisterPool(string tag, Func<IPoolObject> createFunc, int defaultCapacity = 10, int maxSize = 10000)
         {
             if (_pools.ContainsKey(tag))
                 return;
 
-            var pool = new ObjectPool<ITagPoolObject>(createFunc, null, null,
+            var pool = new ObjectPool<IPoolObject>(createFunc, null, null,
                 obj => obj.OnDestroy(), 
                 true,
                 defaultCapacity, maxSize);
@@ -59,7 +51,7 @@ namespace GCL
             }
         }
 
-        public ITagPoolObject GetObject(string tag)
+        public IPoolObject GetObject(string tag)
         {
             if (!_pools.TryGetValue(tag, out var pool))
             {
@@ -72,7 +64,7 @@ namespace GCL
             return obj;
         }
 
-        public void ReleaseObject(string tag, ITagPoolObject obj)
+        public void ReleaseObject(string tag, IPoolObject obj)
         {
             if (!_pools.TryGetValue(tag, out var pool))
             {

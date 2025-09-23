@@ -40,7 +40,7 @@ namespace NS
                 EntryNodeId = nodeId
             };
             graphRunner.Init(ref initParam);
-            graphRunner.StartRunner();
+            graphRunner.Start();
             _graphRunners.Add(graphRunner);
         }
 

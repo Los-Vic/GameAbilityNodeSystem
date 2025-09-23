@@ -18,37 +18,23 @@
     
     public sealed class BranchFlowNodeRunner:FlowNodeRunner
     {
-        private BranchNode _node;
-        private bool _condition;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner,  Node node)
         {
-            base.Init(ref context);
-            _node = (BranchNode)context.Node;
+            base.Execute(graphRunner, node);
+            graphRunner.Forward();
         }
 
-        public override void Execute()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            base.Execute();
-            _condition = GraphRunner.GetInPortVal<bool>(_node.InPortBool);
-            Complete();
-        }
-
-        public override string GetNextNode()
-        {
-            var outPortId =  _condition ? _node.OutPortTrueExec : _node.OutPortFalseExec;
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(outPortId);
+            var n = (BranchNode)node;
+            var condition = graphRunner.GetInPortVal<bool>(n.InPortBool);
+            var outPortId =  condition ? n.OutPortTrueExec : n.OutPortFalseExec;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(outPortId);
             if (!port.IsConnected())
-                return default;
+                return null;
 
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

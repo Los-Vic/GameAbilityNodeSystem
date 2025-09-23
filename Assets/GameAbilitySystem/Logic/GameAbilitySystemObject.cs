@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    public class GameAbilitySystemObject:IPoolClass
+    public class GameAbilitySystemObject:IPoolObject
     {
         public GameAbilitySystem System { get; internal set; }
         

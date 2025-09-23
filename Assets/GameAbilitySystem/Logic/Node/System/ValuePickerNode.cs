@@ -24,28 +24,12 @@ namespace GAS.Logic
 
     public sealed class ValuePickerNodeRunner : NodeRunner
     {
-        private GameUnit _unit;
-        private ValuePickerNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (ValuePickerNode)context.Node;
-            
-            _unit = GraphRunner.GetInPortVal<GameUnit>(_node.InPortUnit);
-        }
-        
-        public override void Execute()
-        {
-            var lv = GraphRunner.GetInPortVal<FP>(_node.InPortLv);
-            GraphRunner.SetOutPortVal(_node.OutPortVal, ValuePickerUtility.GetValue(_node.Config, _unit, (uint)lv));
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _unit = null;
-            _node = null;
+            var n = (ValuePickerNode)node;
+            var lv = graphRunner.GetInPortVal<FP>(n.InPortLv);
+            var unit = graphRunner.GetInPortVal<GameUnit>(n.InPortUnit);
+            graphRunner.SetOutPortVal(n.OutPortVal, ValuePickerUtility.GetValue(n.Config, unit, (uint)lv));
         }
     }
 }

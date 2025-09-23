@@ -29,21 +29,14 @@ namespace NS
 
     public sealed class ValueEquationNodeRunner : NodeRunner
     {
-        private ValueEquationNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (ValueEquationNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            var a = GraphRunner.GetInPortVal<FP>(_node.InPortA);
-            var b = GraphRunner.GetInPortVal<FP>(_node.InPortB);
+            var n = (ValueEquationNode)node;
+            var a = graphRunner.GetInPortVal<FP>(n.InPortA);
+            var b = graphRunner.GetInPortVal<FP>(n.InPortB);
             FP res = 0;
 
-            switch (_node.Op)
+            switch (n.Op)
             {
                case EValueEquationType.Add:
                    res = a + b;
@@ -61,13 +54,7 @@ namespace NS
                    res = FP.Abs(a - b);
                    break;
             }
-            GraphRunner.SetOutPortVal(_node.OutPortVal, res);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            graphRunner.SetOutPortVal(n.OutPortVal, res);
         }
     }
 

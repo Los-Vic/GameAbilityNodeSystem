@@ -21,28 +21,22 @@
     
     public sealed class ForLoopFlowNodeRunner:LoopNodeRunner
     {
-        private ForLoopNode _node;
         private bool _started;
         private int _startIndex;
         private int _endIndex;
         private int _curIndex;
         private string _outPortId;
-
-        public override void Init(ref NodeRunnerInitContext context)
-        {
-            base.Init(ref context);
-            _node = (ForLoopNode)context.Node;
-        }
         
-        public override void Execute()
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Execute();
+            base.Execute(graphRunner, node);
+            var n = (ForLoopNode)node;
             if (!_started)
             {
-                GraphRunner.EnterLoop(this);
+                graphRunner.EnterLoop(this, node);
                 _started = true;
-                _startIndex = GraphRunner.GetInPortVal<int>(_node.InStartIndex);
-                _endIndex = GraphRunner.GetInPortVal<int>(_node.InEndIndex);
+                _startIndex = graphRunner.GetInPortVal<int>(n.InStartIndex);
+                _endIndex = graphRunner.GetInPortVal<int>(n.InEndIndex);
                 _curIndex = _startIndex;
                 _started = true;
             }
@@ -55,24 +49,24 @@
             
             if (IsLoopEnd)
             {
-                _outPortId = _node.OutCompleteExecPort;
-                GraphRunner.ExitLoop();
+                _outPortId = n.OutCompleteExecPort;
+                graphRunner.ExitLoop();
             }
             else
             {
-                _outPortId = _node.OutForEachExecPort;
+                _outPortId = n.OutForEachExecPort;
             }
 
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var outPort = GraphRunner.GraphAssetRuntimeData.GetPortById(_outPortId);
+            var outPort = graphRunner.GraphAssetRuntimeData.GetPortById(_outPortId);
             if (!outPort.IsConnected())
-                return default;
+                return null;
 
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(outPort.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(outPort.connectPortId);
             return connectPort.belongNodeId;
         }
         
@@ -82,7 +76,6 @@
             _curIndex = 0;
             _endIndex = 0;
             _started = false;
-            _node = null;
             base.OnReturnToPool();
         }
     }

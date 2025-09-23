@@ -51,7 +51,7 @@ namespace GAS.Logic
             };
             
             Singleton<HandlerMgr<GameEventArg>>.Instance.AddRefCount(param.Handler);
-            graphRunner.StartRunner();
+            graphRunner.Start();
             return graphRunner;
         }
 
@@ -72,7 +72,7 @@ namespace GAS.Logic
                 graphRunner.OnRunnerRunEnd += customOnRunGraphEnd;
             }
             
-            graphRunner.StartRunner();
+            graphRunner.Start();
             return graphRunner;
         }
 

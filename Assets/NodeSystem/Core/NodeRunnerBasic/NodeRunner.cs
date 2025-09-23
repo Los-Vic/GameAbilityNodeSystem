@@ -2,26 +2,16 @@
 
 namespace NS
 {
-    public struct NodeRunnerInitContext
-    {
-        public Node Node;
-        public NodeGraphRunner GraphRunner;
-    }
-    
-    public class NodeRunner:IPoolClass
+    public class NodeRunner:IPoolObject
     {
         public static readonly NodeRunner DefaultRunner = new();
-        protected NodeGraphRunner GraphRunner { get; private set; }
-        public string NodeId { get; private set; }
-        public virtual void Init(ref NodeRunnerInitContext context)
+        
+        public virtual void Init(NodeGraphRunner graphRunner, Node node)
         {
-            NodeId = context.Node.Id;
-            GraphRunner = context.GraphRunner;
         }
         
-        public virtual void Execute()
+        public virtual void Execute(NodeGraphRunner graphRunner, Node node)
         {
-           
         }
 
         #region Pool Object
@@ -36,8 +26,6 @@ namespace NS
 
         public virtual void OnReturnToPool()
         {
-            NodeId = null;
-            GraphRunner = null;
         }
 
         public virtual void OnDestroy()

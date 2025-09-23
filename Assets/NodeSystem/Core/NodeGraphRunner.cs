@@ -25,7 +25,7 @@ namespace NS
     {
     }
     
-    public class NodeGraphRunner:IPoolClass
+    public class NodeGraphRunner:IPoolObject
     {
         //Hook
         public Action<NodeGraphRunner, EGraphRunnerEnd> OnRunnerRunEnd;
@@ -40,13 +40,14 @@ namespace NS
         
         //Run node runner
         private Node _entryNode;
+        private Node _curNode;
         private FlowNodeRunner _curNodeRunner;
         private readonly Dictionary<string, LoopNodeRunner> _loopNodeRunnerMap = new();
         private readonly Stack<string> _runningLoopNodeIds = new();
         
         public GraphAssetRuntimeData GraphAssetRuntimeData { get; private set; }
         public string AssetName => _asset?.name ?? "";
-        public string EntryName => _entryNode?.DisplayName() ?? "";
+        public string EntryName => _entryNode?.ToString() ?? "";
         public INodeSystemTaskScheduler TaskScheduler => _nodeSystem.TaskScheduler;
         public NodeGraphRunnerContext Context { get; private set; }
         /// <summary>
@@ -58,6 +59,7 @@ namespace NS
             _asset = initContext.Asset;
             GraphAssetRuntimeData = _nodeSystem.GetGraphRuntimeData(initContext.Asset);
             _entryNode = GraphAssetRuntimeData.GetNodeById(initContext.EntryNodeId);
+            _curNode = _entryNode;
             Context = initContext.Context;
             
             if (!_entryNode.IsEntryNode())
@@ -65,13 +67,14 @@ namespace NS
                 GameLogger.LogError($"not valid entry node:{initContext.EntryNodeId} of {_asset.name}");
                 return;
             }
-
+            
             if (CreateNodeRunner(initContext.EntryNodeId) is not EntryNodeRunner entryNodeRunner)
             {
                 GameLogger.LogError($"not valid entry node runner:{initContext.EntryNodeId} of {_asset.name}");
                 return;
             }
-            entryNodeRunner.SetEntryParam(initContext.EntryParam);
+            
+            entryNodeRunner.SetEntryParam(this, _entryNode, initContext.EntryParam);
             _curNodeRunner = entryNodeRunner;
             _isValid = true;
         }
@@ -97,6 +100,7 @@ namespace NS
             OnRunnerRunEnd = null;
             _asset = null;
             _entryNode = null;
+            _curNode = null;
             _isValid = false;
             _hasStarted = false;
             GraphAssetRuntimeData = null;
@@ -104,67 +108,67 @@ namespace NS
             Context = null;
         }
         
-        public void StartRunner()
+        public void Start()
         {
             if (!_isValid)
             {
-                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()} failed. not valid.");
+                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode} failed. not valid.");
                 return;
             }
 
             if (_hasStarted)
             {
-                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()} failed. already running.");
+                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode} failed. already running.");
                 return;
             }
 
             if (_curNodeRunner == null)
             {
-                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()} failed. entry runner is null.");
+                GameLogger.LogError($"start run graph:{_asset.name}, entry:{_entryNode} failed. entry runner is null.");
                 return;
             }
             
             _hasStarted = true;
-            GameLogger.Log($"start run graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            ExecuteRunner();
+            GameLogger.Log($"start run graph:{_asset.name}, entry:{_entryNode}");
+            Execute(_curNodeRunner, _curNode);
         }
         
-        private void CompleteRunner()
+        private void Complete()
         {
-            GameLogger.Log($"complete graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
+            GameLogger.Log($"complete graph:{_asset.name}, entry:{_entryNode}");
             OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Completed);
         }
 
-        public void CancelRunner()
+        public void Cancel()
         {
-            GameLogger.Log($"cancel graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
+            GameLogger.Log($"cancel graph:{_asset.name}, entry:{_entryNode}, cur:{_curNode}");
             OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Canceled);
         }
 
-        public void AbortRunner()
+        public void Abort()
         {
-            GameLogger.Log($"abort graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
+            GameLogger.Log($"abort graph:{_asset.name}, entry:{_entryNode}, cur:{_curNode}");
             OnRunnerRunEnd?.Invoke(this, EGraphRunnerEnd.Aborted);
         }
         
-        private void ExecuteRunner()
+        private void Execute(FlowNodeRunner nodeRunner, Node node)
         {
-            if (_curNodeRunner == null)
+            if (nodeRunner == null)
             {
-                CompleteRunner();
+                Complete();
                 return;
             }
-            GameLogger.Log($"execute node:{_curNodeRunner.GetType()}, graph:{_asset.name}, entry:{_entryNode.DisplayName()}");
-            _curNodeRunner.Execute();
+            GameLogger.Log($"execute node:{node}, graph:{_asset.name}, entry:{_entryNode}");
+            nodeRunner.Execute(this, node);
         }
 
-        internal void ForwardRunner()
+        public void Forward()
         {
-            var nextNode = _curNodeRunner.GetNextNode();
+            var nextNode = _curNodeRunner.GetNextNode(this, _curNode);
             
             if (IsInLoop(out var loopNode))
             {
-                if (_curNodeRunner.NodeId != loopNode)
+                if (_curNode.Id != loopNode)
                 {
                     DestroyNodeRunner(_curNodeRunner);
                 }
@@ -188,19 +192,14 @@ namespace NS
                 _curNodeRunner = null;
             }
             
-            ExecuteRunner();
+            Execute(_curNodeRunner, _curNode);
         }
         
         internal NodeRunner CreateNodeRunner(string nodeId)
         {
             var n = GraphAssetRuntimeData.GetNodeById(nodeId);
             var runner = _nodeSystem.CreateNodeRunner(n.GetType());
-            var context = new NodeRunnerInitContext()
-            {
-                Node = n,
-                GraphRunner = this,
-            };
-            runner.Init(ref context);
+            runner.Init(this, n);
             return runner;
         }
 
@@ -247,10 +246,10 @@ namespace NS
         
         #region Loop
 
-        public void EnterLoop(LoopNodeRunner loopRunner)
+        public void EnterLoop(LoopNodeRunner loopRunner, Node loopNode)
         {
-            _runningLoopNodeIds.Push(loopRunner.NodeId);
-            _loopNodeRunnerMap.Add(loopRunner.NodeId, loopRunner);
+            _runningLoopNodeIds.Push(loopNode.Id);
+            _loopNodeRunnerMap.Add(loopNode.Id, loopRunner);
         }
         
         private bool IsInLoop(out string loopNodeId)
@@ -267,14 +266,17 @@ namespace NS
             _loopNodeRunnerMap.Remove(nodeId);
         }
 
-        public LoopNodeRunner GetCurLoopNode()
+        public LoopNodeRunner GetCurLoopNodeRunner()
         {
-            if (!IsInLoop(out var loopNodeId)) 
-                return null;
-            
-            return _loopNodeRunnerMap.GetValueOrDefault(loopNodeId);
+            var loopNodeId = GetCurLoopNode();
+            return loopNodeId == null ? null : _loopNodeRunnerMap.GetValueOrDefault(loopNodeId);
         }
 
+        public string GetCurLoopNode()
+        {
+            return !IsInLoop(out var loopNodeId) ? null : loopNodeId;
+        }
+        
         #endregion
         
         #region Pool Object

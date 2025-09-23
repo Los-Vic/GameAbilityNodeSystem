@@ -60,8 +60,8 @@ namespace GCL
     public class HandlerMgr<T> where T : class, new()
     {
         private T[] _rscArray;
-        private uint[] _generationArray;
-        private uint[] _refCountArray;
+        private ushort[] _generationArray;
+        private ushort[] _refCountArray;
         private uint[] _compactDataArray;  // compactArray -> rscArray , faster to iterate , no stable order
         private uint _compactDataCount;  //compactArray中index小于该值的value才是有效的资源
         private uint[] _rscArrayToCompactArrayLookUp; //needed when release handler, rscArray -> compactArray
@@ -80,8 +80,8 @@ namespace GCL
         {
             _inited = true;
             _rscArray = new T[arraySize];
-            _generationArray = new uint[arraySize];
-            _refCountArray = new uint[arraySize];
+            _generationArray = new ushort[arraySize];
+            _refCountArray = new ushort[arraySize];
             _compactDataArray = new uint[arraySize];
             _rscArrayToCompactArrayLookUp = new uint[arraySize];
             _onReleaseItem = onReleaseItem;

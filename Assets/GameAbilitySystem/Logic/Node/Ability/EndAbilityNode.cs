@@ -13,25 +13,11 @@ namespace GAS.Logic
     
     public sealed class EndAbilityNodeRunner : FlowNodeRunner
     {
-        private EndAbilityNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (EndAbilityNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             context.Ability.EndAbility();
-            Complete();
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            graphRunner.Forward();
         }
     }
 }

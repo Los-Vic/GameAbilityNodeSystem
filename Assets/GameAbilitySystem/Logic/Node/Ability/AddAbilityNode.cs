@@ -37,42 +37,40 @@ namespace GAS.Logic
     
     public sealed class AddAbilityNodeRunner : FlowNodeRunner
     {
-        private AddAbilityNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (AddAbilityNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            base.Execute();
-
-            if (_node.AbilityAsset == null)
+            if (node is not AddAbilityNode addAbilityNode)
             {
-                GameLogger.LogWarning("Add ability failed, ability asset is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
             
-            var target = GraphRunner.GetInPortVal<GameUnit>(_node.InPortTarget);
+            base.Execute(graphRunner, node);
+
+            if (addAbilityNode.AbilityAsset == null)
+            {
+                GameLogger.LogWarning("Add ability failed, ability asset is null.");
+                graphRunner.Abort();
+                return;
+            }
+            
+            var target = graphRunner.GetInPortVal<GameUnit>(addAbilityNode.InPortTarget);
             if (target == null)
             {
                 GameLogger.LogWarning("Add ability failed, target is null.");
-                Abort();
+                graphRunner.Abort();
                 return;
             }
 
-            var lv = GraphRunner.GetInPortVal<FP>(_node.InPortLv);
-            var signal1 = GraphRunner.GetInPortVal<FP>(_node.InPortSignal1);
-            var signal2 = GraphRunner.GetInPortVal<FP>(_node.InPortSignal2);
-            var signal3 = GraphRunner.GetInPortVal<FP>(_node.InPortSignal3);
+            var lv = graphRunner.GetInPortVal<FP>(addAbilityNode.InPortLv);
+            var signal1 = graphRunner.GetInPortVal<FP>(addAbilityNode.InPortSignal1);
+            var signal2 = graphRunner.GetInPortVal<FP>(addAbilityNode.InPortSignal2);
+            var signal3 = graphRunner.GetInPortVal<FP>(addAbilityNode.InPortSignal3);
             
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var abilityCreateParam = new AbilityCreateParam()
             {
-                Id = _node.AbilityAsset.id,
+                Id = addAbilityNode.AbilityAsset.id,
                 Lv = (uint)lv,
                 SignalVal1 = signal1,
                 SignalVal2 = signal2,
@@ -81,22 +79,20 @@ namespace GAS.Logic
             };
             
             target.AddAbility(abilityCreateParam);
-            
-            Complete();
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            graphRunner.Forward();
         }
         
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            if (node is not AddAbilityNode addAbilityNode)
+            {
+                return null;
+            }
+            
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(addAbilityNode.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
         }
     }

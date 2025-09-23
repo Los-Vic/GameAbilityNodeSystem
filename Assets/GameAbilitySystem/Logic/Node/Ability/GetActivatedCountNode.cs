@@ -13,24 +13,15 @@ namespace GAS.Logic
     
     public sealed class GetActivatedCountNodeRunner : FlowNodeRunner
     {
-        private GetActivatedCountNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (GetActivatedCountNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
-            GraphRunner.SetOutPortVal(_node.OutPortCount, (FP)context.Ability.ActivatedCount);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            if (node is not GetActivatedCountNode n)
+            {
+                graphRunner.Abort();
+                return;
+            }
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
+            graphRunner.SetOutPortVal(n.OutPortCount, (FP)context.Ability.ActivatedCount);
         }
     }
 }

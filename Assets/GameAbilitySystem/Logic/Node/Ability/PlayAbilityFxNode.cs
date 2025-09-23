@@ -25,49 +25,37 @@ namespace GAS.Logic
     
     public sealed class PlayAbilityFxNodeRunner : FlowNodeRunner
     {
-        private PlayAbilityFxNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (PlayAbilityFxNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            base.Execute();
-            var context = (GameAbilityGraphRunnerContext)GraphRunner.Context;
+            base.Execute(graphRunner, node);
+            var n =  (PlayAbilityFxNode)node;
+            var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var playContext = new PlayAbilityFxCueContext
             {
                 UnitHandler = context.Ability.Owner,
                 AbilityHandler = context.Ability.Handler,
-                GameCueName = _node.CueName,
-                Param = GraphRunner.GetInPortVal<FP>(_node.InParam),
-                IsPersistent = _node.IsPersistent
+                GameCueName = n.CueName,
+                Param = graphRunner.GetInPortVal<FP>(n.InParam),
+                IsPersistent = n.IsPersistent
             };
-            var target = GraphRunner.GetInPortVal<GameUnit>(_node.InTargetUnit);
+            var target = graphRunner.GetInPortVal<GameUnit>(n.InTargetUnit);
             if (target != null)
             {
                 playContext.SubUnitHandler = target.Handler;
             }
            
             context.Ability.AbilityCue.PlayAbilityFxCue(ref playContext);
-            Complete();
+            graphRunner.Forward();
         }
 
-        public override string GetNextNode()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var n = (PlayAbilityFxNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
                 return null;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

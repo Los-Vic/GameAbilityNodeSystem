@@ -12,7 +12,7 @@ namespace NS
         Cancelled
     }
     
-    public class NodeTask: IPoolClass
+    public class NodeTask: IPoolObject
     {
         private Func<ETaskStatus> OnStartTask { get; set; }
         private Action OnCompleteTask { get; set; }

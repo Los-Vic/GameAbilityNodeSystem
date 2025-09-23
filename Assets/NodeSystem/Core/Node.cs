@@ -47,10 +47,11 @@ namespace NS
         {
             return nodeFunctionType == ENodeFunctionType.Entry;
         }
-        
-        public virtual string DisplayName() => nodeName;
-        
-        
+
+        public override string ToString()
+        {
+            return nodeName;
+        }
 #if UNITY_EDITOR
 
         public void InitNode()

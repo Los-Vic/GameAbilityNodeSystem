@@ -14,24 +14,11 @@ namespace NS
     
     public sealed class FP2IntNodeRunner:NodeRunner
     {
-        private FP2IntNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (FP2IntNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            var val = GraphRunner.GetInPortVal<FP>(_node.InPortVal);
-            GraphRunner.SetOutPortVal(_node.OutPortVal, (int)val);
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            var n = (FP2IntNode)node;
+            var val = graphRunner.GetInPortVal<FP>(n.InPortVal);
+            graphRunner.SetOutPortVal(n.OutPortVal, (int)val);
         }
     }
     
@@ -47,24 +34,11 @@ namespace NS
     
     public sealed class FP2FloatNodeRunner:NodeRunner
     {
-        private FP2FloatNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (FP2FloatNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            var val = GraphRunner.GetInPortVal<FP>(_node.InPortVal);
-            GraphRunner.SetOutPortVal(_node.OutPortVal, (float)val);
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            var n = (FP2FloatNode)node;
+            var val = graphRunner.GetInPortVal<FP>(n.InPortVal);
+            graphRunner.SetOutPortVal(n.OutPortVal, (float)val);
         }
     }
 }

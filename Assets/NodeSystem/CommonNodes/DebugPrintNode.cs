@@ -17,33 +17,21 @@ namespace NS
     
     public sealed class DebugPrintFlowNodeRunner:FlowNodeRunner
     {
-        private DebugPrintNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (DebugPrintNode)context.Node;
+            var n = (DebugPrintNode)node;
+            GameLogger.Log(n.Log);
+            graphRunner.Forward();
         }
 
-        public override void Execute()
+        public override string GetNextNode(NodeGraphRunner graphRunner, Node node)
         {
-            GameLogger.Log(_node.Log);
-            Complete();
-        }
-
-        public override string GetNextNode()
-        {
-            var port = GraphRunner.GraphAssetRuntimeData.GetPortById(_node.OutPortExec);
+            var  n = (DebugPrintNode)node;
+            var port = graphRunner.GraphAssetRuntimeData.GetPortById(n.OutPortExec);
             if(!port.IsConnected())
-                return default;
-            var connectPort = GraphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
+                return null;
+            var connectPort = graphRunner.GraphAssetRuntimeData.GetPortById(port.connectPortId);
             return connectPort.belongNodeId;
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
         }
     }
 }

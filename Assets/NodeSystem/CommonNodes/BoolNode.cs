@@ -11,23 +11,10 @@
     
     public sealed class BoolNodeRunner:NodeRunner
     {
-        private BoolNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (BoolNode)context.Node;
-        }
-
-        public override void Execute()
-        {
-            GraphRunner.SetOutPortVal(_node.OutPortVal, _node.Val);
-        }
-
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            var n = (BoolNode)node;
+            graphRunner.SetOutPortVal(n.OutPortVal, n.Val);
         }
     }
 }

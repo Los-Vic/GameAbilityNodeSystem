@@ -14,23 +14,10 @@ namespace NS
     
     public sealed class FPNodeRunner:NodeRunner
     {
-        private FPNode _node;
-
-        public override void Init(ref NodeRunnerInitContext context)
+        public override void Execute(NodeGraphRunner graphRunner, Node node)
         {
-            base.Init(ref context);
-            _node = (FPNode)context.Node;
-        }
-        
-        public override void Execute()
-        {
-            GraphRunner.SetOutPortVal(_node.OutPortVal, (FP)_node.Val);
-        }
-        
-        public override void OnReturnToPool()
-        {
-            base.OnReturnToPool();
-            _node = null;
+            var n = (FPNode)node;
+            graphRunner.SetOutPortVal(n.OutPortVal, (FP)n.Val);
         }
     }
 }
