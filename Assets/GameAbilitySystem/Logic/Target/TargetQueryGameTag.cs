@@ -84,7 +84,13 @@ namespace GAS.Logic.Target
             {
                 if (!hasWithAny && !hasWithAll)
                 {
-                    units.AddRange(ability.System.GetAllGameUnits());
+                    var unitHandlerArray = ability.System.GetAllGameUnits(out var unitNums);
+                    for (var i = 0; i < unitNums; i++)
+                    {
+                        if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitHandlerArray[i], out var unit))
+                            continue;
+                        units.Add(unit);
+                    }
                 }
                 
                 for (var i = units.Count - 1; i >= 0; i--)

@@ -19,9 +19,9 @@ namespace GAS.Logic
             //UnitHandlerRscMgr.Reset();
         }
 
-        public GameUnit[] GetAllUnits()
+        public Handler<GameUnit>[] GetAllUnits(out uint nums)
         {
-            return Singleton<HandlerMgr<GameUnit>>.Instance.GetAllRsc();
+            return Singleton<HandlerMgr<GameUnit>>.Instance.GetAllRscHandlers(out nums);
         }
 
         #region Game Unit Instance Create/Destroy

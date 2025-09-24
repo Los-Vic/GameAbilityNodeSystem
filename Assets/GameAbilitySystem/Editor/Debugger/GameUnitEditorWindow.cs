@@ -115,14 +115,17 @@ namespace GAS.Editor
                 return;
             }
             
-            var unitList = systemDebugger.System.GetAllGameUnits();
+            var unitList = systemDebugger.System.GetAllGameUnits(out var unitNums);
             
             var simpleAttributes = new List<SimpleAttribute>();
             var compositeAttributes = new List<CompositeAttribute>();
             var tags = new List<EGameTag>();
             
-            foreach (var unit in unitList)
+            for(var i = 0; i < unitNums; i++)
             {
+                if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitList[i], out var unit))
+                    continue;
+                
                 var editorObj = new GameUnitEditorObj
                 {
                     name = unit.UnitName,

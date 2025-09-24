@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic; 
 
 namespace GCL
 {
@@ -23,8 +22,8 @@ namespace GCL
         }
 
         public uint Index => _val >> 8;
-        public uint Generation => _val & 0xff;
-        public bool IsAssigned => _val != 0; // generation不为0
+        public uint Generation => _val & 0xffu;
+        public bool IsAssigned => Generation != 0; // generation == 0 表示无效
         
         public static implicit operator uint(Handler<T> handler) => handler._val;
         public static implicit operator Handler<T>(uint val) => new Handler<T>(val);
@@ -54,62 +53,74 @@ namespace GCL
     /// 句柄集合类
     /// 功能：使用句柄来管理类的引用，提供引用计数机制，提供索引数组便于遍历
     /// 句柄值有利于记录
-    /// 代价：额外的空间，多一次检索（跳转），是否值得？
+    /// 代价：额外的空间，额外的检索，是否值得？
     /// </summary>
     /// <typeparam name="T">必须是引用类型，实际对象的内存还是由GC管理的，无法减少CacheMiss</typeparam>
     public class HandlerMgr<T> where T : class, new()
     {
-        private T[] _rscArray;
-        private ushort[] _generationArray;
-        private ushort[] _refCountArray;
-        private uint[] _compactDataArray;  // compactArray -> rscArray , faster to iterate , no stable order
-        private uint _compactDataCount;  //compactArray中index小于该值的value才是有效的资源
-        private uint[] _rscArrayToCompactArrayLookUp; //needed when release handler, rscArray -> compactArray
+        //object reference，目前采用和sparseArray对齐
+        //这里有分支：和packArray对齐，则遍历不需要额外跳转，检索要跳转两次
+        //和sparseArray对齐，则遍历需要一次跳转，检索一次跳转
+        private T[] _rscArray; 
+        private Handler<T>[] _packedArray; // 用于遍历
+        
+        //1、用于外部的句柄检索和比对Generation
+        //2、隐含一个回收index链表
+        private Handler<T>[] _sparseArray; // 用于检索
+        
+        private ushort[] _refCountArray; // ref count , avoid handler been released， _sparseArray对齐
 
-        //当_autoIncreaseCounter == rscArray.Count且_freeSlots.Count == 0时，说明rscArray已满，需要resize
-        private uint _autoIncreaseCounter;
-        private Queue<uint> _freeSlots;
+        private uint _rscNums;  //rsc array valid nums
+        private uint _recycledArrayHead; // shifting in _handlers array
+        private uint _recycledRscNums; 
 
         //当handler创建时，申请资源
         private Func<T> _createItemFunc;
         //当handler释放时的回调，用来处理资源释放
         private Action<T> _onReleaseItem;
-        private bool _inited;
         
-        public void Init(Func<T> createItemFunc, Action<T> onReleaseItem, int arraySize = 64)
-        {
-            _inited = true;
-            _rscArray = new T[arraySize];
-            _generationArray = new ushort[arraySize];
-            _refCountArray = new ushort[arraySize];
-            _compactDataArray = new uint[arraySize];
-            _rscArrayToCompactArrayLookUp = new uint[arraySize];
-            _onReleaseItem = onReleaseItem;
-            _createItemFunc = createItemFunc;
-            _freeSlots = new Queue<uint>(arraySize / 4);
-        }
+        private bool _inited;
 
-        public void Clear()
+        #region Public Methods
+
+        public void Init(Func<T> createItemFunc, Action<T> onReleaseItem, uint rscCapacity = 64)
         {
-            if (!IsInitialized())
+            if(_inited)
                 return;
             
-            foreach (var rsc in _rscArray)
+            _inited = true;
+            
+            _sparseArray = new Handler<T>[rscCapacity];
+            _packedArray = new Handler<T>[rscCapacity];
+            _rscArray = new T[rscCapacity];
+            _refCountArray = new ushort[rscCapacity];
+            
+            _onReleaseItem = onReleaseItem;
+            _createItemFunc = createItemFunc;
+        }
+
+        public void UnInit()
+        {
+            if (!_inited)
+                return;
+            
+            for (var i = 0; i < _rscNums; i++)
             {
-                _onReleaseItem?.Invoke(rsc);
+                _onReleaseItem?.Invoke(_rscArray[i]);
             }
             
-            Array.Clear(_rscArray, 0, _rscArray.Length);
-            Array.Clear(_generationArray, 0, _generationArray.Length);
-            Array.Clear(_refCountArray, 0, _refCountArray.Length);
-            _freeSlots.Clear();
+            _inited = false;
+            _createItemFunc = null;
+            _onReleaseItem = null;
             
-            //没必要清理
-            //Array.Clear(_compactDataArray, 0, _compactDataArray.Length);
-            //Array.Clear(_rscArrayToCompactArrayLookUp, 0,  _rscArrayToCompactArrayLookUp.Length);
+            _packedArray = null;
+            _sparseArray = null;
+            _rscArray = null;
+            _refCountArray = null;
             
-            _compactDataCount = 0;
-            _autoIncreaseCounter = 0;
+            _rscNums = 0;
+            _recycledRscNums = 0;
+            _recycledArrayHead = 0;
         }
         
         /// <summary>
@@ -118,33 +129,44 @@ namespace GCL
         /// <returns></returns>
         public Handler<T> CreateHandler()
         {
-            if (!IsInitialized())
+            if (!_inited)
                 return 0;
 
-            var rsc = _createItemFunc();
-            if (_freeSlots.Count == 0)
+            //no capacity
+            if (_rscNums == _rscArray.Length)
             {
-                if(_autoIncreaseCounter == _rscArray.Length)
-                    AutoResize();
-
-                var slot = _autoIncreaseCounter++;
-                _rscArray[slot] = rsc;
-                _rscArrayToCompactArrayLookUp[slot] = _compactDataCount;
-                _compactDataArray[_compactDataCount++] = slot;
-                _generationArray[slot] = 1;
-                var h =  new Handler<T>(slot, 1);
-                AddRefCount(h);
+                AutoResize();
+            }
+            
+            var r = _createItemFunc();
+            
+            //no recycled slot
+            if (_recycledRscNums == 0)
+            {
+                var h =  new Handler<T>(_rscNums, 1);
+                _rscArray[_rscNums] = r;
+                _sparseArray[_rscNums] = h;
+                _packedArray[_rscNums] = h;
+                _refCountArray[_rscNums] += 1;
+                _rscNums++;
                 return h;
             }
+            else
+            {
+                var slot = _recycledArrayHead;
+                var internalHandler = _sparseArray[_recycledArrayHead];
+                var generation = internalHandler.Generation;
+                _recycledArrayHead = internalHandler.Index;
+                _recycledRscNums--;
 
-            var freeSlot = _freeSlots.Dequeue();
-            _rscArray[freeSlot] = rsc;
-            _rscArrayToCompactArrayLookUp[freeSlot] = _compactDataCount;
-            _compactDataArray[_compactDataCount++] = freeSlot;
-
-            var h1 = new Handler<T>(freeSlot, _generationArray[freeSlot]);
-            AddRefCount(h1);
-            return h1;
+                var h = new Handler<T>(_rscNums, generation);
+                _rscArray[slot] = r;
+                _sparseArray[slot] = h;
+                _packedArray[_rscNums] = new Handler<T>(slot, generation);
+                _refCountArray[slot] += 1;
+                _rscNums++;
+                return h;
+            }
         }
         
         /// <summary>
@@ -157,46 +179,40 @@ namespace GCL
         {
             rsc = null;
             
-            if (!IsInitialized())
+            if (!IsRscValid(handler))
                 return false;
             
-            var index = handler.Index;
-
-            if (!handler.IsAssigned || index >= _rscArray.Length || _generationArray[index] != handler.Generation)
-            {
-                return false;
-            }
-
-            rsc = _rscArray[index];
+            rsc = _rscArray[handler.Index];
             return true;
         }
 
         public bool IsRscValid(Handler<T> handler)
         {
-            if (!IsInitialized())
+            if (!_inited)
+                return false;
+
+            if (!handler.IsAssigned)
                 return false;
             
             var index = handler.Index;
-            return handler.IsAssigned && index < _rscArray.Length && _generationArray[index] == handler.Generation;
+            if (_sparseArray[index].Generation != handler.Generation)
+                return false;
+
+            return true;
         }
         
         public void AddRefCount(Handler<T> handler)
         {
-            if (!IsInitialized())
-                return;
             if (!IsRscValid(handler))
-                return;
-            if(handler.Index >= _rscArray.Length)
                 return;
             _refCountArray[handler.Index] += 1;
         }
 
         public void RemoveRefCount(Handler<T> handler)
         {
-            if (!IsInitialized() || !IsRscValid(handler))
+            if (!IsRscValid(handler))
                 return;
             _refCountArray[handler.Index] -= 1;
-            
             if (_refCountArray[handler.Index] == 0)
             {
                 ReleaseHandler(handler);
@@ -205,45 +221,24 @@ namespace GCL
 
         public void ForceRelease(Handler<T> handler)
         {
-            if (!IsInitialized() || !IsRscValid(handler))
+            if (!IsRscValid(handler))
                 return;
             ReleaseHandler(handler);
         }
-
-        //ReSharper restore Unity.ExpensiveCode
-        public T[] GetAllRsc()
+        
+        public Handler<T>[] GetAllRscHandlers(out uint rscNums)
         {
-            if(!IsInitialized() || _compactDataCount == 0)
-                return Array.Empty<T>();
-            
-            var rscArray = new T[_compactDataCount];
-            for (var i = 0; i < _compactDataCount; i++)
-            {
-                rscArray[i] = _rscArray[_compactDataArray[i]];
-            }
-            return rscArray;
+            rscNums = _rscNums;
+            return rscNums == 0 ? null : _packedArray;
         }
 
-        public void ForeachRsc(Action<T> action)
-        {
-            if (!IsInitialized())
-                return;
-            for (var i = 0; i < _compactDataCount; i++)
-            {
-                action(_rscArray[_compactDataArray[i]]);
-            }
-        }
+        #endregion
 
-        public bool IsInitialized()
-        {
-            return _inited;
-        }
+        #region  Private Methods
         
         // private uint GetRefCount(Handler<T> handler)
         // {
         //     if (!IsRscValid(handler))
-        //         return 0;
-        //     if (handler.Index >= _dataArray.Length)
         //         return 0;
         //     return _refCountArray[handler.Index];
         // }
@@ -255,19 +250,23 @@ namespace GCL
         /// <returns></returns>
         private void ReleaseHandler(Handler<T> handler)
         {
+            if (!IsRscValid(handler))
+                return;
+            
             var index = handler.Index;
-
-            if (!handler.IsAssigned && index >= _rscArray.Length)
-                return;
-            
-            if (_generationArray[index] != handler.Generation)
-                return;
-            
-            //remain handler valid when call OnHandlerReleased
             var rsc = _rscArray[index];
+            //remain handler valid when call OnHandlerReleased
             _onReleaseItem(rsc);
             
-            var generation = _generationArray[index];
+            
+            _rscArray[index] = null;
+            //Swap
+            var slotInPackArray = _sparseArray[index].Index;
+            _packedArray[slotInPackArray] = _packedArray[_rscNums - 1];
+            _rscNums--;
+            
+            //New generation
+            var generation = handler.Generation;
             if (generation == 0xffu)
             {
                 generation = 1;
@@ -277,15 +276,9 @@ namespace GCL
                 generation += 1;
             }
             
-            _generationArray[index] = generation;
-            _freeSlots.Enqueue(index);
-            _rscArray[index] = null;
-            //_rscArrayToCompactArrayLookUp[index] = 0;
-            var compactId = _rscArrayToCompactArrayLookUp[index];
-            var last = _compactDataArray[_compactDataCount - 1];
-            _rscArrayToCompactArrayLookUp[last] = compactId;
-            _compactDataArray[compactId] = last;
-            _compactDataCount--;
+            _recycledRscNums++;
+            _sparseArray[index] = new Handler<T>(_recycledArrayHead, generation);
+            _recycledArrayHead = index;
         }
         
         //ReSharper restore Unity.ExpensiveCode
@@ -293,10 +286,12 @@ namespace GCL
         {
             var newSize = _rscArray.Length * 2;
             Array.Resize(ref _rscArray, newSize);
-            Array.Resize(ref _generationArray, newSize);
+            Array.Resize(ref _packedArray, newSize);
+            Array.Resize(ref _sparseArray, newSize);
             Array.Resize(ref _refCountArray, newSize);
-            Array.Resize(ref _compactDataArray, newSize);
-            Array.Resize(ref _rscArrayToCompactArrayLookUp, newSize);
         }
+
+        #endregion
+
     }
 }

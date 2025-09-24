@@ -19,7 +19,7 @@ namespace GAS.Logic
         {
             _needTickAbilities.Clear();
             _traverseAbilityCache.Clear();
-            Singleton<HandlerMgr<GameAbility>>.Instance.Clear();
+            Singleton<HandlerMgr<GameAbility>>.Instance.UnInit();
             base.UnInit();
         }
 

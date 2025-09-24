@@ -166,7 +166,7 @@ namespace GAS.Logic
         public GameUnit CreateGameUnit(ref GameUnitCreateParam param) => UnitInstanceSubsystem.CreateGameUnit(ref param);
         public void DestroyGameUnit(Handler<GameUnit> unitHandler) => UnitInstanceSubsystem.DestroyGameUnit(unitHandler);
         public void DestroyGameUnit(GameUnit unit) => UnitInstanceSubsystem.DestroyGameUnit(unit.Handler);
-        public GameUnit[] GetAllGameUnits() => UnitInstanceSubsystem.GetAllUnits();
+        public Handler<GameUnit>[] GetAllGameUnits(out uint nums) => UnitInstanceSubsystem.GetAllUnits(out nums);
 
         public static void RegisterOnAddTag(GameUnit unit, object observer, Action<EGameTag> callback, int priority = 0)
         {
