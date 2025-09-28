@@ -47,10 +47,10 @@ namespace GAS.Logic
             }
             graphRunner.OnRunnerRunEnd += (runner, endType) =>
             {
-                Singleton<HandlerMgr<GameEventArg>>.Instance.RemoveRefCount(param.Handler);
+                _system.HandlerManagers.EventArgHandlerMgr.RemoveRefCount(param.Handler);
             };
             
-            Singleton<HandlerMgr<GameEventArg>>.Instance.AddRefCount(param.Handler);
+            _system.HandlerManagers.EventArgHandlerMgr.AddRefCount(param.Handler);
             graphRunner.Start();
             return graphRunner;
         }

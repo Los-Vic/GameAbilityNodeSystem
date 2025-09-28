@@ -99,7 +99,7 @@ namespace GAS.Logic
             SignalVal2 = param.CreateParam.SignalVal2;
             SignalVal3 = param.CreateParam.SignalVal3;
 
-            if (Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(param.CreateParam.Instigator, out var instigator))
+            if (System.HandlerManagers.UnitHandlerMgr.DeRef(param.CreateParam.Instigator, out var instigator))
             {
                 instigator.OnUnitDestroyed.RegisterObserver(this, OnInstigatorDestroy);
             }
@@ -116,7 +116,7 @@ namespace GAS.Logic
             Owner = 0;
             _hasOnTickEntry = false;
             
-            if (Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Instigator, out var instigator))
+            if (System.HandlerManagers.UnitHandlerMgr.DeRef(Instigator, out var instigator))
             {
                 instigator.OnUnitDestroyed.UnRegisterObserver(this);
             }
@@ -240,7 +240,7 @@ namespace GAS.Logic
             //Cost 
             foreach (var costElement in Asset.costs)
             {
-                if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
+                if(!System.HandlerManagers.UnitHandlerMgr.DeRef(Owner, out var owner))
                     continue;
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
                 if (owner.GetSimpleAttributeVal(costElement.attributeType) < costNums)
@@ -257,7 +257,7 @@ namespace GAS.Logic
             
             foreach (var costElement in Asset.costs)
             {
-                if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
+                if(!System.HandlerManagers.UnitHandlerMgr.DeRef(Owner, out var owner))
                     continue;
                 var costNums = ValuePickerUtility.GetValue(costElement.costVal, owner, Lv);
                 var attribute = owner.GetSimpleAttribute(costElement.attributeType);
@@ -276,7 +276,7 @@ namespace GAS.Logic
 
         private void StartCooldown()
         {
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
+            if (!System.HandlerManagers.UnitHandlerMgr.DeRef(Owner, out var owner))
                 return;
             
             CooldownDuration = ValuePickerUtility.GetValue(Asset.cooldown, owner, Lv);
@@ -310,7 +310,7 @@ namespace GAS.Logic
         //结束Ability
         internal void EndAbility()
         {
-            if(Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
+            if(System.HandlerManagers.UnitHandlerMgr.DeRef(Owner, out var owner))
                 owner.RemoveAbility(this);
         }
         
@@ -376,7 +376,7 @@ namespace GAS.Logic
             
             CommitAbility();
             
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(Owner, out var owner))
+            if (!System.HandlerManagers.UnitHandlerMgr.DeRef(Owner, out var owner))
             {
                 GameLogger.Log($"Add activation req job failed, owner is null. {AbilityName}");
                 return;

@@ -11,7 +11,13 @@ namespace GAS.Logic
         public override void Init()
         {
             base.Init();
-            Singleton<HandlerMgr<GameEffect>>.Instance.Init(GetEffect, DisposeEffect, 1024);
+            System.HandlerManagers.EffectHandlerMgr.Init(GetEffect, DisposeEffect, 1024);
+        }
+
+        public override void UnInit()
+        {
+            System.HandlerManagers.EffectHandlerMgr.UnInit();
+            base.UnInit();
         }
 
         public override void Update(float deltaTime)
@@ -32,8 +38,8 @@ namespace GAS.Logic
 
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
-            var h = Singleton<HandlerMgr<GameEffect>>.Instance.CreateHandler();
-            Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(h, out var effect);
+            var h = System.HandlerManagers.EffectHandlerMgr.CreateHandler();
+            System.HandlerManagers.EffectHandlerMgr.DeRef(h, out var effect);
             var initParam = new GameEffectInitParam()
             {
                 CreateParam = param,
@@ -49,7 +55,7 @@ namespace GAS.Logic
                 return;
 
             effect.MarkDestroy = true;
-            Singleton<HandlerMgr<GameEffect>>.Instance.RemoveRefCount(effect.Handler);
+            System.HandlerManagers.EffectHandlerMgr.RemoveRefCount(effect.Handler);
         }
 
         private GameEffect GetEffect()

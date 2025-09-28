@@ -55,6 +55,9 @@ namespace GAS.Logic
         //Observable
         public readonly Observable<GameUnitCreateObserve> OnUnitCreated = new (); 
         public readonly Observable<GameUnitDestroyObserve> OnUnitDestroyed = new ();
+        
+        //Handler mgr collection
+        public readonly HandlerMgrCollection HandlerManagers = new();
 
         #region SubSystems
 

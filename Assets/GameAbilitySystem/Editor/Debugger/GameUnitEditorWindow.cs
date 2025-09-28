@@ -123,7 +123,7 @@ namespace GAS.Editor
             
             for(var i = 0; i < unitNums; i++)
             {
-                if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitList[i], out var unit))
+                if(!systemDebugger.System.HandlerManagers.UnitHandlerMgr.DeRef(unitList[i], out var unit))
                     continue;
                 
                 var editorObj = new GameUnitEditorObj
@@ -160,7 +160,7 @@ namespace GAS.Editor
 
                 foreach (var abilityHandler in unit.GameAbilities)
                 {
-                    if(!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability))
+                    if(!systemDebugger.System.HandlerManagers.AbilityHandlerMgr.DeRef(abilityHandler, out var ability))
                         continue;
                     
                     editorObj.abilities.Add(new GameUnitEditorAbility()
@@ -172,7 +172,7 @@ namespace GAS.Editor
 
                 foreach (var effectHandler in unit.GameEffects)
                 {
-                    if(!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(effectHandler, out var effect))
+                    if(!systemDebugger.System.HandlerManagers.EffectHandlerMgr.DeRef(effectHandler, out var effect))
                         continue;
                     
                     editorObj.effects.Add(new GameUnitEditorEffect()

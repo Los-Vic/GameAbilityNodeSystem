@@ -17,7 +17,7 @@ namespace GAS.Logic
         {
             var context = (GameAbilityGraphRunnerContext)graphRunner.Context;
             var n = (GetPlayerIndexNode)node;
-            if (Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
+            if (context.Ability.System.HandlerManagers.UnitHandlerMgr.DeRef(context.Ability.Owner, out var owner))
             {
                 graphRunner.SetOutPortVal(n.OutPortCount, owner.PlayerIndex);
             }

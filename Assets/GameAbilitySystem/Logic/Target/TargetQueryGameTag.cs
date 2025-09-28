@@ -87,7 +87,7 @@ namespace GAS.Logic.Target
                     var unitHandlerArray = ability.System.GetAllGameUnits(out var unitNums);
                     for (var i = 0; i < unitNums; i++)
                     {
-                        if(!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitHandlerArray[i], out var unit))
+                        if(!ability.System.HandlerManagers.UnitHandlerMgr.DeRef(unitHandlerArray[i], out var unit))
                             continue;
                         units.Add(unit);
                     }
@@ -113,7 +113,7 @@ namespace GAS.Logic.Target
 
             bool IgnoreSelfCheck(GameUnit u)
             {
-                Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(ability.Owner, out var owner);
+                u.System.HandlerManagers.UnitHandlerMgr.DeRef(ability.Owner, out var owner);
                 return !ignoreSelf || u != owner;
             }
         }

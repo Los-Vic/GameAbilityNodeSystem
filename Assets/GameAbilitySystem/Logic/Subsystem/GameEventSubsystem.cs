@@ -13,7 +13,7 @@ namespace GAS.Logic
 
         public override void Init()
         {
-            Singleton<HandlerMgr<GameEventArg>>.Instance.Init(GetGameEventArg, DisposeGameEventArg, 256);
+            System.HandlerManagers.EventArgHandlerMgr.Init(GetGameEventArg, DisposeGameEventArg, 256);
         }
 
         public override void UnInit()
@@ -21,6 +21,7 @@ namespace GAS.Logic
             _gameEvents.Clear();
             _eventStack.Clear();
             _nextFrameEventsCache.Clear();
+            System.HandlerManagers.EventArgHandlerMgr.UnInit();
         }
 
         public override void Update(float deltaTime)
@@ -66,8 +67,8 @@ namespace GAS.Logic
             if(!CheckEventStack(ref param))
                 return;
             
-            var h = Singleton<HandlerMgr<GameEventArg>>.Instance.CreateHandler();
-            Singleton<HandlerMgr<GameEventArg>>.Instance.DeRef(h, out var eventArg);
+            var h = System.HandlerManagers.EventArgHandlerMgr.CreateHandler();
+            System.HandlerManagers.EventArgHandlerMgr.DeRef(h, out var eventArg);
             
             var initParam = new GameEventInitParam()
             {
@@ -85,7 +86,7 @@ namespace GAS.Logic
             GameLogger.Log($"Pop game event, event type:{param.EventType}, stack depth:{_eventStack.Count}");
             _eventStack.Pop();
 
-            Singleton<HandlerMgr<GameEventArg>>.Instance.RemoveRefCount(h);
+            System.HandlerManagers.EventArgHandlerMgr.RemoveRefCount(h);
         }
 
         private GameEventArg GetGameEventArg()
@@ -154,7 +155,7 @@ namespace GAS.Logic
 
             var srcHandler = arg.EventSrcUnit;
             if (!srcHandler.IsAssigned ||
-                !Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(srcHandler, out var src))
+                !owner.System.HandlerManagers.UnitHandlerMgr.DeRef(srcHandler, out var src))
                 return false;
             
             foreach (var f in filters)

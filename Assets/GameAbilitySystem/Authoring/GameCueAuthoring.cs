@@ -49,7 +49,7 @@ namespace GAS
         private void OnAttributeChange(PlayAttributeValChangeCueContext context)
         {
             //forward event directly
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.UnitHandler, out var unit))
+            if (!_gameAbilitySystem.HandlerManagers.UnitHandlerMgr.DeRef(context.UnitHandler, out var unit))
                 return;
             if (context.AttributeType != ESimpleAttributeType.None)
             {

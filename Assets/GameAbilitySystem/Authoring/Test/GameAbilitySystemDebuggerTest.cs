@@ -136,7 +136,7 @@ namespace GAS
         {
             if (System == null)
                 return;
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(setAttributeValContext.unitHandler, out var u))
+            if (!System.HandlerManagers.UnitHandlerMgr.DeRef(setAttributeValContext.unitHandler, out var u))
                 return;
             System.AttributeInstanceSubsystem.SetAttributeVal(u, setAttributeValContext.type,
                 setAttributeValContext.newVal);
@@ -151,7 +151,7 @@ namespace GAS
         {
             if (System == null)
                 return;
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(addAbilityContext.unitHandler, out var u))
+            if (!System.HandlerManagers.UnitHandlerMgr.DeRef(addAbilityContext.unitHandler, out var u))
                 return;
             
             u.AddAbility(new AbilityCreateParam()

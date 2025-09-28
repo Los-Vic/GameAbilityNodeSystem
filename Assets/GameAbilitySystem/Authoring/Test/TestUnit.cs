@@ -13,7 +13,7 @@ namespace GAS
             GameAbilitySystem = system;
             UnitHandler = unitHandler;
 
-            Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(unitHandler, out var unit);
+            GameAbilitySystem.HandlerManagers.UnitHandlerMgr.DeRef(unitHandler, out var unit);
             var mana = unit.GetSimpleAttribute(ESimpleAttributeType.Mana);
             GameAbilitySystem.RegisterAttributeOnPlayValChangeCue(this, mana, OnManaChangeForCue);
         }

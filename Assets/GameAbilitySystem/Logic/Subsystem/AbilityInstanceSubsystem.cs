@@ -12,14 +12,14 @@ namespace GAS.Logic
         public override void Init()
         {
             base.Init();
-            Singleton<HandlerMgr<GameAbility>>.Instance.Init(GetAbility, DisposeAbility, 1024);
+            System.HandlerManagers.AbilityHandlerMgr.Init(GetAbility, DisposeAbility, 1024);
         }
 
         public override void UnInit()
         {
             _needTickAbilities.Clear();
             _traverseAbilityCache.Clear();
-            Singleton<HandlerMgr<GameAbility>>.Instance.UnInit();
+            System.HandlerManagers.AbilityHandlerMgr.UnInit();
             base.UnInit();
         }
 
@@ -45,8 +45,8 @@ namespace GAS.Logic
                 return null;
             }
             
-            var h = Singleton<HandlerMgr<GameAbility>>.Instance.CreateHandler();
-            Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(h, out var ability);
+            var h = System.HandlerManagers.AbilityHandlerMgr.CreateHandler();
+            System.HandlerManagers.AbilityHandlerMgr.DeRef(h, out var ability);
 
             var initParam = new AbilityInitParam()
             {
@@ -63,7 +63,7 @@ namespace GAS.Logic
             
             ability.MarkDestroy();
             RemoveFromTickList(ability);
-            Singleton<HandlerMgr<GameAbility>>.Instance.RemoveRefCount(ability.Handler);
+            System.HandlerManagers.AbilityHandlerMgr.RemoveRefCount(ability.Handler);
         }
 
         private GameAbility GetAbility()
@@ -89,8 +89,5 @@ namespace GAS.Logic
         {
             _needTickAbilities.Remove(ability);
         }
-
-        internal bool GetAbilityByHandler(Handler<GameAbility> h, out GameAbility ability) =>
-            Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(h, out ability);
     }
 }

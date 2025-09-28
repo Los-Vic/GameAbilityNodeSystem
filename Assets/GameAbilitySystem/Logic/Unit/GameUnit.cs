@@ -111,7 +111,7 @@ namespace GAS.Logic
             for (var i = _gameAbilities.Count - 1; i >= 0; i--)
             {
                 var abilityHandler = _gameAbilities[i];
-                if (!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability)) 
+                if (!System.HandlerManagers.AbilityHandlerMgr.DeRef(abilityHandler, out var ability)) 
                     continue;
                 ability.OnRemoveAbility();
                 System.AbilityInstanceSubsystem.DestroyAbility(ability);
@@ -122,7 +122,7 @@ namespace GAS.Logic
             for (var i = _gameEffects.Count - 1; i > 0; i--)
             {
                 var effectHandler = _gameEffects[i];
-                if (!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(effectHandler, out var effect)) 
+                if (!System.HandlerManagers.EffectHandlerMgr.DeRef(effectHandler, out var effect)) 
                     continue;
                 effect.OnRemoveEffect();
                 System.EffectInstanceSubsystem.DestroyEffect(effect);
@@ -254,7 +254,7 @@ namespace GAS.Logic
         {
             foreach (var abilityHandler in _gameAbilities)
             {
-                if(!Singleton<HandlerMgr<GameAbility>>.Instance.DeRef(abilityHandler, out var ability))
+                if(!System.HandlerManagers.AbilityHandlerMgr.DeRef(abilityHandler, out var ability))
                     continue;
                 if (abilityId != ability.ID) 
                     continue;
@@ -291,7 +291,7 @@ namespace GAS.Logic
             var pendingRemoveEffects = new List<GameEffect>();
             foreach (var handler in _gameEffects)
             {
-                if(!Singleton<HandlerMgr<GameEffect>>.Instance.DeRef(handler, out var effect))
+                if(!System.HandlerManagers.EffectHandlerMgr.DeRef(handler, out var effect))
                     continue;
                 if(effect.EffectName != effectName)
                     continue;

@@ -55,7 +55,7 @@ namespace GAS.Logic
 
             var job = context.Ability.System.ClassObjectPoolSubsystem.Get<AbilityActivationReqJob>();
 
-            if (!Singleton<HandlerMgr<GameUnit>>.Instance.DeRef(context.Ability.Owner, out var owner))
+            if (!context.Ability.System.HandlerManagers.UnitHandlerMgr.DeRef(context.Ability.Owner, out var owner))
             {
                 GameLogger.LogError($"Failed to get owner of {context.Ability}");
                 graphRunner.Abort();
