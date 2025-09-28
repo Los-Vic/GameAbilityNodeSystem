@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("RemoveAbility", "AbilitySystem/Action/RemoveAbility", ENodeFunctionType.Value, typeof(RemoveAbilityNodeRunner), 
+    [Node("RemoveAbility", "AbilitySystem/Action/RemoveAbility", ENodeType.Value, typeof(RemoveAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class RemoveAbilityNode: Node
     {

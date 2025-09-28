@@ -2,7 +2,7 @@
 
 namespace GAS.Logic.Command
 {
-    [Node("SpawnUnit", "AbilitySystem/Command/SpawnUnit", ENodeFunctionType.Action, typeof(CmdSpawnUnitNodeRunner), 
+    [Node("SpawnUnit", "AbilitySystem/Command/SpawnUnit", ENodeType.Action, typeof(CmdSpawnUnitNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public class CmdSpawnUnitNode:Node
     {

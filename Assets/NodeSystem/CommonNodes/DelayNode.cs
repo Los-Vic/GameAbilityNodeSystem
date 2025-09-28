@@ -3,7 +3,7 @@ using MissQ;
 
 namespace NS
 {
-    [Node("Delay", "Common/Task/Delay",ENodeFunctionType.Action, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
+    [Node("Delay", "Common/Task/Delay",ENodeType.Action, typeof(DelayFlowNodeRunner), CommonNodeCategory.Task)]
     public sealed class DelayNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

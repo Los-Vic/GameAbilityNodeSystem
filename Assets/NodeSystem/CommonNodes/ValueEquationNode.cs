@@ -11,7 +11,7 @@ namespace NS
         Distance
     }
     
-    [Node("ValueEquation", "Common/Value/ValueEquation", ENodeFunctionType.Value, typeof(ValueEquationNodeRunner), CommonNodeCategory.Value)]
+    [Node("ValueEquation", "Common/Value/ValueEquation", ENodeType.Value, typeof(ValueEquationNodeRunner), CommonNodeCategory.Value)]
     public sealed class ValueEquationNode : Node
     {
         [Exposed]

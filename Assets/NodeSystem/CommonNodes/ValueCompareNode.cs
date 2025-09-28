@@ -12,7 +12,7 @@ namespace NS
         LessThanOrEqualTo,
     }
     
-    [Node("ValueCompare", "Common/Value/ValueCompare", ENodeFunctionType.Value, typeof(ValueCompareNodeRunner), CommonNodeCategory.Value)]
+    [Node("ValueCompare", "Common/Value/ValueCompare", ENodeType.Value, typeof(ValueCompareNodeRunner), CommonNodeCategory.Value)]
     public sealed class ValueCompareNode : Node
     {
         [Exposed]

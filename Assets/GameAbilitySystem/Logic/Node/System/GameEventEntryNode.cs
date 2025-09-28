@@ -3,7 +3,7 @@ using Node = NS.Node;
 
 namespace GAS.Logic
 {
-    [Node("GameEventEntry", "AbilitySystem/GameEvent/GameEventEntry", ENodeFunctionType.Entry, typeof(GameEventEntryNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.AbilitySystem)]
+    [Node("GameEventEntry", "AbilitySystem/GameEvent/GameEventEntry", ENodeType.Entry, typeof(GameEventEntryNodeRunner), CommonNodeCategory.Entry, NodeScopeDefine.AbilitySystem)]
     public sealed class GameEventEntryNode:Node
     {
         [Port(EPortDirection.Output, typeof(BaseFlowPort))]

@@ -3,7 +3,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    [Node("GetActivatedCount", "AbilitySystem/Value/GetActivatedCount", ENodeFunctionType.Action, typeof(GetActivatedCountNodeRunner), 
+    [Node("GetActivatedCount", "AbilitySystem/Value/GetActivatedCount", ENodeType.Action, typeof(GetActivatedCountNodeRunner), 
         CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class GetActivatedCountNode:Node
     {

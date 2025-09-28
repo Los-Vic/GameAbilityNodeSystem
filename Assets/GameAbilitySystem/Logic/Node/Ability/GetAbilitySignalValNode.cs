@@ -10,7 +10,7 @@ namespace GAS.Logic
         SignalVal3,
     }
     
-    [Node("GetAbilitySignalValNode", "AbilitySystem/Value/GetAbilitySignalValNode", ENodeFunctionType.Value , typeof(GetAbilitySignalValNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
+    [Node("GetAbilitySignalValNode", "AbilitySystem/Value/GetAbilitySignalValNode", ENodeType.Value , typeof(GetAbilitySignalValNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class GetAbilitySignalValNode:Node
     {
         [Exposed]

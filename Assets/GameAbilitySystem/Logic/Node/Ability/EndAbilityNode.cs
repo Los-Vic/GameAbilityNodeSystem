@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("EndAbility", "AbilitySystem/Action/EndAbility", ENodeFunctionType.Value, typeof(EndAbilityNodeRunner), 
+    [Node("EndAbility", "AbilitySystem/Action/EndAbility", ENodeType.Value, typeof(EndAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem, 
         "End ability will kill ability and remove it from owner")]
     public sealed class EndAbilityNode:Node

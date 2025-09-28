@@ -3,7 +3,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    [Node("PlayAbilityFx", "AbilitySystem/Action/PlayAbilityFx", ENodeFunctionType.Action, typeof(PlayAbilityFxNodeRunner), 
+    [Node("PlayAbilityFx", "AbilitySystem/Action/PlayAbilityFx", ENodeType.Action, typeof(PlayAbilityFxNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class PlayAbilityFxNode:Node
     {

@@ -3,7 +3,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    [Node("GetPlayerIndex", "AbilitySystem/Value/GetPlayerIndex", ENodeFunctionType.Action, typeof(GetPlayerIndexNodeRunner), 
+    [Node("GetPlayerIndex", "AbilitySystem/Value/GetPlayerIndex", ENodeType.Action, typeof(GetPlayerIndexNodeRunner), 
         CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class GetPlayerIndexNode:Node
     {

@@ -3,7 +3,7 @@ using NS;
 
 namespace GAS.Logic
 {
-    [Node("GetAbilityLevelNode", "AbilitySystem/Value/GetAbilityLevelNode", ENodeFunctionType.Action, typeof(GetAbilityLevelNodeRunner), 
+    [Node("GetAbilityLevelNode", "AbilitySystem/Value/GetAbilityLevelNode", ENodeType.Action, typeof(GetAbilityLevelNodeRunner), 
         CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class GetAbilityLevelNode:Node
     {

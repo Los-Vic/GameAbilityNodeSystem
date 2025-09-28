@@ -1,6 +1,6 @@
 ﻿namespace NS
 {
-    [Node("BreakLoop", "Common/FlowControl/BreakLoop", ENodeFunctionType.Action, typeof(BreakLoopNodeRunner), CommonNodeCategory.FlowControl)]
+    [Node("BreakLoop", "Common/FlowControl/BreakLoop", ENodeType.Action, typeof(BreakLoopNodeRunner), CommonNodeCategory.FlowControl)]
     public sealed class BreakLoopNode : Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

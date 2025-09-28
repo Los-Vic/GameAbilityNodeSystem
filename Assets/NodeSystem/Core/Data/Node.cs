@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace NS
 {
-    public enum ENodeFunctionType
+    public enum ENodeType
     {
-        Value,
-        Action,
-        Entry,
+        Value = 0,
+        Action = 1,
+        Entry = 2,
     }
     
     [Serializable]
@@ -20,7 +20,7 @@ namespace NS
         [SerializeField]
         private string nodeName;
         [SerializeField]
-        private ENodeFunctionType nodeFunctionType;
+        private ENodeType nodeType;
 
         public string NodeName => nodeName;
 
@@ -35,17 +35,17 @@ namespace NS
         
         public bool IsActionNode()
         {
-            return nodeFunctionType == ENodeFunctionType.Action;
+            return nodeType == ENodeType.Action;
         }
         
         public bool IsValueNode()
         {
-            return nodeFunctionType == ENodeFunctionType.Value;
+            return nodeType == ENodeType.Value;
         }
         
         public bool IsEntryNode()
         {
-            return nodeFunctionType == ENodeFunctionType.Entry;
+            return nodeType == ENodeType.Entry;
         }
 
         public override string ToString()
@@ -61,7 +61,7 @@ namespace NS
                 return;
 
             nodeName = nodeAttribute.Title;
-            nodeFunctionType = nodeAttribute.FunctionType;
+            nodeType = nodeAttribute.Type;
         }
         
         public void SetNodeName(string postfix)

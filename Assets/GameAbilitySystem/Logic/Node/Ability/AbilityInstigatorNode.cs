@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("Instigator", "AbilitySystem/Value/Instigator", ENodeFunctionType.Value , typeof(AbilityInstigatorNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
+    [Node("Instigator", "AbilitySystem/Value/Instigator", ENodeType.Value , typeof(AbilityInstigatorNodeRunner), CommonNodeCategory.Value, NodeScopeDefine.AbilitySystem)]
     public sealed class AbilityInstigatorNode:Node
     {
         [Port(EPortDirection.Output, typeof(GameUnit),"Unit")]

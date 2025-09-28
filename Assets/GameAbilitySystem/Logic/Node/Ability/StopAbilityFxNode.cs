@@ -2,7 +2,7 @@
 
 namespace GAS.Logic
 {
-    [Node("StopAbilityFx", "AbilitySystem/Action/StopAbilityFx", ENodeFunctionType.Action, typeof(StopAbilityFxNodeRunner), 
+    [Node("StopAbilityFx", "AbilitySystem/Action/StopAbilityFx", ENodeType.Action, typeof(StopAbilityFxNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class StopAbilityFxNode:Node
     {

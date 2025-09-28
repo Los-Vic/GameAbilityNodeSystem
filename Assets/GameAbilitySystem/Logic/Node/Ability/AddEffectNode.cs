@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddEffect", "AbilitySystem/Action/AddEffect", ENodeFunctionType.Action, typeof(AddEffectNodeRunner),
+    [Node("AddEffect", "AbilitySystem/Action/AddEffect", ENodeType.Action, typeof(AddEffectNodeRunner),
         NodeCategoryDefine.EffectNode, NodeScopeDefine.AbilitySystem)]
     public sealed class AddEffectNode:Node
     {

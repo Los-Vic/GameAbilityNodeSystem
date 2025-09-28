@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddTag", "AbilitySystem/Action/AddTag", ENodeFunctionType.Value, typeof(AddTagNodeRunner), 
+    [Node("AddTag", "AbilitySystem/Action/AddTag", ENodeType.Value, typeof(AddTagNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class AddTagNode:Node
     {

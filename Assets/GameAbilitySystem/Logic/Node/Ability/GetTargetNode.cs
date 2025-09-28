@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("GetTargetNode", "AbilitySystem/Action/GetTarget", ENodeFunctionType.Action, typeof(GetTargetNodeRunner),
+    [Node("GetTargetNode", "AbilitySystem/Action/GetTarget", ENodeType.Action, typeof(GetTargetNodeRunner),
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class GetTargetNode:Node
     {
@@ -30,7 +30,7 @@ namespace GAS.Logic
         public string OutUnit;
     }
     
-    [Node("GetTargetsNode", "AbilitySystem/Action/GetTargets", ENodeFunctionType.Action, typeof(GetTargetsNodeRunner),
+    [Node("GetTargetsNode", "AbilitySystem/Action/GetTargets", ENodeType.Action, typeof(GetTargetsNodeRunner),
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class GetTargetsNode:Node
     {

@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("FP2Int", "Common/Value/FP2Int", ENodeFunctionType.Value , typeof(FP2IntNodeRunner), CommonNodeCategory.Value)]
+    [Node("FP2Int", "Common/Value/FP2Int", ENodeType.Value , typeof(FP2IntNodeRunner), CommonNodeCategory.Value)]
     public sealed class FP2IntNode:Node
     {
         [Port(EPortDirection.Input, typeof(FP))]
@@ -22,7 +22,7 @@ namespace NS
         }
     }
     
-    [Node("FP2Float", "Common/Value/FP2Float", ENodeFunctionType.Value , typeof(FP2FloatNodeRunner), CommonNodeCategory.Value)]
+    [Node("FP2Float", "Common/Value/FP2Float", ENodeType.Value , typeof(FP2FloatNodeRunner), CommonNodeCategory.Value)]
     public sealed class FP2FloatNode:Node
     {
         [Port(EPortDirection.Input, typeof(FP))]

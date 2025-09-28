@@ -5,7 +5,7 @@ using GCL;
 namespace NS
 {
     //todo:目前没有在editor环境校验 InEnumerable和OutElement的类型匹配
-    [Node("ForEach", "Common/FlowControl/ForEach", ENodeFunctionType.Action, typeof(ForEachFlowNodeRunner), CommonNodeCategory.FlowControl)]
+    [Node("ForEach", "Common/FlowControl/ForEach", ENodeType.Action, typeof(ForEachFlowNodeRunner), CommonNodeCategory.FlowControl)]
     public sealed class ForEachNode:Node
     {
         [Port(EPortDirection.Input, typeof(BaseFlowPort))]

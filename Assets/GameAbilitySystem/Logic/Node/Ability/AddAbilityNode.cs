@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GAS.Logic
 {
-    [Node("AddAbility", "AbilitySystem/Action/AddAbility", ENodeFunctionType.Value, typeof(AddAbilityNodeRunner), 
+    [Node("AddAbility", "AbilitySystem/Action/AddAbility", ENodeType.Value, typeof(AddAbilityNodeRunner), 
         CommonNodeCategory.Action, NodeScopeDefine.AbilitySystem)]
     public sealed class AddAbilityNode: Node
     {

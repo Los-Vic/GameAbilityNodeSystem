@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("Print","Common/Debug/Print", ENodeFunctionType.Action, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
+    [Node("Print","Common/Debug/Print", ENodeType.Action, typeof(DebugPrintFlowNodeRunner), CommonNodeCategory.Debug)]
     public sealed class DebugPrintNode:Node
     {
         [Exposed]

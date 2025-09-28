@@ -2,7 +2,7 @@
 
 namespace NS
 {
-    [Node("FP", "Common/Value/FP", ENodeFunctionType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
+    [Node("FP", "Common/Value/FP", ENodeType.Value , typeof(FPNodeRunner), CommonNodeCategory.Value)]
     public sealed class FPNode:Node
     {
         [Exposed]
