@@ -44,7 +44,14 @@ namespace GAS.Logic
         {
             foreach (var observer in _observers)
             {
-                _callbackMap[observer]?.SafeInvoke(msg);
+                try
+                {
+                    _callbackMap[observer]?.Invoke(msg);
+                }
+                catch (Exception e)
+                {
+                    GameLogger.LogError(e.ToString());
+                }
             }
         }
 

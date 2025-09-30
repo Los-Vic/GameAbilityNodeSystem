@@ -1,0 +1,21 @@
+{
+    "name": "Gray.NodeGraph.Editor",
+    "rootNamespace": "Gray.NodeGraph.Editor",
+    "references": [
+        "GUID:70ef9a24f4cfc4aec911c1414e3f90ad",
+        "GUID:1895b091a168f5f44a301932a21ed99a",
+        "GUID:d1e08c06f8f9473888c892637c83c913",
+        "GUID:8c9ef94c4e33aae44bff179e64581112"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
