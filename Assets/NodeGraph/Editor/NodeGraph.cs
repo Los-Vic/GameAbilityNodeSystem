@@ -10,7 +10,7 @@ namespace Gray.NG.Editor
     {
         public const string DEFAULT_NAME = "Node Graph";
         public const string ASSET_EXTENSION = "ng";
-
+        
         [MenuItem("Assets/Create/Node Graph")]
         private static void CreateAssetFile()
         {

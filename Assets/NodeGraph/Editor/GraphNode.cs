@@ -39,12 +39,18 @@ namespace Gray.NG.Editor
 
         public virtual RuntimeNode CreateRuntimeNode()
         {
-            return null;
+            throw new System.NotImplementedException();
         }
         
         public virtual void AssignRuntimeNodePortValues(RuntimeNode runtimeNode,
-            Dictionary<INode, RuntimeNode> nodeMap)
+            NodeGraphImporter importer)
         {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual bool IsTickable()
+        {
+            return false;
         }
         
         public static PortConnectorUI GetPortConnectorUI(EPortConnectorStyle style)
@@ -86,11 +92,11 @@ namespace Gray.NG.Editor
             return value;
         }
         
-        public static INode GetNextNode(INode currentNode, string portName)
+        public static GraphNode GetNextNode(GraphNode currentNode, string portName)
         {
             var outputPort = currentNode.GetOutputPortByName(portName);
             var nextNodePort = outputPort.firstConnectedPort;
-            var nextNode = nextNodePort?.GetNode();
+            var nextNode = nextNodePort?.GetNode() as GraphNode;
             return nextNode;
         }
     }

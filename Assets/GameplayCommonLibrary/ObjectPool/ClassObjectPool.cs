@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace GCL
@@ -37,6 +36,15 @@ namespace GCL
                 true, capacity, maxSize);
         }
 
+        public void PrepareObjects(int nums)
+        {
+            for (var i = 0; i < nums; ++i)
+            {
+                var obj = (IPoolObject)Activator.CreateInstance(_poolObjectType);
+                _pool.Release(obj);
+            }
+        }
+        
         public IPoolObject Get()
         {
             var obj = _pool.Get();
@@ -65,15 +73,7 @@ namespace GCL
 
         private IPoolObject CreateItem()
         {
-            var obj = Activator.CreateInstance(_poolObjectType) as IPoolObject;
-
-            if (obj == null)
-            {
-                GameLogger.LogError(
-                    $"[ObjectPool]create object item failed: type [{_poolObjectType}] can not assign to IPoolObject");
-                return null;
-            }
-           
+            var obj = (IPoolObject)Activator.CreateInstance(_poolObjectType);
             obj.OnCreateFromPool();
             return obj;
         }
@@ -109,8 +109,24 @@ namespace GCL
     public class ClassObjectPoolCollection
     {
         private readonly Dictionary<Type, ClassObjectPool> _objectPoolMap = new();
-        private const int DefaultCapacity = 32;
-        private const int DefaultMaxSize = 10000;
+        public const int DefaultCapacity = 32;
+        public const int DefaultMaxSize = 10000;
+
+        public ClassObjectPool CreatePoolExplicit(Type type, int capacity, int maxSize)
+        {
+            if (_objectPoolMap.TryGetValue(type, out var existedPool))
+                return existedPool;
+            
+            var pool =  new ClassObjectPool(type, capacity, maxSize);
+            _objectPoolMap.Add(type, pool);
+            return pool;
+        }
+
+        public void PrepareObjects(Type type, int capacity, int maxSize)
+        {
+            var pool = CreatePoolExplicit(type, capacity, maxSize);
+            pool.PrepareObjects(capacity);
+        }
 
         public T Get<T>() where T : class, IPoolObject, new()
         {

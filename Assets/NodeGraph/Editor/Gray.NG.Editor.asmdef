@@ -1,6 +1,6 @@
 {
-    "name": "Gray.NodeGraph.Editor",
-    "rootNamespace": "Gray.NodeGraph.Editor",
+    "name": "Gray.NG.Editor",
+    "rootNamespace": "Gray.NG.Editor",
     "references": [
         "GUID:70ef9a24f4cfc4aec911c1414e3f90ad",
         "GUID:1895b091a168f5f44a301932a21ed99a",

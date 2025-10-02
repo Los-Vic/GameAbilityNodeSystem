@@ -1,15 +1,47 @@
-﻿namespace Gray.NG
+﻿using GCL;
+
+namespace Gray.NG
 {
-    public abstract class NodeExecutor
+    public class NodeExecutor:IPoolObject
     {
-        public virtual async void ExecuteAsync(NodeGraphDirector director, RuntimeNode node)
+        public GraphExecutor GraphExecutor { get; private set; }
+        public RuntimeNode Node { get; private set; }
+        
+        public void Init(GraphExecutor graphExecutor, RuntimeNode node)
+        {
+            GraphExecutor = graphExecutor;
+            Node = node;
+        }
+        
+        public virtual void Tick(float dt)
         {
             
         }
-
-        public virtual void Execute(NodeGraphDirector director, RuntimeNode node)
+        
+        // public virtual async void ExecuteAsync()
+        // {
+        // }
+        
+        public virtual void Execute()
         {
-            
+        }
+
+        public virtual void OnCreateFromPool()
+        {
+        }
+
+        public virtual void OnTakeFromPool()
+        {
+        }
+
+        public virtual void OnReturnToPool()
+        {
+            GraphExecutor = null;
+            Node = null;
+        }
+
+        public virtual void OnDestroy()
+        {
         }
     }
 }

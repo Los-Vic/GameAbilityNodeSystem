@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.GraphToolkit.Editor;
-
-namespace Gray.NG.Editor
+﻿namespace Gray.NG.Editor
 {
     public class EntryNode:GraphNode
     {
@@ -16,7 +13,12 @@ namespace Gray.NG.Editor
             return new RtEntryNode();
         }
 
-        public override void AssignRuntimeNodePortValues(RuntimeNode runtimeNode, Dictionary<INode, RuntimeNode> nodeMap)
+        public override bool IsTickable()
+        {
+            return true;
+        }
+
+        public override void AssignRuntimeNodePortValues(RuntimeNode runtimeNode, NodeGraphImporter importer)
         {
             if(runtimeNode is not RtEntryNode rtEntryNode)
                 return;
@@ -24,9 +26,9 @@ namespace Gray.NG.Editor
             rtEntryNode.EntryVal = GetInputPortValue<int>(GetInputPortByName("EntryVal"));
 
             var node = GetNextNode(this, "NextNode");
-            if (node != null && nodeMap.TryGetValue(node, out var rtNode))
+            if (node != null)
             {
-                rtEntryNode.NextNode = rtNode;
+                rtEntryNode.NextNode = importer.GetRuntimeNodeOfGraphNode(node);
             }
         }
     }

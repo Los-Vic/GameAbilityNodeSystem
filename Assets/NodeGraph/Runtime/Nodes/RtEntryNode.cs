@@ -1,4 +1,6 @@
-﻿namespace Gray.NG
+﻿using GCL;
+
+namespace Gray.NG
 {
     [Node(ExecutorType = typeof(EntryNodeExecutor))]
     public class RtEntryNode:RuntimeNode
@@ -10,8 +12,13 @@
         public RuntimeNode NextNode;
     }
     
+    
     public class EntryNodeExecutor:NodeExecutor
     {
-        
+        public override void Execute()
+        {
+            GameLogger.Log("Execute entry node!");
+            GraphExecutor.Forward(((RtEntryNode)Node).NextNode);
+        }
     }
 }
