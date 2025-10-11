@@ -4,21 +4,30 @@ using GCL;
 
 namespace Gray.NG
 {
+    public enum EGraphEnd
+    {
+        Completed,
+        Failed,
+        Cancelled,
+    }
+    
     public class GraphExecutor:IPoolObject
     {
         public GraphDirector Director { get; private set; }
         public NodeExecutor CurExecutor { get; private set; }
 
         private Type _entryNodeType;
+        private Action<GraphExecutor, EGraphEnd> _onEndDelegate;
         
-        public void Init(GraphDirector director)
+        public void Init(GraphDirector director, Action<GraphExecutor, EGraphEnd> onEnd)
         {
             Director = director;
+            _onEndDelegate = onEnd;
         }
 
         public void Tick(float dt)
         {
-            CurExecutor?.Tick(dt);
+            
         }
 
         public void Start(Type entryNodeType)
@@ -49,17 +58,36 @@ namespace Gray.NG
         {
             if (node == null)
             {
-                GameLogger.Log(
-                    $"Graph executor normal end, entry node={_entryNodeType}, end node={CurExecutor.Node.GetType()}");
-                
-                DestroyNodeExecutor(CurExecutor);
-                CurExecutor = null;
+                End(EGraphEnd.Completed);
                 return;
             }
             
             DestroyNodeExecutor(CurExecutor);
             CurExecutor = CreateNodeExecutor(node);
             CurExecutor.Execute();
+        }
+
+        public void Stop()
+        {
+            End(EGraphEnd.Cancelled);
+        }
+
+        public void Abort()
+        {
+            End(EGraphEnd.Failed);
+        }
+
+        private void End(EGraphEnd endType)
+        {
+            GameLogger.Log(
+                $"Graph executor end with type={endType}, entry node={_entryNodeType}, end node={CurExecutor?.Node.GetType()}");
+            
+            _onEndDelegate?.Invoke(this, endType);
+            if(CurExecutor == null)
+                return;
+            
+            DestroyNodeExecutor(CurExecutor);
+            CurExecutor = null;
         }
         
         private NodeExecutor CreateNodeExecutor(RuntimeNode node)
@@ -74,7 +102,9 @@ namespace Gray.NG
         {
             Director.Mgr.PoolCollection.Release(executor);
         }
-        
+
+        #region IPoolObject
+
         public void OnCreateFromPool()
         {
         }
@@ -86,10 +116,15 @@ namespace Gray.NG
         public void OnReturnToPool()
         {
             Director = null;
+            CurExecutor = null;
+            _onEndDelegate = null;
         }
 
         public void OnDestroy()
         {
         }
+
+        #endregion
+       
     }
 }

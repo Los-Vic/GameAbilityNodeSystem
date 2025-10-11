@@ -7,8 +7,7 @@ namespace Gray.NG.Sample
     {
         public RuntimeNodeGraph graph;
         private readonly NodeGraphManager _mgr = new();
-
-
+        
         private void Start()
         {
             if(!graph)

@@ -13,18 +13,11 @@ namespace Gray.NG
             Node = node;
         }
         
-        public virtual void Tick(float dt)
-        {
-            
-        }
-        
-        // public virtual async void ExecuteAsync()
-        // {
-        // }
-        
         public virtual void Execute()
         {
         }
+
+        #region IPoolObject
 
         public virtual void OnCreateFromPool()
         {
@@ -43,5 +36,8 @@ namespace Gray.NG
         public virtual void OnDestroy()
         {
         }
+
+        #endregion
+        
     }
 }

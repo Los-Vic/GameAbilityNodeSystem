@@ -11,7 +11,6 @@ namespace GCL
         void OnDestroy();
     }
 
-
     public class ClassObjectPool
     {
         //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
@@ -100,6 +99,77 @@ namespace GCL
         {
             GameLogger.Log(
                 $"[ObjectPool][{_poolObjectType.Name}]: active/total:[{_pool.CountActive}/{_pool.CountAll}]");
+            return (_pool.CountActive, _pool.CountAll);
+        }
+
+        #endregion
+    }
+
+    public class ClassObjectPool<T> where T : class, IPoolObject, new()
+    {
+        //Unity Pool里只会保留Inactive对象的引用， 只有当Inactive的对象超过maxsize才会触发destroy
+        private readonly UnityEngine.Pool.ObjectPool<T> _pool;
+
+        //Constructor
+        public ClassObjectPool(int capacity, int maxSize)
+        {
+            GameLogger.Log($"[ObjectPool]create object pool, type [{typeof(T)}]");
+            _pool = new UnityEngine.Pool.ObjectPool<T>(CreateItem, null, null,
+                OnDestroyItem,
+                true, capacity, maxSize);
+        }
+
+        public void PrepareObjects(int nums)
+        {
+            for (var i = 0; i < nums; ++i)
+            {
+                var obj = new T();
+                _pool.Release(obj);
+            }
+        }
+        
+        public T Get()
+        {
+            var obj = _pool.Get();
+            obj.OnTakeFromPool();
+            return obj;
+        }
+
+        public void Release(T obj)
+        {
+            obj.OnReturnToPool();
+            _pool.Release(obj);
+        }
+        
+        public void Clear()
+        {
+            GameLogger.Log($"[ObjectPool]clear object pool, type [{typeof(T)}], active [{_pool.CountActive}], total [{_pool.CountAll}]");
+            _pool.Clear();
+        }
+        
+        #region Pool Callback
+
+        private T CreateItem()
+        {
+            var obj = new T();
+            obj.OnCreateFromPool();
+            return obj;
+        }
+
+        private static void OnDestroyItem(T obj)
+        {
+            obj.OnDestroy();
+        }
+
+        #endregion
+
+
+        #region Interface
+
+        public (int, int) LogState()
+        {
+            GameLogger.Log(
+                $"[ObjectPool][{typeof(T).Name}]: active/total:[{_pool.CountActive}/{_pool.CountAll}]");
             return (_pool.CountActive, _pool.CountAll);
         }
 

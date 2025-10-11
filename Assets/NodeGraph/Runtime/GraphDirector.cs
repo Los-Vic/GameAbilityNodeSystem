@@ -9,6 +9,8 @@ namespace Gray.NG
         public NodeGraphManager Mgr { get; private set; }
         public RuntimeNodeGraph RuntimeNodeGraph { get; private set; }
 
+        public event Action<GraphExecutor, EGraphEnd> OnGraphExecutorEndCallback;
+
         private readonly List<GraphExecutor> _graphExecutors = new();
         private readonly List<GraphExecutor> _tickingExecutors = new();
 
@@ -36,13 +38,22 @@ namespace Gray.NG
 
         public void StopAll()
         {
-            
+            for (var i = _graphExecutors.Count - 1; i >= 0; i--)
+            {
+                _graphExecutors[i].Stop();
+            }
         }
 
+        private void OnGraphExecutorEnd(GraphExecutor executor, EGraphEnd endType)
+        {
+            OnGraphExecutorEndCallback?.Invoke(executor, endType);
+            DestroyGraphExecutor(executor);
+        }
+        
         private GraphExecutor CreateGraphExecutor()
         {
             var graphExecutor = Mgr.PoolCollection.Get<GraphExecutor>();
-            graphExecutor.Init(this);
+            graphExecutor.Init(this, OnGraphExecutorEnd);
             _graphExecutors.Add(graphExecutor);
             return graphExecutor;
         }
@@ -52,7 +63,9 @@ namespace Gray.NG
             _graphExecutors.Remove(graphExecutor);
             Mgr.PoolCollection.Release(graphExecutor);
         }
-        
+
+        #region IPoolObject
+
         public void OnCreateFromPool()
         {
             
@@ -72,10 +85,14 @@ namespace Gray.NG
             _tickingExecutors.Clear();
             Mgr = null;
             RuntimeNodeGraph = null;
+            OnGraphExecutorEndCallback = null;
         }
 
         public void OnDestroy()
         {
         }
+
+        #endregion
+       
     }
 }
