@@ -67,7 +67,7 @@ namespace GAS.Logic
             if(!CheckEventStack(ref param))
                 return;
             
-            var h = System.HandlerManagers.EventArgHandlerMgr.CreateHandler();
+            var h = System.HandlerManagers.EventArgHandlerMgr.Create();
             System.HandlerManagers.EventArgHandlerMgr.DeRef(h, out var eventArg);
             
             var initParam = new GameEventInitParam()

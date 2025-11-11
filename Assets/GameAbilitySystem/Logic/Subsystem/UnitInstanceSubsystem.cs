@@ -1,4 +1,5 @@
-﻿using GCL;
+﻿using System.Collections.Generic;
+using GCL;
 
 namespace GAS.Logic
 {
@@ -18,7 +19,7 @@ namespace GAS.Logic
             System.HandlerManagers.UnitHandlerMgr.UnInit();
         }
 
-        public Handler<GameUnit>[] GetAllUnits(out uint nums)
+        public IList<Handler<GameUnit>> GetAllUnits(out uint nums)
         {
             return System.HandlerManagers.UnitHandlerMgr.GetAllRscHandlers(out nums);
         }
@@ -26,7 +27,7 @@ namespace GAS.Logic
         #region Game Unit Instance Create/Destroy
         internal GameUnit CreateGameUnit(ref GameUnitCreateParam param)
         {
-            var h = System.HandlerManagers.UnitHandlerMgr.CreateHandler();
+            var h = System.HandlerManagers.UnitHandlerMgr.Create();
             System.HandlerManagers.UnitHandlerMgr.DeRef(h, out var unit);
             
             var initParam = new GameUnitInitParam()

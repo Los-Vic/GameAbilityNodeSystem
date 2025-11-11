@@ -45,7 +45,7 @@ namespace GAS.Logic
                 return null;
             }
             
-            var h = System.HandlerManagers.AbilityHandlerMgr.CreateHandler();
+            var h = System.HandlerManagers.AbilityHandlerMgr.Create();
             System.HandlerManagers.AbilityHandlerMgr.DeRef(h, out var ability);
 
             var initParam = new AbilityInitParam()

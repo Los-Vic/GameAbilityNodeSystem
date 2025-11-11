@@ -38,7 +38,7 @@ namespace GAS.Logic
 
         internal GameEffect CreateEffect(ref GameEffectCreateParam param)
         {
-            var h = System.HandlerManagers.EffectHandlerMgr.CreateHandler();
+            var h = System.HandlerManagers.EffectHandlerMgr.Create();
             System.HandlerManagers.EffectHandlerMgr.DeRef(h, out var effect);
             var initParam = new GameEffectInitParam()
             {

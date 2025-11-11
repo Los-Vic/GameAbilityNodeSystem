@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GCL
 {
@@ -58,7 +59,7 @@ namespace GCL
     /// <typeparam name="T">必须是引用类型，实际对象的内存还是由GC管理的，无法减少CacheMiss</typeparam>
     public class HandlerMgr<T> where T : class, new()
     {
-        //object reference，目前采用和sparseArray对齐
+        //object reference，目前采用和sparseArray对齐, 即  PackedArray[SparseArray[i]] = i
         //这里有分支：和packArray对齐，则遍历不需要额外跳转，检索要跳转两次
         //和sparseArray对齐，则遍历需要一次跳转，检索一次跳转
         private T[] _rscArray; 
@@ -127,7 +128,7 @@ namespace GCL
         /// 
         /// </summary>
         /// <returns></returns>
-        public Handler<T> CreateHandler()
+        public Handler<T> Create()
         {
             if (!_inited)
                 return 0;
@@ -226,10 +227,10 @@ namespace GCL
             ReleaseHandler(handler);
         }
         
-        public Handler<T>[] GetAllRscHandlers(out uint rscNums)
+        public IList<Handler<T>> GetAllRscHandlers(out uint rscNums)
         {
             rscNums = _rscNums;
-            return rscNums == 0 ? null : _packedArray;
+            return rscNums == 0 ? null : Array.AsReadOnly(_packedArray) as IList<Handler<T>>;
         }
 
         #endregion
