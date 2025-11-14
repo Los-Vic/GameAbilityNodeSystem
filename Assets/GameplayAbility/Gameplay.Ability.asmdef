@@ -1,0 +1,16 @@
+{
+    "name": "Gameplay.Ability",
+    "rootNamespace": "Gameplay.Ability",
+    "references": [
+        "GUID:0d49cbbc2fccff8428f6578b639d237c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

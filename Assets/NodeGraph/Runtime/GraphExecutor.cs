@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using GCL;
+using Gameplay.Common;
 
 namespace Gray.NG
 {

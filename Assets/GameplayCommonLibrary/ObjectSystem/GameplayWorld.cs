@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace GCL
+namespace Gameplay.Common
 {
     /// <summary>
     /// 基础的ObjectModel: World --- System --- Entity --- Component

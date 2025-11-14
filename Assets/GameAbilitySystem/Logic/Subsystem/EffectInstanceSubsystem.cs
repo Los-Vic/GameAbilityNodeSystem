@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS.Logic
 {
@@ -63,7 +63,7 @@ namespace GAS.Logic
             return System.ClassObjectPoolSubsystem.Get<GameEffect>();
         }
         
-        private void DisposeEffect(GameEffect effect)
+        private void DisposeEffect(Handler<GameEffect> h, GameEffect effect)
         {
             GameLogger.Log($"Release effect:{effect}");
             System.ClassObjectPoolSubsystem.Release(effect);

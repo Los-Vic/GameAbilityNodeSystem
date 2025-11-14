@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS.Logic.Target
 {

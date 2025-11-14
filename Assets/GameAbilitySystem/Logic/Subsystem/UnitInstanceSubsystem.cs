@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS.Logic
 {
@@ -87,7 +87,7 @@ namespace GAS.Logic
             return System.ClassObjectPoolSubsystem.Get<GameUnit>();
         }
         
-        private void DisposeUnit(GameUnit unit)
+        private void DisposeUnit(Handler<GameUnit> h, GameUnit unit)
         {
             GameLogger.Log($"Release unit:{unit}");
             System.ClassObjectPoolSubsystem.Release(unit);

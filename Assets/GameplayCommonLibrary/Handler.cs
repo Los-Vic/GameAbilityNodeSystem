@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GCL
+namespace Gameplay.Common
 {
     /// <summary>
     ///  1 - 8 bit: Generation ,9 - 32 bit : index
@@ -9,6 +9,7 @@ namespace GCL
     /// index: 0 ~ 16,777,216
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     public readonly struct Handler<T> : IEquatable<Handler<T>>
     {
         private readonly uint _val;
@@ -59,6 +60,8 @@ namespace GCL
     /// <typeparam name="T">必须是引用类型，实际对象的内存还是由GC管理的，无法减少CacheMiss</typeparam>
     public class HandlerMgr<T> where T : class, new()
     {
+        private const int DefaultRscCapacity = 2;
+        
         //object reference，目前采用和sparseArray对齐, 即  PackedArray[SparseArray[i]] = i
         //这里有分支：和packArray对齐，则遍历不需要额外跳转，检索要跳转两次
         //和sparseArray对齐，则遍历需要一次跳转，检索一次跳转
@@ -78,13 +81,13 @@ namespace GCL
         //当handler创建时，申请资源
         private Func<T> _createItemFunc;
         //当handler释放时的回调，用来处理资源释放
-        private Action<T> _onReleaseItem;
+        private Action<Handler<T>, T> _onReleaseItem;
         
         private bool _inited;
 
         #region Public Methods
 
-        public void Init(Func<T> createItemFunc, Action<T> onReleaseItem, uint rscCapacity = 64)
+        public void Init(Func<T> createItemFunc, Action<Handler<T>, T> onReleaseItem, int rscCapacity = DefaultRscCapacity)
         {
             if(_inited)
                 return;
@@ -107,7 +110,8 @@ namespace GCL
             
             for (var i = 0; i < _rscNums; i++)
             {
-                _onReleaseItem?.Invoke(_rscArray[i]);
+                var h = _packedArray[i];
+                _onReleaseItem?.Invoke(h, _rscArray[h.Index]);
             }
             
             _inited = false;
@@ -163,10 +167,11 @@ namespace GCL
                 var h = new Handler<T>(_rscNums, generation);
                 _rscArray[slot] = r;
                 _sparseArray[slot] = h;
-                _packedArray[_rscNums] = new Handler<T>(slot, generation);
+                var outHandler = new Handler<T>(slot, generation);
+                _packedArray[_rscNums] = outHandler;
                 _refCountArray[slot] += 1;
                 _rscNums++;
-                return h;
+                return outHandler;
             }
         }
         
@@ -257,7 +262,7 @@ namespace GCL
             var index = handler.Index;
             var rsc = _rscArray[index];
             //remain handler valid when call OnHandlerReleased
-            _onReleaseItem(rsc);
+            _onReleaseItem(handler, rsc);
             
             
             _rscArray[index] = null;

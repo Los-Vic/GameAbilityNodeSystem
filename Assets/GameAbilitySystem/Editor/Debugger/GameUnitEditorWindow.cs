@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic; 
 using GAS.Logic;
-using GCL;
+using Gameplay.Common;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;

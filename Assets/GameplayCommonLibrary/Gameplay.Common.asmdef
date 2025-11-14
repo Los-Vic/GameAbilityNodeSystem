@@ -1,6 +1,6 @@
 {
     "name": "GameplayCommonLibrary",
-    "rootNamespace": "GCL",
+    "rootNamespace": "Gameplay.Common",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

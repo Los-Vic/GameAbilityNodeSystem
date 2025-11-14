@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GCL
+namespace Gameplay.Common
 {
     public interface IPoolObject
     {

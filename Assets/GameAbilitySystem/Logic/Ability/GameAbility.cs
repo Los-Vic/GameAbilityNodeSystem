@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 using GAS.Logic.Value;
 using MissQ;
 using NS;

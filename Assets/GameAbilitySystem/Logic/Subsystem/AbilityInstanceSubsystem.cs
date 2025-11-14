@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS.Logic
 {
@@ -71,7 +71,7 @@ namespace GAS.Logic
             return System.ClassObjectPoolSubsystem.Get<GameAbility>();
         }
         
-        private void DisposeAbility(GameAbility ability)
+        private void DisposeAbility(Handler<GameAbility> h, GameAbility ability)
         {
             GameLogger.Log($"Release ability:{ability}");
             System.ClassObjectPoolSubsystem.Release(ability);

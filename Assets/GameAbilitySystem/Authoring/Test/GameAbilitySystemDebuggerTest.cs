@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 using GAS.Logic;
 using Sirenix.OdinInspector;
 using UnityEngine; 

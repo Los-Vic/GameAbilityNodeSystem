@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Pool;
 
-namespace GCL
+namespace Gameplay.Common
 {
     public class TagObjectPoolMgr
     {

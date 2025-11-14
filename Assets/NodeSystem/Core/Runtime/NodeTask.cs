@@ -1,5 +1,5 @@
 ﻿using System;
-using GCL;
+using Gameplay.Common;
 
 namespace NS
 {

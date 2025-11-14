@@ -1,5 +1,5 @@
 ﻿using GAS.Logic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS
 {

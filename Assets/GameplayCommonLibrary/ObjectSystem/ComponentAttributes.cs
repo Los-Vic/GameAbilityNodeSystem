@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GCL
+namespace Gameplay.Common
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ComponentAttribute: Attribute

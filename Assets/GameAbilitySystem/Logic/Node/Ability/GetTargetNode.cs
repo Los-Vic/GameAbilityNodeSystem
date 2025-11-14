@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 using GAS.Logic.Target;
 using NS;
 using UnityEngine;

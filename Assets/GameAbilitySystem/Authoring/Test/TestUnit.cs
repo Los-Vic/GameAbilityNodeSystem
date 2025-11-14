@@ -1,4 +1,4 @@
-﻿using GCL;
+﻿using Gameplay.Common;
 using GAS.Logic;
 
 namespace GAS

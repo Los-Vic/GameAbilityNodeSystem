@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GCL;
+using Gameplay.Common;
 
 namespace GAS.Logic
 {
@@ -94,7 +94,7 @@ namespace GAS.Logic
             return System.ClassObjectPoolSubsystem.Get<GameEventArg>();
         }
         
-        private void DisposeGameEventArg(GameEventArg arg)
+        private void DisposeGameEventArg(Handler<GameEventArg> h, GameEventArg arg)
         {
             GameLogger.Log($"Release game event, event type:{arg.EventType}");
             System.ClassObjectPoolSubsystem.Release(arg);
