@@ -18,6 +18,11 @@ namespace Gameplay.Ability
         
         //Handler managers
         
+        //Event 
+        public EventDispatcher EventDispatcher { get; private set; }
+        
+        //Database
+        public Database Database { get; private set; }
         
         #region Life Cycle
 
@@ -26,17 +31,20 @@ namespace Gameplay.Ability
             _assetManager = interfaceImplementors.AssetManager;
             
             _systems = new List<ISystem>();
-            
+            Database = new Database();
+            EventDispatcher = new EventDispatcher();
         }
         
         public void Init()
         {
-            
+            EventDispatcher.Init(this);
+            Database.Init(this);
         }
 
         public void UnInit()
         {
-            
+            Database.UnInit();
+            EventDispatcher.UnInit();
         }
 
         #endregion

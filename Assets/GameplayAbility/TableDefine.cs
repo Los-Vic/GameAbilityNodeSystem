@@ -1,4 +1,6 @@
-﻿namespace Gameplay.Ability
+﻿using Gameplay.Common;
+
+namespace Gameplay.Ability
 {
     public enum EEquationOperator
     {
@@ -15,6 +17,33 @@
         AllUnits,
     }
     
+    public enum EUnitPrimaryAttribute
+    {
+        Hp = 0,
+        AttackBase = 1,
+        AttackBuff = 2,
+    }
+
+    public enum EUnitSecondaryAttribute
+    {
+        Attack = 0
+    }
+
+    //Key = UnitID , Record = Val
+    public class PrimaryAttributeTable : Table<uint, float>
+    {
+    }
+
+    //Key = UnitID, Record = Val
+    public class SecondaryAttributeTable : Table<uint, float>
+    {
+    }
+
+    //Key = UnitID， Val = UnitID
+    public class UnitIDTable : Table<uint, uint>
+    {
+        
+    }
     
     /*---------------Table-----------*/
     /* BasicAttributesForAllUnits */
