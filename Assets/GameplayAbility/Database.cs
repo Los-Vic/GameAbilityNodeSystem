@@ -2,20 +2,24 @@
 
 namespace Gameplay.Ability
 {
+    //All tables in GameplayAbility World
     public class Database
     {
         public const int DefaultCollectionCapacity = 8;
+        public World World { get; private set; }
+        
+        //Tables
         public UnitIDTable UnitIDTable { get; private set; }
 
         public Dictionary<EUnitPrimaryAttribute, PrimaryAttributeTable> PrimaryAttributeTables;
         public Dictionary<EUnitSecondaryAttribute, SecondaryAttributeTable> SecondaryAttributeTables;
-        public World World { get; private set; }
+      
 
         internal void Init(World world)
         {
             UnitIDTable.Init(DefaultCollectionCapacity);
-            UnitIDTable.OnAddRecord += OnUnitIDTableAdd;
-            UnitIDTable.OnRemoveRecord += OnUnitIDTableRemove;
+            UnitIDTable.OnAddRecord.Register(OnUnitIDTableAdd);
+            UnitIDTable.OnRemoveRecord.Register(OnUnitIDTableRemove);
             
             InitAttributeTables();
         }
@@ -35,8 +39,8 @@ namespace Gameplay.Ability
                 var table = new PrimaryAttributeTable();
                 table.Init(Database.DefaultCollectionCapacity);
                 PrimaryAttributeTables.Add(e, table);
-                table.OnUpdateRecord += (unitId, oldVal, newVal) =>
-                    World.EventDispatcher.InternalOnPrimaryAttributeUpdate(e, unitId, oldVal, newVal);
+                table.OnUpdateRecord.Register((unitId, oldVal, newVal) =>
+                    World.EventDispatcher.InternalOnPrimaryAttributeUpdate(e, unitId, oldVal, newVal));
             }
 
             foreach (var e in (EUnitSecondaryAttribute[])typeof(EUnitSecondaryAttribute).GetEnumValues())
@@ -44,8 +48,8 @@ namespace Gameplay.Ability
                 var table = new SecondaryAttributeTable();
                 table.Init(Database.DefaultCollectionCapacity);
                 SecondaryAttributeTables.Add(e, table);
-                table.OnUpdateRecord += (unitId, oldVal, newVal) =>
-                    World.EventDispatcher.InternalOnSecondaryAttributeUpdate(e, unitId, oldVal, newVal);
+                table.OnUpdateRecord.Register((unitId, oldVal, newVal) =>
+                    World.EventDispatcher.InternalOnSecondaryAttributeUpdate(e, unitId, oldVal, newVal));
             }
 
             //ApplyAttackAttributeRelations();

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Gameplay.Common;
 
 namespace Gameplay.Ability
 {
+    //Events of all tables for the outer world
     public class EventDispatcher
     {
         private Dictionary<(EUnitPrimaryAttribute, uint), Event<float, float>> _onUnitPrimaryAttributeUpdateHooks;
@@ -17,14 +19,14 @@ namespace Gameplay.Ability
                 evt = new Event<float, float>();
             }
 
-            evt.InternalEvent += hook;
+            evt.Register(hook);
         }
 
         public void UnregisterUnitPrimaryAttributeUpdate(EUnitPrimaryAttribute attributeType, uint unitID, Action<float, float> hook)
         {
             if (!_onUnitPrimaryAttributeUpdateHooks.TryGetValue((attributeType, unitID), out var evt))
                 return;
-            evt.InternalEvent -= hook;
+            evt.Unregister(hook);
         }
         
         
